@@ -1,0 +1,21 @@
+#source insight
+*.IAB
+*.IAD
+*.IMD
+*.PFI
+*.PO
+*.PR
+*.PRI
+*.PS
+*.SearchResults
+*.WK3
+*.IMB
+*.IMB
+
+*.a
+*.bak
+*.tem
+*.temp
+*.swp
+*.*~
+~*.*
