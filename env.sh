@@ -33,9 +33,9 @@ function make()
 }
 
 ################################################
-# x86 mips86el loongarch64 
+# local mips64el loongarch64 
 ################################################
-SUPPORT_PLATFORM=(x86 mips86el loongarch64)
+SUPPORT_PLATFORM=(local mips64el loongarch64)
 unset PLATFORM
 
 if [ $1 ];then 
@@ -65,7 +65,7 @@ export SDK_DIR=$(pwd)
 # modules
 ################################################
 if [ $PLATFORM ] ;then
-  if [ $PLATFORM = "x86" ] ; then  
+  if [ $PLATFORM = "local" ] ; then  
     unset CI_SUPPORT
     export CI_SUPPORT=1
   elif [ $PLATFORM = "mips64el" ] ; then   

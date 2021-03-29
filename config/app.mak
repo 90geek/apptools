@@ -55,7 +55,7 @@ LIB += -l${TESTTOOL_LIB} -l${PLATFORM_LIB}
 #platform 
 #########################################################################
 
-ifeq ($(PLATFORM), x86)
+ifeq ($(PLATFORM), local)
 
 INCLUDEFLAGS +=
 LIB +=

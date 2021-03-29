@@ -2,7 +2,7 @@
 ifeq ($(PLATFORM), hisi)
 TOOLCHAIN_DIR = $(SDK_DIR)/../toolchain/hisi/arm-histbv310-linux
 export TOOLCHAIN_PREFIX = ${TOOLCHAIN_DIR}/bin/arm-histbv310-linux-
-else ifeq ($(PLATFORM), x86)
+else ifeq ($(PLATFORM), local)
 TOOLCHAIN_DIR = /usr
 export TOOLCHAIN_PREFIX = ${TOOLCHAIN_DIR}/bin/
 else ifeq ($(PLATFORM), loongarch64)
