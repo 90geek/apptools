@@ -1,5 +1,5 @@
-#ifndef __PBI_OS_H__
-#define __PBI_OS_H__
+#ifndef __APP_OS_H__
+#define __APP_OS_H__
 
 #include <pthread.h>
 #include <stdio.h>
@@ -28,10 +28,10 @@
 
 //#include "misc/llist.h"
 
-#include "pbi_types.h"
+#include "app_types.h"
 
 
-#include "pbi_debug.h"
+#include "app_debug.h"
 
 /**
  ***/
@@ -45,12 +45,12 @@ typedef struct _msg_buf_t{
 #define MSG_QUE_BLOCK  1
 #define MSG_QUE_NON_BLOCK 0
 
-typedef void  pbi_mutex_t;
-typedef void  pbi_semaphore_t;
-typedef void  pbi_file_t;
-typedef void  pbi_thread_t;
+typedef void  app_mutex_t;
+typedef void  app_semaphore_t;
+typedef void  app_file_t;
+typedef void  app_thread_t;
 
-typedef pthread_attr_t pbi_thread_attr_t;
+typedef pthread_attr_t app_thread_attr_t;
 
 /**
 * @ingroup     
@@ -59,7 +59,7 @@ typedef pthread_attr_t pbi_thread_attr_t;
 * @param       size     Size to allocate.
 * @return      Pointer to allocated memory, NULL if no more memory available.
 */
-void* pbi_malloc(S32 size);
+void* app_malloc(S32 size);
 
 /*
 * @ingroup     
@@ -69,7 +69,7 @@ void* pbi_malloc(S32 size);
 * @param       i32Size  Size to allocate.
 * @return      Pointer to allocated memory, NULL if no more memory available.
 */
-void* pbi_realloc(void* pData, S32 size);
+void* app_realloc(void* pData, S32 size);
 /*
 * @ingroup     
 * @brief       Free memory.
@@ -77,7 +77,7 @@ void* pbi_realloc(void* pData, S32 size);
 * @param       pData    Pointer to memory to free.
 * @return      none
 */
-void pbi_free(void* pData);
+void app_free(void* pData);
 
 /*
 * @ingroup     
@@ -86,7 +86,7 @@ void pbi_free(void* pData);
 * @param       none
 * @return      Pointer to created mutex, NULL if creation failed.
 */
-pbi_mutex_t* pbi_mutex_create(void);
+app_mutex_t* app_mutex_create(void);
 /*
 * @ingroup     
 * @brief       Delete mutex.
@@ -94,7 +94,7 @@ pbi_mutex_t* pbi_mutex_create(void);
 * @param       pMutex   Pointer to mutex to delete.
 * @return      none
 */
-void pbi_mutex_delete(pbi_mutex_t* pMutex);
+void app_mutex_delete(app_mutex_t* pMutex);
 
 /*
 * @ingroup     
@@ -103,7 +103,7 @@ void pbi_mutex_delete(pbi_mutex_t* pMutex);
 * @param       pMutex      Pointer to mutex to lock.
 * @return      none
 */
-void pbi_mutex_lock(pbi_mutex_t* pMutex);
+void app_mutex_lock(app_mutex_t* pMutex);
 
 /*
 * @ingroup     
@@ -112,7 +112,7 @@ void pbi_mutex_lock(pbi_mutex_t* pMutex);
 * @param       pMutex      Pointer to mutex to unlock.
 * @return      none
 */
-void pbi_mutex_unlock(pbi_mutex_t* pMutex);
+void app_mutex_unlock(app_mutex_t* pMutex);
 
 /*
 * @ingroup     
@@ -121,11 +121,11 @@ void pbi_mutex_unlock(pbi_mutex_t* pMutex);
 * @param       none
 * @return      Pointer to created semaphore, NULL if creation failed.
 */
-pbi_semaphore_t* pbi_semaphore_create(void);
+app_semaphore_t* app_semaphore_create(void);
 
 
 
-S32 pbi_semaphore_wait(pbi_semaphore_t* pSemaphore);
+S32 app_semaphore_wait(app_semaphore_t* pSemaphore);
 
 /*
 * @ingroup     
@@ -137,7 +137,7 @@ S32 pbi_semaphore_wait(pbi_semaphore_t* pSemaphore);
 * @return      returns 0 if successfull, otherwise -1.
 
 */
-S32 pbi_semaphore_wait_timeout(pbi_semaphore_t* pSemaphore, S32 ms);
+S32 app_semaphore_wait_timeout(app_semaphore_t* pSemaphore, S32 ms);
 
 
 /*
@@ -147,7 +147,7 @@ S32 pbi_semaphore_wait_timeout(pbi_semaphore_t* pSemaphore, S32 ms);
 * @param       pSemaphore     Pointer to semaphore.
 * @return      returns 0 if successfull, otherwise -1.
 */
-S32 pbi_semaphore_signal(pbi_semaphore_t* pSemaphore);
+S32 app_semaphore_signal(app_semaphore_t* pSemaphore);
 
 /*
 * @ingroup     
@@ -156,7 +156,7 @@ S32 pbi_semaphore_signal(pbi_semaphore_t* pSemaphore);
 * @param       pSemaphore  Pointer to semaphore to delete.
 * @return      none
 */
-void pbi_semaphore_delete(pbi_semaphore_t* pSemaphore);
+void app_semaphore_delete(app_semaphore_t* pSemaphore);
 
 /*
 * @ingroup     
@@ -165,9 +165,9 @@ void pbi_semaphore_delete(pbi_semaphore_t* pSemaphore);
 * @param       ms       Wait time in milliseconds.
 * @return      none
 */
-void pbi_sleep(S32 ms);
+void app_sleep(S32 ms);
 
-void pbi_sleep_us(S32 us);
+void app_sleep_us(S32 us);
 
 
 /*
@@ -178,7 +178,7 @@ void pbi_sleep_us(S32 us);
 * @param       pcMode      NULL-terminated opening arguments. "r", "w", "a", "b" supported.
 * @return      Pointer to open file, NULL if failure.
 */
-pbi_file_t* pbi_file_open(const char* pcFilename, const char* pcMode);
+app_file_t* app_file_open(const char* pcFilename, const char* pcMode);
 /*
 * @ingroup     
 * @brief       Close file.
@@ -186,7 +186,7 @@ pbi_file_t* pbi_file_open(const char* pcFilename, const char* pcMode);
 * @param       pFile     Pointer to file.
 * @return      Zero value if successfull, nonzero value if failure.
 */
-S32 pbi_file_close(pbi_file_t* pFile);
+S32 app_file_close(app_file_t* pFile);
 /*
 * @ingroup     
 * @brief       Read bytes from file.
@@ -196,7 +196,7 @@ S32 pbi_file_close(pbi_file_t* pFile);
 * @param       pFile    Pointer to file.
 * @return      Number of successfully read bytes.
 */
-S32 pbi_file_read(void* pData, S32 size, pbi_file_t* pFile);
+S32 app_file_read(void* pData, S32 size, app_file_t* pFile);
 
 /*
 * @ingroup     
@@ -207,7 +207,7 @@ S32 pbi_file_read(void* pData, S32 size, pbi_file_t* pFile);
 * @param       pFile    Pointer to file.
 * @return      Number of successfully written bytes.
 */
-S32 pbi_file_write(const void* pData, S32 size, pbi_file_t* pFile);
+S32 app_file_write(const void* pData, S32 size, app_file_t* pFile);
 
 /*
 * @ingroup     
@@ -222,7 +222,7 @@ S32 pbi_file_write(const void* pData, S32 size, pbi_file_t* pFile);
 *                             OS_SEEK_SET   End of file
 * @return      Zero value if successfull, nonzero value if failure.
 */
-S32 pbi_file_seek(pbi_file_t* pFile, S32 offset, S32 origin);
+S32 app_file_seek(app_file_t* pFile, S32 offset, S32 origin);
 /*
 * @ingroup     
 * @brief       Gets the file position indicator.
@@ -230,7 +230,7 @@ S32 pbi_file_seek(pbi_file_t* pFile, S32 offset, S32 origin);
 * @param       pFile       Pointer to file.
 * @return      File position indicator if successfull, -1 if failure.
 */
-S32 pbi_file_tell(pbi_file_t* pFile);
+S32 app_file_tell(app_file_t* pFile);
 
 /*
 * @ingroup     
@@ -242,10 +242,10 @@ S32 pbi_file_tell(pbi_file_t* pFile);
 * @param       stackSize         Size of the stack, in bytes.
 * @return      Pointer to created thread, NULL if creation failed.
 */
-pbi_thread_t* pbi_thread_create(S32 (*pstFunction)(void*), void* pParam,
+app_thread_t* app_thread_create(S32 (*pstFunction)(void*), void* pParam,
                                    S32       stackSize);
 
-pbi_thread_t* pbi_thread_create_ext(S32 (*pstFunction)(void*), void* pParam, pbi_thread_attr_t *attr,
+app_thread_t* app_thread_create_ext(S32 (*pstFunction)(void*), void* pParam, app_thread_attr_t *attr,
                                    S32       stackSize);
 
 /*
@@ -255,16 +255,16 @@ pbi_thread_t* pbi_thread_create_ext(S32 (*pstFunction)(void*), void* pParam, pbi
 * @param       pstThread      A pointer to the thread to delete.
 * @return      Zero value if successfull, nonzero value if failure.
 */
-S32 pbi_thread_delete(pbi_thread_t* pstThread);
+S32 app_thread_delete(app_thread_t* pstThread);
 
 
-int pbi_msg_queue_create(int  key) ;
-int pbi_msg_queue_delete(int msg_id);
-int pbi_msg_send_no_wait(int msg_id,msg_buf_t  *msg_buf, int len);
+int app_msg_queue_create(int  key) ;
+int app_msg_queue_delete(int msg_id);
+int app_msg_send_no_wait(int msg_id,msg_buf_t  *msg_buf, int len);
 /*flag = 1, block 
  flag = 0 , no wait*/
-int  pbi_msg_receive(int msg_id,msg_buf_t  *msg_buf,int len,int flag);
+int  app_msg_receive(int msg_id,msg_buf_t  *msg_buf,int len,int flag);
 
-void pbi_print_data(unsigned char *buf,int size);
+void app_print_data(unsigned char *buf,int size);
 
 #endif

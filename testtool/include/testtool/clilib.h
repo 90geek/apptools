@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-#include "platform/pbi_os.h"
+#include "platform/app_os.h"
 
 /* Max token and line size */
 /* ----------------------- */

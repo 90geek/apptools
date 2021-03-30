@@ -1,5 +1,5 @@
-#ifndef __PBI_TYPE_H__
-#define __PBI_TYPE_H__
+#ifndef __APP_TYPE_H__
+#define __APP_TYPE_H__
 
 /* Common unsigned types */
 #ifndef DEFINED_U8

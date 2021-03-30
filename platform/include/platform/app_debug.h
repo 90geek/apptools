@@ -1,5 +1,5 @@
-#ifndef __PBI_DEBUG_H__
-#define __PBI_DEBUG_H__
+#ifndef __APP_DEBUG_H__
+#define __APP_DEBUG_H__
 
 #define BLACK 	30
 #define RED 	31

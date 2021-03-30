@@ -30,7 +30,7 @@
 #include "testtool/clilib.h"
 #include "testtool/testtool.h"
 
-#include "platform/pbi_os.h"
+#include "platform/app_os.h"
 
 
 /* Global constants */

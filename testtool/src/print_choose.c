@@ -1,9 +1,8 @@
 
-//#include "system/system_db.h"
-//#include "platform/pbi_lcd.h"
 #include "testtool/print_choose.h"
 
-#include "platform/pbi_os.h"
+#include "platform/app_os.h"
+//#include "system/system_db.h"
 
 static int Log_Print_Flag = 0;
 
@@ -57,7 +56,7 @@ static void *log_task(void *arg)
 					freopen("/dev/console","ab",stdout);
 			}
 		}
-		pbi_sleep(1000);
+		app_sleep(1000);
 	}while(1);
 
 	return 0;
@@ -66,7 +65,7 @@ static void *log_task(void *arg)
 void Log_Print_Init(void)
 {
 	int value;
-	pbi_thread_t*  log_task_t;
+	app_thread_t*  log_task_t;
 	int iStatus = -1;
 	struct stat buf;
 	
@@ -86,7 +85,7 @@ void Log_Print_Init(void)
 		}
 	}
 
-	log_task_t = pbi_thread_create((void *)log_task,NULL , 0);
+	log_task_t = app_thread_create((void *)log_task,NULL , 0);
 	if(log_task_t == NULL)
 	{
 		printf("create log task failed\n");

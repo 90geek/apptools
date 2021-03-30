@@ -13,7 +13,7 @@ LIBS := libplatform
 
 DRV_LIB_OUT := ../lib/$(LINK_TYPE)
 
-OBJS := pbi_os.o
+OBJS := app_os.o
 
 
 #===============================================================================
