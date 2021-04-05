@@ -68,11 +68,17 @@ if [ $PLATFORM ] ;then
   if [ $PLATFORM = "local" ] ; then  
     unset CI_SUPPORT
     export CI_SUPPORT=1
+    
+    unset CAPSULE_SUPPORT
+    export CAPSULE_SUPPORT=1
   elif [ $PLATFORM = "mips64el" ] ; then   
     echo "not define"  
   elif [ $PLATFORM = "loongarch64" ] ; then 
     unset CI_SUPPORT
     export CI_SUPPORT=1
+    
+    unset CAPSULE_SUPPORT
+    export CAPSULE_SUPPORT=1
   else 
     echo "PLATFORM not define"  
 fi

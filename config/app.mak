@@ -32,16 +32,16 @@ TESTTOOL_LIB = testtool
 SUBDIRS += testtool/src
 
 ##########################################################################
-ifeq ($(TSIP_SUPPORT), 0) 
-INCLUDEFLAGS +=
-CFLAGS +=
+ifeq ($(CAPSULE_SUPPORT), 1) 
+CAPSULE_INCLUDE =  $(SDK_DIR)/capsule/include
+INCLUDEFLAGS += -I$(CAPSULE_INCLUDE)
+CFLAGS += -DCAPSULE_INCLUDE
 
-LIBPATH += -L$(SDK_DIR)/tsip/lib/$(LINK_TYPE)
-LIB += -ltsip_app
+LIBPATH += -L$(SDK_DIR)/capsule/lib/$(LINK_TYPE)
+LIB += -lcapsule
 
-SUBDIRS +=  tsip/src
+SUBDIRS +=  capsule/src
 
-INCLUDEFLAGS +=
 
 else
 
