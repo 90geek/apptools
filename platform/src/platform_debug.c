@@ -1,24 +1,52 @@
-/*
- * app_platorm_debug.c
- *
- *  Created on: 2017Äê11ÔÂ17ÈÕ
- *      Author: qqtian
- */
-
-
-// #include "platform/app_gpio.h"
-// #include "platform/app_key.h"
-// #include "platform/app_lcd.h"
-// #include "platform/app_i2c.h"
-// #include "platform/fpga_reg.h"
-// #include "platform/fpga.h"
-// #include "platform/app_led.h"
-// #include "platform/app_reset.h"
-
-// #include "platform/driver/eeprom.h"
 #include "testtool/testtool.h"
 #include "platform/app_spi.h"
-#include "platform_debug.h"
+#include "platform/platform_debug.h"
+#include "loongson/pwm.h"
+
+int fan_set_debug(parse_t * pars_p,char *result_p)
+{
+	int num,level;
+	unsigned char buf[20]={0};
+	int error;
+	error=cget_integer(pars_p,0,&num);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->num!");
+		return 1;
+	}
+
+	error=cget_integer(pars_p,0,&level);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->level!");
+		return 1;
+	}
+  SmartFanSet (num);
+
+	printf("set fan %d %\n", num);
+
+	return 0;
+}
+
+int read_temp_debug(parse_t * pars_p,char *result_p)
+{
+	int num;
+	unsigned char buf[20]={0};
+	int i=0, error;
+
+	error=cget_integer(pars_p,0,&num);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->num!");
+		return 1;
+	}
+
+  ls132_tempdetect();
+	printf("GPIO NUM %d input is %d\n", num, i);
+
+	return 0;
+}
+
 
 
 //int gpio_write_debug(parse_t * pars_p,char *result_p)
@@ -820,15 +848,15 @@ int spi_write_debug(parse_t * pars_p,char *result_p)
 
 void platform_debug_register(void)
 {
+	register_command ("LS_FAN_WRITE" 			, fan_set_debug , "<IO number>,< Level>");
+	register_command ("LS_TEMP_READ"			, read_temp_debug , "<IO number>");
+
 	// register_command ("DRV_GPIO_WRITE" 			, gpio_write_debug , "<IO number>,< Level>");
 	// register_command ("DRV_GPIO_READ"			, gpio_read_debug , "<IO number>");
 	// register_command ("DRV_GPIO_GET_DIRECTION"	, gpio_get_direction_debug , "<IO number>");
 	// register_command ("DRV_GPIO_SET_DIRECTION"	, gpio_set_direction_debug , "<IO number>,< in/out>");
 	
 	// register_command ("DRV_GPIO_TEST"			, gpio_iotest_debug , "none");
-// #ifdef DEVICE_2210P
-	// register_command ("DRV_GPIO_IP_RST"			, gpio_ip_reset_debug , "none");
-// #endif
 	// register_command ("DRV_KEY_TEST"			, gpio_keytest_debug , "none");
 	// register_command ("DRV_LCD_TEST"			, gpio_lcdtest_debug , "none");
 	// register_command ("DRV_ALARM_LED"			, gpio_alarm_led_debug , "<index><status, 0/green, 1/red, 2/off>");
@@ -856,7 +884,4 @@ void platform_debug_register(void)
 
 	// register_command ("DRV_TUNER_RESET"		, tuner_reset_debug , "<id>");
 
-// #ifdef PLATFORM_MSTAR
-	// mi_debug_register();
-// #endif
 }

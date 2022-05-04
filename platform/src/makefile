@@ -13,7 +13,7 @@ LIBS := libplatform
 
 DRV_LIB_OUT := ../lib/$(LINK_TYPE)
 
-OBJS := app_os.o
+OBJS := app_os.o app_platform.o platform_debug.o loongson/mem.o loongson/pwm.o
 
 
 #===============================================================================

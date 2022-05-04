@@ -42,7 +42,6 @@ LIB += -lcapsule
 
 SUBDIRS +=  capsule/src
 
-
 else
 
 endif

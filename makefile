@@ -11,7 +11,7 @@ include $(SDK_DIR)/config/app.mak
 
 
 APP =apptools
-OBJS = main.o apptools.o
+OBJS = main.o
 
 #===============================================================================
 # rules

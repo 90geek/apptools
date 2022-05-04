@@ -24,9 +24,8 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <sys/ioctl.h>
+#include <sys/mman.h>
 #include <sys/time.h>
-
-//#include "misc/llist.h"
 
 #include "app_types.h"
 
