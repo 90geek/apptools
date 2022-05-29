@@ -22,7 +22,7 @@
 ##
 */
 #include "LsRegDef.h"
-#include "platform/app_types.h"
+#include "edk_api.h"
 #include "platform/app_platform.h"
 
 UINT64 PwmRegBaseAddr;

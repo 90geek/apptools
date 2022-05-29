@@ -12,5 +12,6 @@
 
 #define DEBUG_LINE() 	printf("[%s:%s] line=%d\r\n",__FILE__, __func__, __LINE__)
 #define MODULE_PRINT(color,fmt, module, args...) printf("\033[%dm[%s]"#fmt"\033[0m\r\n", color, module,  ##args)
+#define MODULE_PRINT(color,fmt, module, args...) printf("\033[%dm[%s]"#fmt"\033[0m\r\n", color, module,  ##args)
 
 #endif

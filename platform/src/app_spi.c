@@ -1,125 +1,87 @@
 #include "platform/app_os.h"
 #include "platform/app_spi.h"
-// #include "platform/app_gpio.h"
-// #include "platform/platform_device.h"
+#include "platform/app_platform.h"
 
-// #ifdef PLATFORM_MSTAR
-// #include "mstar/app_spi_mstar.h"
-// #elif defined PLATFORM_HISI
-// #include "hisi/app_spi_hisi.h"
-// #endif
+#define FLASH_SIZE 0x400000
+U64 spi_base_addr;
+
+void update_bios(char *file_path)
+{
+  int from_fd=0,len=0,count=0;
+  unsigned char  *ptr1 = NULL,*ptr2 = NULL;
+  int Ret = 0;
+  void * vaddr = NULL;
+
+  if((from_fd=open(file_path,O_RDONLY))==-1)
+  {
+          printf("Open %s Error\n",file_path);
+          return 1;
+  }
+
+  len=lseek(from_fd,0,SEEK_END);
+  lseek(from_fd,0,SEEK_SET);
+
+  count=len;
+  ptr1=app_malloc(len*sizeof(char));
+  memset(ptr1,0x0,len*sizeof(char));
+  ptr2=ptr1;
+
+  Ret=read(from_fd,ptr1,len);
+  if(Ret==-1)
+  {
+          printf("Load FPGA File Error\n");
+          close(from_fd);
+          return 1;
+  }
+  printf("Load Bios File, Size is %d\n",Ret);
+
+  vaddr=p2v_mem_mapping(GetLs3ASpiRegBaseAddr(),FLASH_SIZE);
+
+  if(Ret>FLASH_SIZE)
+  {
+    printf("file size > flash size\n");
+    return 1;
+  }
+  UpdateBiosInSpiFlash(0,ptr2,Ret,(U64)vaddr);
+  p2v_mem_clean(vaddr);
+}
+
+U64 get_7a_spi_base_addr(void)
+{
+  return spi_base_addr;
+}
+void set_7a_spi_base_addr(U64 base_addr)
+{
+  spi_base_addr=base_addr;
+}
+
+void read_7a_spi(int offset, unsigned char * datas, int read_cnt) 
+{
+  void * vaddr = NULL;
+
+  vaddr=p2v_mem_mapping(GetLs7ASpiRegBaseAddr(),FLASH_SIZE);
+  SpiFlashRead ((U64)offset,(void *)datas,(U64)read_cnt,(U64)vaddr);
+  p2v_mem_clean(vaddr);
+}
+
+void write_7a_spi(int offset, unsigned char * datas, int write_cnt)
+{
+  void * vaddr = NULL;
+  vaddr=p2v_mem_mapping(GetLs7ASpiRegBaseAddr(),FLASH_SIZE);
+  SpiFlashSafeWrite ((U64)offset, (void *)datas, (U64)write_cnt,(U64)vaddr);
+  p2v_mem_clean(vaddr);
+}
 #define NOT_USED printf("%s not used\n", __FUNCTION__)
 void app_spi_init(void)
 {
-#ifdef PLATFORM_MSTAR
-	app_spi_init_mstar();
-#elif defined PLATFORM_HISI
-	app_spi_init_hisi();
-#endif
-
-}
-
-void app_spi_read_reg32(int spi_dev,unsigned int reg, unsigned int *data)
-{	
-#ifdef PLATFORM_MSTAR
-	app_spi_read_reg32_mstar(spi_dev, reg,data);
-#elif defined PLATFORM_HISI
-	NOT_USED;
-#else
-	UNUSED(spi_dev);
-#endif
-
-}
-
-void app_spi_write_reg32(int spi_dev,unsigned int reg, unsigned int data)
-{
-
-#ifdef PLATFORM_MSTAR
-	app_spi_write_reg32_mstar(spi_dev,reg, data);
-#elif defined PLATFORM_HISI
-	NOT_USED;
-#endif
-
-
-}
-
-void app_spi_read_reg16(int spi_dev,unsigned int reg, unsigned short *data) 
-{
-#ifdef PLATFORM_MSTAR
-	app_spi_read_reg16_mstar(spi_dev,reg,data) ;
-#elif defined PLATFORM_HISI
-	NOT_USED;
-#endif
-
-}
-
-void app_spi_write_reg16(int spi_dev,unsigned int reg, unsigned short data)
-{
-#ifdef PLATFORM_MSTAR
-	app_spi_write_reg16_mstar(spi_dev, reg, data);
-#elif defined PLATFORM_HISI
-	NOT_USED;
-#endif
-}
-
-
-void app_spi_read_reg8(int spi_dev,unsigned int reg, unsigned char *data) 
-{
-#ifdef PLATFORM_MSTAR
-	app_spi_read_reg8_mstar(spi_dev, reg, data);
-#elif defined PLATFORM_HISI
-	NOT_USED;
-#endif
-
-}
-
-void app_spi_write_reg8(int spi_dev,unsigned int reg, unsigned char data)
-{
-#ifdef PLATFORM_MSTAR
-	app_spi_write_reg8_mstar( spi_dev, reg, data);
-#elif defined PLATFORM_HISI
-	NOT_USED;
-#endif
-
-}
-
-void app_spi_read_reg_burst(int spi_dev, unsigned int reg,unsigned short* datas, int read_cnt)
-{	
-#ifdef PLATFORM_MSTAR
-	app_spi_read_reg_burst_mstar( spi_dev, reg, datas, read_cnt);
-#elif defined PLATFORM_HISI
-	NOT_USED;
-#endif
-
-}
-
-void app_spi_write_reg_burst(int spi_dev, unsigned int reg, unsigned short * datas, int write_cnt)
-{
-#ifdef PLATFORM_MSTAR
-	app_spi_write_reg_burst_mstar(spi_dev, reg, datas, write_cnt);
-#elif defined PLATFORM_HISI
-	NOT_USED;
-#endif
-
+  NOT_USED;
 }
 
 void app_spi_read(int spi_dev, unsigned char * datas, int read_cnt) 
 {
-#ifdef PLATFORM_MSTAR
-	app_spi_read_mstar(spi_dev, datas, read_cnt);
-#elif defined PLATFORM_HISI
-	app_spi_read_hisi(spi_dev, datas, read_cnt);
-#endif
-
 }
 
 void app_spi_write(int spi_dev, unsigned char * datas, int write_cnt)
 {
-#ifdef PLATFORM_MSTAR
-	app_spi_write_mstar(spi_dev, datas, write_cnt);
-#elif defined PLATFORM_HISI
-	 app_spi_write_hisi(spi_dev, datas, write_cnt);
-#endif
-
 }
 

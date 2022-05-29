@@ -56,14 +56,14 @@ LIB += -l${TESTTOOL_LIB} -l${PLATFORM_LIB}
 
 ifeq ($(PLATFORM), local)
 
-INCLUDEFLAGS +=
+INCLUDEFLAGS += -I$(SDK_DIR)/platform/src
 LIB +=
 CFLAGS += -fgnu89-inline
 
 #########################################################################
 else ifeq ($(PLATFORM), loongarch64)
 
-INCLUDEFLAGS += 
+INCLUDEFLAGS += -I$(SDK_DIR)/platform/src
 
 MSTAR_LIB +=
 

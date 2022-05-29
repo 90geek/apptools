@@ -28,8 +28,6 @@
 #include <sys/time.h>
 
 #include "app_types.h"
-
-
 #include "app_debug.h"
 
 /**

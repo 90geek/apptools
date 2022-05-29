@@ -1,7 +1,7 @@
 #include "testtool/testtool.h"
 #include "platform/app_spi.h"
 #include "platform/platform_debug.h"
-#include "loongson/pwm.h"
+#include "platform/app_platform.h"
 
 int fan_set_debug(parse_t * pars_p,char *result_p)
 {

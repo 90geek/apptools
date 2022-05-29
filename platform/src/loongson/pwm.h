@@ -23,6 +23,9 @@
 */
 #ifndef  _PWM_H_
 #define  _PWM_H_
+
+#include "edk_api.h"
+
 int SmartFanSet (UINT8 Percent);
 UINT8 ls132_tempdetect();
 

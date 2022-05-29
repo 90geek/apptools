@@ -2,6 +2,8 @@
 #define _PLATFORM_H_
 
 #include "app_types.h"
+#include "loongson/spi.h"
+#include "loongson/mem.h"
 
 typedef struct app_platform_s{
   int cpu_type;
@@ -15,13 +17,5 @@ void app_platform_init(void) ;
 void app_platform_deinit(void) ;
 app_platform_t* get_app_platform_info(void);
 
-
-
 /****************************************/
-void memory_mapping(void);
-void memory_release(void);
-
-void * get_gpio_mem_base(void) ;
-void * get_pwm_mem_base(void); 
-
 #endif

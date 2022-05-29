@@ -31,13 +31,16 @@
 //
 // loongarch memory map definition
 //
-#define LOONGARCH64 1
-#if LOONGARCH64
+#define ARCH 3
+#if (ARCH==1)
 #define CACHED_MEMORY_ADDR         0x9000000000000000
 #define UNCACHED_MEMORY_ADDR       0x8000000000000000
-#else // mips64el
+#elif (ARCH==2) // mips64el
 #define CACHED_MEMORY_ADDR         0x9800000000000000
 #define UNCACHED_MEMORY_ADDR       0x9000000000000000
+#else
+#define CACHED_MEMORY_ADDR         0x0000000000000000
+#define UNCACHED_MEMORY_ADDR       0x0000000000000000
 #endif
 
 #define PHYS_TO_CACHED(x)       ((UINT64)CACHED_MEMORY_ADDR | (x))
