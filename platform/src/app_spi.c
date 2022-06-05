@@ -55,19 +55,63 @@ void set_7a_spi_base_addr(U64 base_addr)
   spi_base_addr=base_addr;
 }
 
-void read_7a_spi(int offset, unsigned char * datas, int read_cnt) 
+void read_7a_spi(unsigned int offset, unsigned char * datas, int read_cnt) 
 {
   void * vaddr = NULL;
 
-  vaddr=p2v_mem_mapping(GetLs7ASpiRegBaseAddr(),FLASH_SIZE);
+  if(GetLs7ASpiRegBaseAddr()==0)
+  {
+    printf("7a spi base addr is 0\n");
+    return 0;
+  }
+  vaddr=p2v_mem_mapping(GetLs7ASpiRegBaseAddr(),read_cnt);
   SpiFlashRead ((U64)offset,(void *)datas,(U64)read_cnt,(U64)vaddr);
   p2v_mem_clean(vaddr);
 }
 
-void write_7a_spi(int offset, unsigned char * datas, int write_cnt)
+void write_7a_spi(unsigned int offset, unsigned char * datas, int write_cnt)
 {
   void * vaddr = NULL;
-  vaddr=p2v_mem_mapping(GetLs7ASpiRegBaseAddr(),FLASH_SIZE);
+  if(GetLs7ASpiRegBaseAddr()==0)
+  {
+    printf("7a spi base addr is 0\n");
+    return 0;
+  }
+  vaddr=p2v_mem_mapping(GetLs7ASpiRegBaseAddr(),write_cnt);
+  SpiFlashSafeWrite ((U64)offset, (void *)datas, (U64)write_cnt,(U64)vaddr);
+  p2v_mem_clean(vaddr);
+}
+
+void write_7a_flash_mac(unsigned int eth, unsigned char * datas)
+{
+  void * vaddr = NULL;
+  unsigned int offset=0;
+
+  if(GetLs7ASpiRegBaseAddr()==0)
+  {
+    printf("7a spi base addr is 0\n");
+    return 0;
+  }
+
+  offset=(eth==0?0x0:0x10);
+  vaddr=p2v_mem_mapping(GetLs7ASpiRegBaseAddr(),8);
+  SpiFlashSafeWrite ((U64)offset, (void *)datas, (U64)8,(U64)vaddr);
+  p2v_mem_clean(vaddr);
+}
+
+void read_cpu_spi_flash(unsigned int offset, unsigned char * datas, int read_cnt) 
+{
+  void * vaddr = NULL;
+
+  vaddr=p2v_mem_mapping(GetLs3ASpiRegBaseAddr(),read_cnt);
+  SpiFlashRead ((U64)offset,(void *)datas,(U64)read_cnt,(U64)vaddr);
+  p2v_mem_clean(vaddr);
+}
+
+void write_cpu_spi_flash(unsigned int offset, unsigned char * datas, int write_cnt)
+{
+  void * vaddr = NULL;
+  vaddr=p2v_mem_mapping(GetLs3ASpiRegBaseAddr(),write_cnt);
   SpiFlashSafeWrite ((U64)offset, (void *)datas, (U64)write_cnt,(U64)vaddr);
   p2v_mem_clean(vaddr);
 }
@@ -77,11 +121,33 @@ void app_spi_init(void)
   NOT_USED;
 }
 
-void app_spi_read(int spi_dev, unsigned char * datas, int read_cnt) 
+void app_spi_read(int spi_dev,unsigned int offset, unsigned char * datas, int read_cnt) 
 {
+  switch(spi_dev)
+  {
+    case 0:
+      read_cpu_spi_flash(offset,datas,read_cnt);
+      break;
+    case 1:
+      read_7a_spi(offset,datas,read_cnt);
+    break;
+    default:
+    printf("spi dev %d is no suport!!!\n",spi_dev);
+  }
 }
 
-void app_spi_write(int spi_dev, unsigned char * datas, int write_cnt)
+void app_spi_write(int spi_dev,unsigned int offset, unsigned char * datas, int write_cnt)
 {
+  switch(spi_dev)
+  {
+    case 0:
+      write_cpu_spi_flash(offset,datas,write_cnt);
+      break;
+    case 1:
+      write_7a_spi(offset,datas,write_cnt);
+    break;
+    default:
+    printf("spi dev %d is no suport!!!\n",spi_dev);
+  }
 }
 

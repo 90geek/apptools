@@ -12,7 +12,7 @@ typedef struct app_platform_s{
   int harware_version;
 }app_platform_t;
 
-
+void* str2data_mac(char *szMacStr);
 void app_platform_init(void) ;
 void app_platform_deinit(void) ;
 app_platform_t* get_app_platform_info(void);
