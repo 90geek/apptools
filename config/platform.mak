@@ -6,7 +6,7 @@ else ifeq ($(PLATFORM), local)
 TOOLCHAIN_DIR = /usr
 export TOOLCHAIN_PREFIX = ${TOOLCHAIN_DIR}/bin/
 else ifeq ($(PLATFORM), loongarch64)
-TOOLCHAIN_DIR = /home/zhubo/00_loongson/toolchain/la_toolchain/loongarch64-linux-gnu-2021-01-02
+TOOLCHAIN_DIR = /home/zhubo/loongson/toolchain/LARCH_toolchain_root
 export TOOLCHAIN_PREFIX = ${TOOLCHAIN_DIR}/bin/loongarch64-linux-gnu-
 else 
 $(error PLATFORM not define) 

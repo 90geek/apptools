@@ -473,4 +473,63 @@ void app_print_data(unsigned char *buf,int size)
 			printf("*******\n");
 	}
 	printf("\n\n");
-}		
+}
+
+char* app_system(const char *cmd)
+{
+  char result[10240] = {0};
+	char buf[1024] = {0};
+  FILE *fp = NULL;
+	char *data=NULL;
+	int count=0;
+
+	if( (fp = popen(cmd, "r")) == NULL ) {
+			printf("popen error!\n");
+			return;
+	}
+
+	while (fgets(buf, sizeof(buf), fp)) {
+			strcat(result, buf);
+			count++;
+			if(count*1024==10240)
+			{
+				printf("result buffer is overflow!!!\n");
+				break;
+			}
+	}
+	pclose(fp);
+	// printf("result: %s\n", result);
+	// printf("resultlen: %d\n", strlen(result));
+	if(strlen(result)!=0)
+	{
+		data=app_malloc(strlen(result));
+		if(data==NULL)
+			printf("app_molloc failed!!!\n");
+		strcpy(data,result);
+	}
+	return data;
+}
+
+U64 app_get_pcie_region(const char *dev)
+{
+	char cmd[1024] = {0};
+	char *data=NULL;
+	char * leftover=NULL;
+	U64 base=0;
+
+	if(dev==NULL)
+		return 0;
+	
+	sprintf(cmd,"lspci -nnvv -s %s | grep 'Region 0' | awk -F' ' '{print $5}'",dev);
+	printf("cmd: %s\n", cmd);
+	data=app_system(cmd);
+	if(data==NULL)
+	{
+		printf("app_system failed!!!\n");
+		return 0;
+	}
+
+	base=strtoul(data,&leftover,16);
+	printf("base=0x%llx\n",base);
+	return base;
+}

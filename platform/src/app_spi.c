@@ -48,7 +48,14 @@ void update_bios(char *file_path)
 
 U64 get_7a_spi_base_addr(void)
 {
-  return spi_base_addr;
+	if(spi_base_addr!=0)
+		return spi_base_addr;
+	else
+	{
+		spi_base_addr=app_get_pcie_region("00:16.0");
+		return spi_base_addr;
+	}
+
 }
 void set_7a_spi_base_addr(U64 base_addr)
 {

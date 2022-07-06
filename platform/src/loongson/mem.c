@@ -123,8 +123,10 @@ int memoffset;
 void *p2v_mem_mapping(unsigned long long paddr,int size)
 {
   void *vaddr = NULL;
-  memmask = paddr & ~(0xffff);
+  memmask = paddr & ~(0xffff);//64k aline
   memoffset = paddr & (0xffff);
+	if(size<0x10000)
+		size=0x10000;
 	vaddr = (void*)mmap(NULL,size, PROT_READ|PROT_WRITE,MAP_SHARED,fd,memmask);
 	vaddr = vaddr + memoffset;
 	printf("mmap addr start : %p \n",vaddr);

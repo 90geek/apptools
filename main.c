@@ -63,16 +63,15 @@ void write_mac_addr(int argc, char *argv[])
 
 void apptools_release(void)
 {
-    memory_release();
+		memory_release();
 		return;
 
 }
 
 int main (int argc,char *argv[])
 {
-  int argv_c = argc - 1, argv_p = 1;
-  int Ret = 0;
-
+	int argv_c = argc - 1, argv_p = 1;
+	int Ret = 0;
 	if (argc == 1)
 	{
 	_show_usage:
@@ -80,16 +79,16 @@ int main (int argc,char *argv[])
 		goto cleanup;
 	}
 
-  TesttoolInit(0);
-  app_platform_init();
-  // capsule_init();
+	TesttoolInit(0);
+	app_platform_init();
+	// capsule_init();
 	if (!strcmp(argv[argv_p], "upbios"))
 	{
 		argv_c--;
 		argv_p++;
 		if (argv_c < 1)
 			goto _show_usage;
-    update_bios(argv[argv_p]);
+		update_bios(argv[argv_p]);
 		goto cleanup;
 	}
 
@@ -105,12 +104,12 @@ int main (int argc,char *argv[])
 	}
 
 	if (!strcmp(argv[argv_p], "cmd"))
-  {
-    TesttoolRun(1);
-  }
+	{
+		TesttoolRun(1);
+	}
 cleanup:
-  apptools_release();
+	apptools_release();
 
-  return Ret;
+	return Ret;
 }
 
