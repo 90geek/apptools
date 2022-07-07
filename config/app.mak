@@ -45,6 +45,37 @@ SUBDIRS +=  capsule/src
 else
 
 endif
+##########################################################################
+ifeq ($(HARDINFO_SUPPORT), 1) 
+HARDINFO_INCLUDE =  $(SDK_DIR)/hardinfo/include
+INCLUDEFLAGS += -I$(HARDINFO_INCLUDE)
+CFLAGS += -DHARDINFO_INCLUDE
+
+LIBPATH += -L$(SDK_DIR)/hardinfo/lib/$(LINK_TYPE)
+LIB += -lhardinfo
+
+SUBDIRS +=  hardinfo/src
+
+else
+
+endif
+
+##########################################################################
+ifeq ($(DMIDECODE_SUPPORT), 1) 
+DMIDECODE_INCLUDE =  $(SDK_DIR)/dmidecode/include
+# DMIDECODE_INCLUDE +=  $(SDK_DIR)/dmidecode/src
+INCLUDEFLAGS += -I$(DMIDECODE_INCLUDE)
+CFLAGS += -DDMIDECODE_INCLUDE
+
+LIBPATH += -L$(SDK_DIR)/dmidecode/lib/$(LINK_TYPE)
+LIB += -ldmidecode
+
+SUBDIRS += dmidecode/src
+CFLAGS += -W -Wall -Wshadow -Wstrict-prototypes -Wpointer-arith -Wcast-qual \
+          -Wcast-align -Wwrite-strings -Wmissing-prototypes -Winline -Wundef
+else
+
+endif
 
 ##########################################################################
 INCLUDEFLAGS += -I${PLATFORM_INCLUDE} -I${TESTTOOL_INCLUDE}

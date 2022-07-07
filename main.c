@@ -5,6 +5,7 @@
 #include "apptools.h"
 #include "platform/app_platform.h"
 #include "platform/app_spi.h"
+#include "dmidecode_api.h"
 
 static void ShowUsage(void)
 {
@@ -15,7 +16,7 @@ static void ShowUsage(void)
 		"  wmac 7aspi_paddr eth macaddr :write 7a flash mac addr,eg wmac 0x452a0000 0 11:22:33:44:55:66\n"
 		"  cmd into apptool cmdline \n");
 }
-void write_mac_addr(int argc, char *argv[])
+static void write_mac_addr(int argc, char *argv[])
 {
 	unsigned char *pbuf=NULL;
 	unsigned int eth=0;
@@ -61,11 +62,10 @@ void write_mac_addr(int argc, char *argv[])
 	write_7a_flash_mac(eth,pbuf);
 }
 
-void apptools_release(void)
+static void apptools_release(void)
 {
 		memory_release();
 		return;
-
 }
 
 int main (int argc,char *argv[])
@@ -82,6 +82,7 @@ int main (int argc,char *argv[])
 	TesttoolInit(0);
 	app_platform_init();
 	// capsule_init();
+	hardinfo_init();
 	if (!strcmp(argv[argv_p], "upbios"))
 	{
 		argv_c--;
@@ -100,6 +101,15 @@ int main (int argc,char *argv[])
 			goto _show_usage;
 		write_mac_addr(argv_c, argv + argv_p);
 
+		goto cleanup;
+	}
+
+	if (!strcmp(argv[argv_p], "dmi"))
+	{
+		argv_c--;
+		argv_p++;
+		// dmidecode(argv_c, argv + argv_p);
+		dmidecode(argc, argv);
 		goto cleanup;
 	}
 
