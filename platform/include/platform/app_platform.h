@@ -4,6 +4,8 @@
 #include "app_types.h"
 #include "loongson/spi.h"
 #include "loongson/mem.h"
+#include "loongson/temperature.h"
+#include "loongson/cpufreq.h"
 
 typedef struct app_platform_s{
   int cpu_type;

@@ -23,22 +23,23 @@ int fan_set_debug(parse_t * pars_p,char *result_p)
 	return 0;
 }
 
-int read_temp_debug(parse_t * pars_p,char *result_p)
+int read_cpu_temp_debug(parse_t * pars_p,char *result_p)
 {
-	int num;
-	unsigned char buf[20]={0};
-	int i=0, error;
+	U32 temp0,temp1;
 
-	error=cget_integer(pars_p,0,&num);
-	if (error)
-	{
-		tag_current_line(pars_p,"-->num!");
-		return 1;
-	}
-	ls132_tempdetect();
+	lscpu_tempdetect(&temp0,&temp1);
+	printf("cpu temp0 %d ,temp1 %d\n", temp0,temp1);
 	return 0;
 }
 
+int read_cpu_freq_debug(parse_t * pars_p,char *result_p)
+{
+	U32 freq;
+
+	CpuGetFrequency (100000,&freq);
+	printf("cpu freq %d\n", freq);
+	return 0;
+}
 int set_7a_spi_base_addr_debug(parse_t * pars_p,char *result_p)
 {
 	unsigned int addr_h,addr_l;
@@ -484,7 +485,8 @@ int mm_read_burst_debug(parse_t * pars_p,char *result_p)
 void platform_debug_register(void)
 {
 	register_command ("LS_FAN_WRITE" 			, fan_set_debug , "<Percent number>:0-100");
-	register_command ("LS_TEMP_READ"			, read_temp_debug , "");
+	register_command ("LS_CPU_TEMP"			, read_cpu_temp_debug , "");
+	register_command ("LS_CPU_FREQ"			, read_cpu_freq_debug , "");
 	register_command ("SET_7A_SPI_BASE"			, set_7a_spi_base_addr_debug , "<base_addr_hi>,<base_addr_lo>");
 	register_command ("SPI_READ"			, spi_read_debug , "<spi_dev>,<offset>,<len>:spi_dev 0cpuflash/17a");
 	register_command ("SPI_WRITE"			, spi_write_debug , "<spi_dev>,<offset>,<data>:spi_dev 0cpuflash/17a,data 32bit");

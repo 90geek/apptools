@@ -172,7 +172,7 @@ UINT8 fanflag = 0;  //默认情况风扇最低转速
 char  cputemp0,cputemp1;
 char  cputemp;
 
-UINT8 ls132_tempdetect()
+UINT8 ls132_tempdetect_to_pwm()
 {
   UINT32 val32;
   UINT16 tmp0,tmp1;
@@ -275,84 +275,3 @@ int SmartFanSet (UINT8 Percent)
   return Status;
 }
 
-// void SetFan(DevNode *this,int fd)
-// {
-//   unsigned long long c = 0;
-//   int status ;
-//   char RecordName[100];
-// 	void * p = NULL;
-
-//   p = vtpa(this->devaddr,fd);
-//   get_pwm_mem_base=p;
-//   // printf("pwm base addr:0x%llx\n",get_pwm_mem_base);
-//   printf("Please Input Fan Percent(0~100):");
-//   status = scanf("%s",RecordName);
-//   sscanf (RecordName,"%d",&c);
-//   // c = atoi(RecordName);
-//   if(c>=0&&c<=100)
-//   {
-//     printf("Set Fan for %d%\n",c);
-//     SmartFanSet (100-c);
-//   }
-//   else
-//     printf("Invalid parameter Please Input:0~100\n");
-// }
-
-// void ReadFanSpeed(DevNode *this,int fd)
-// {
-//   unsigned long long c = 0;
-//   int status ;
-//   char RecordName[100];
-// 	void * p = NULL;
-
-//   p = vtpa(this->devaddr,fd);
-//   get_pwm_mem_base=p;
-//   // printf("pwm base addr:0x%llx\n",get_pwm_mem_base);
-//   ls132_speed();
-// }
-
-// void cpu_temperature(DevNode *this,int fd)
-// {
-//   unsigned long long c = 0;
-//   int status ;
-//   char RecordName[100];
-// 	void * p = NULL;
-
-//   p = vtpa(this->devaddr,fd);
-//   TempRegBaseAddr=p;
-//   // printf("temp base addr:0x%llx\n",TempRegBaseAddr);
-//   ls132_tempdetect ();
-// }
-// DevNode PwmInstance = {
-//     "pwm",
-//     NULL,
-//     LS7A_MISC_BASE_ADDR + LS7A_PWM_BASE,
-//     NULL,
-//     NULL
-// };
-
-// DevNode TempInstance = {
-//     "temp",
-//     NULL,
-//     CPU_TEMP_REG,
-//     NULL,
-//     NULL
-// };
-
-// Cmd PwmCmd[3] = {
-//   {"-set fan",SetFan},
-//   {"-read fan speed",ReadFanSpeed},
-//   {NULL,NULL}
-// };
-// Cmd TempCmd[2] = {
-//   {"-temperature", cpu_temperature},
-//   {NULL,NULL}
-// };
-// void PwmInitInstance(void)
-// {
-//    PwmInstance.CmdInstance = PwmCmd;
-//    DevInstanceInsert(&PwmInstance);
-
-//    TempInstance.CmdInstance = TempCmd;
-//    DevInstanceInsert(&TempInstance);
-// }

@@ -3,7 +3,7 @@
 
 #include "platform/app_types.h"
 
-typedef struct _cpu_info_t{
+typedef struct _cpu_info_t_{
 	const char *cpu_name;
 	U64 cpu_id;
 	const char *cpu_ver;
@@ -15,6 +15,13 @@ typedef struct _cpu_info_t{
 	U8 cpu_w;
 	U8 cpu_h;
 }cpu_info_t;
+
+
+typedef struct _ls7a_ver_t_{
+	char ls7a_ver[20];
+	U16 ls7a_id;
+	U16 ls7a_108reg;
+}ls7a_ver_t;
 
 cpu_info_t *get_cpu_info(void);
 int hardinfo_init(void);

@@ -20,13 +20,14 @@ cpu_info_t cpu_info[] ={
 	{"3A5000HV", LS3A5000HV_VERSION, "3A5000HV", "14nm",0,100,"LGA",37, 37,3},
 	{NULL, 0, NULL, "14nm",0,100,"LGA",37, 37,3}
 };
+static ls7a_ver_t ls7a;
 
 cpu_info_t *get_cpu_info(void)
 {
 	S32 i;
 	U64 cpuid=0;
 
-	app_mm_read(0x1fe00020, &cpuid, 8);
+	app_mm_read(LSCPU_ID, (U64 *)&cpuid, 8);
 
 	printf("cpu_id 0x%llx\n",cpuid);
 	for(i=0;;i++)
@@ -41,6 +42,35 @@ cpu_info_t *get_cpu_info(void)
 			break;
 	}
 	return NULL;
+}
+
+ls7a_ver_t *get_7a_version(void)
+{
+	U16 ls7a_id;
+	U16 ls7a_108reg;
+
+	app_mm_read(LS7A_VER+2, (U64 *)&ls7a_id, 2);
+	app_mm_read(LS7A_VER180_REG, (U64 *)&ls7a_108reg, 1);
+	
+	// printf("0x%x 0x%x\n",ls7a_id,ls7a_108reg);
+	switch(ls7a_id)
+	{
+		case 0x0:
+			strcpy(ls7a.ls7a_ver,"ACTT");
+			break;
+		case 0x1:
+			strcpy(ls7a.ls7a_ver,"BCTT");
+			break;
+		case 0x3:
+			strcpy(ls7a.ls7a_ver,"CATT");
+			break;
+		default:
+			strcpy(ls7a.ls7a_ver,"UNKNOW");
+	}
+	ls7a.ls7a_id = ls7a_id;
+	ls7a.ls7a_108reg = ls7a_108reg;
+
+	return &ls7a;
 }
 
 int cpu_info_debug(parse_t * pars_p,char *result_p)
@@ -67,9 +97,27 @@ int cpu_info_debug(parse_t * pars_p,char *result_p)
 	return 0;
 }
 
+int ls7a_ver_debug(parse_t * pars_p,char *result_p)
+{
+	ls7a_ver_t *ls7a=NULL;
+
+	ls7a=get_7a_version();
+	if(ls7a==NULL)
+	{
+		printf("ls7a is no support!\n");
+	}
+
+	printf("ls7a_ver %s\n",ls7a->ls7a_ver);
+	printf("ls7a_id 0x%x\n",ls7a->ls7a_id);
+	printf("ls7a_108reg 0x%x\n",ls7a->ls7a_108reg);
+
+	return 0;
+}
+
 void hardinfo_debug_register(void)
 {
-	register_command ("CPU_INFO" , cpu_info_debug , "<>");
+	register_command ("CPU_INFO" , cpu_info_debug , "<NONE>");
+	register_command ("LS7A_VER" , ls7a_ver_debug , "<NONE>");
 }
 
 int hardinfo_init(void)

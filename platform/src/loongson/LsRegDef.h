@@ -26,8 +26,6 @@
 #define __LS_REG_DEF_H__
 
 
-#define CPU_TEMP_REG       (0x1fe00198 + 0x4)
-
 //
 // loongarch memory map definition
 //
@@ -50,16 +48,19 @@
 #define VA_TO_PHYS(x)           ((UINT64)(x) & 0xffffffffffffULL)
 
 /*****************************************************************************
+ *                                cpu                                     *
+ *****************************************************************************/
+
+#define CPU_TEMP_SAMPLE_BASE  PHYS_TO_UNCACHED(0x1fe00198)  //Temperature sampling register
+#define TEMP_SENSOR_VALUE_OFFSET    0x4
+
+/*****************************************************************************
  *                                Common                                     *
  *****************************************************************************/
-// #define HT_CONF_TYPE0_ADDR              PHYS_TO_UNCACHED(0xefdfe000000)
-// #define HT_CONF_TYPE1_ADDR              PHYS_TO_UNCACHED(0xefdff000000)
-// #define HT1_MEM_BASE_ADDR               PHYS_TO_UNCACHED(0xe0000000000)
-// #define HT1_CONTROLLER_CONF_BASE_ADDR   PHYS_TO_UNCACHED(0xefdfb000000)
-#define HT_CONF_TYPE0_ADDR              0
-#define HT_CONF_TYPE1_ADDR              0
-#define HT1_MEM_BASE_ADDR               0
-#define HT1_CONTROLLER_CONF_BASE_ADDR   0
+#define HT_CONF_TYPE0_ADDR              PHYS_TO_UNCACHED(0xefdfe000000)
+#define HT_CONF_TYPE1_ADDR              PHYS_TO_UNCACHED(0xefdff000000)
+#define HT1_MEM_BASE_ADDR               PHYS_TO_UNCACHED(0xe0000000000)
+#define HT1_CONTROLLER_CONF_BASE_ADDR   PHYS_TO_UNCACHED(0xefdfb000000)
 #define CONFBUS_BASE_ADDR               0x10010000
 #define INT_BASE_ADDR                   0x10000000
 #define HPET_BASE_ADDR                  0x10001000

@@ -1,4 +1,3 @@
-
 /*
 ## @file
 #
@@ -22,30 +21,50 @@
 #
 ##
 */
+#include "LsRegDef.h"
+#include "edk_api.h"
+#include "mem.h"
+#include "platform/app_platform.h"
 
-#ifndef __LS3A_DEF_H__
-#define __LS3A_DEF_H__
+#define CPU_FREQ_CONFIG_BASE	PHYS_TO_UNCACHED(0x1fe001b0)	//Frequency configuration register
 
-#include "loongson/LsRegDef.h"
-#define NODE_OFFSET 44
+/**
+	This module is Get the operating frequency of the processor.
 
-#define PHYS_TO_CACHED(x)       (CACHED_MEMORY_ADDR | (x))
-#define PHYS_TO_UNCACHED(x)     (UNCACHED_MEMORY_ADDR | (x))
-#define LS3A5000_VERSION                        0x0000303030354133 /* 3A5000 */
-#define LS3A5000LL_VERSION                      0x4C4C303030354133 /* 3A5000LL */
-#define LS3A5000M_VERSION                       0x004D303030354133 /* 3A5000M */
-#define LS3B5000_VERSION                        0x0000303030354233 /* 3B5000 */
-#define LS3C5000L_VERSION                       0x004C303030354333 /* 3C5000L */
-#define LS3C5000LL_VERSION                      0x4C4C303030354333 /* 3C5000LL */
-#define LS3A5000I_VERSION                       0x0049303030354133 /* 3A5000I */
-#define LS3A5000i_VERSION                       0x0069303030354133 /* 3A5000i */
-#define LS3A5000BM_VERSION                      0x4D42303030354133 /* 3A5000BM */
-#define LS3A5000HV_VERSION                      0x5648303030354133 /* 3A5000HV */
+	@param[in] This						Point to the processor interface.
+	@param[in] Buffer					Read processor frequency to buffer.
 
+	@retval EFI_SUCCESS				The entry point is executed successfully.
+	@retval other							Some error occurs when executing this entry point.
 
-#define LSCPU_ID	0x1fe00020
-#define LS7A_VER	LS7A_CONFBUS_BASE_ADDR|0x3ff8
-#define LS7A_VER180_REG	HT_CONF_TYPE0_ADDR|0x108
+**/
+EFI_STATUS
+EFIAPI
+CpuGetFrequency (
+	IN UINT32	clk_ref,
+	OUT VOID				*Frequency //&UINT32 Mhz
+	)
+{
+	 UINT32 Data = 0;
+	 UINT64 CpuFre = 0;
+	 UINT64 CoreLoopc = 0;
+	 UINT64 CoreDiv = 0;
+	 UINT64 DivRefc = 0;
+	 void * vaddr = NULL;
 
-#endif
+	 vaddr=p2v_mem_mapping(CPU_FREQ_CONFIG_BASE,4);
+	 Data = Read32((U64)vaddr);
+	 DivRefc = (Data & 0xfc000000) >> 26; //L1 PLL PARAM: DIV_REFC
+	 Data = Read32((U64)vaddr + 0x4);
+	 p2v_mem_clean(vaddr);
+	 CoreLoopc = (Data & 0x1ff);//L1 PLL PARAM: DIV_LOOPC
+
+	 CoreDiv = (Data & 0xfc00) >> 10;//L1 PLL PARAM: DIV_OUT
+
+	 CpuFre = (clk_ref / DivRefc * CoreLoopc * 1000)/(CoreDiv);//CLK_REF default 100MHZ
+
+	 *(UINT32*)Frequency = CpuFre / 1000000;
+
+	 return EFI_SUCCESS;
+}
 

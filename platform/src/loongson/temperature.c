@@ -1,4 +1,3 @@
-
 /*
 ## @file
 #
@@ -22,30 +21,33 @@
 #
 ##
 */
+#include "LsRegDef.h"
+#include "edk_api.h"
+#include "mem.h"
+#include "platform/app_platform.h"
 
-#ifndef __LS3A_DEF_H__
-#define __LS3A_DEF_H__
+UINT64 TempRegBaseAddr;
 
-#include "loongson/LsRegDef.h"
-#define NODE_OFFSET 44
+UINT8 lscpu_tempdetect(UINT32 *temp0,UINT32 *temp1)
+{
+	UINT32 Data = 0;
+	UINT16 TempSensorDigital0,TempSensorDigital1; //UINT16
+	INT8	 TempSensorAnalog0,TempSensorAnalog1;		//INT8 (-40 - 125)
+  void * vaddr = NULL;
 
-#define PHYS_TO_CACHED(x)       (CACHED_MEMORY_ADDR | (x))
-#define PHYS_TO_UNCACHED(x)     (UNCACHED_MEMORY_ADDR | (x))
-#define LS3A5000_VERSION                        0x0000303030354133 /* 3A5000 */
-#define LS3A5000LL_VERSION                      0x4C4C303030354133 /* 3A5000LL */
-#define LS3A5000M_VERSION                       0x004D303030354133 /* 3A5000M */
-#define LS3B5000_VERSION                        0x0000303030354233 /* 3B5000 */
-#define LS3C5000L_VERSION                       0x004C303030354333 /* 3C5000L */
-#define LS3C5000LL_VERSION                      0x4C4C303030354333 /* 3C5000LL */
-#define LS3A5000I_VERSION                       0x0049303030354133 /* 3A5000I */
-#define LS3A5000i_VERSION                       0x0069303030354133 /* 3A5000i */
-#define LS3A5000BM_VERSION                      0x4D42303030354133 /* 3A5000BM */
-#define LS3A5000HV_VERSION                      0x5648303030354133 /* 3A5000HV */
+  vaddr=p2v_mem_mapping(CPU_TEMP_SAMPLE_BASE +TEMP_SENSOR_VALUE_OFFSET,4);
+	Data = Read32((U64)vaddr);
+  p2v_mem_clean(vaddr);
 
+	TempSensorDigital0 = Data & 0xffff;
+	TempSensorDigital1 = (Data & (0xffff << 16)) >> 16; //48-32 16
+	//Calculate Temp
+	TempSensorAnalog0 = TempSensorDigital0 * 731 / 0x4000 - 273 ;
+	TempSensorAnalog1 = TempSensorDigital1 * 731 / 0x4000 - 273 ;
+	// *(INT8 *)Temperature = (TempSensorAnalog0 + TempSensorAnalog1) / 2;
+	*temp0=TempSensorAnalog0;
+	*temp1=TempSensorAnalog1;
 
-#define LSCPU_ID	0x1fe00020
-#define LS7A_VER	LS7A_CONFBUS_BASE_ADDR|0x3ff8
-#define LS7A_VER180_REG	HT_CONF_TYPE0_ADDR|0x108
-
-#endif
+	return EFI_SUCCESS;
+}
 

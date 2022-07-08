@@ -29,6 +29,7 @@
 #include "edk_api.h"
 #include "platform/app_platform.h"
 #include "platform/app_os.h"
+#include "platform/app_spi.h"
 
 
 #define GPIO_DATA_REG  PHYS_TO_UNCACHED(0x1fe0011c)

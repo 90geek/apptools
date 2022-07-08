@@ -71,7 +71,7 @@ LIBPATH += -L$(SDK_DIR)/dmidecode/lib/$(LINK_TYPE)
 LIB += -ldmidecode
 
 SUBDIRS += dmidecode/src
-CFLAGS += -W -Wall -Wshadow -Wstrict-prototypes -Wpointer-arith -Wcast-qual \
+# CFLAGS += -W -Wall -Wshadow -Wstrict-prototypes -Wpointer-arith -Wcast-qual \
           -Wcast-align -Wwrite-strings -Wmissing-prototypes -Winline -Wundef
 else
 
