@@ -85,7 +85,7 @@ LIB += -l${TESTTOOL_LIB} -l${PLATFORM_LIB}
 #platform 
 #########################################################################
 
-ifeq ($(PLATFORM), local)
+ifeq ($(PLATFORM), host)
 
 INCLUDEFLAGS += -I$(SDK_DIR)/platform/src
 LIB +=

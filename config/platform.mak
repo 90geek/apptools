@@ -1,13 +1,11 @@
 
-ifeq ($(PLATFORM), hisi)
-TOOLCHAIN_DIR = $(SDK_DIR)/../toolchain/hisi/arm-histbv310-linux
-export TOOLCHAIN_PREFIX = ${TOOLCHAIN_DIR}/bin/arm-histbv310-linux-
-else ifeq ($(PLATFORM), local)
+ifeq ($(PLATFORM), host)
 TOOLCHAIN_DIR = /usr
 export TOOLCHAIN_PREFIX = ${TOOLCHAIN_DIR}/bin/
 else ifeq ($(PLATFORM), loongarch64)
-TOOLCHAIN_DIR = /home/zhubo/loongson/toolchain/LARCH_toolchain_root
-export TOOLCHAIN_PREFIX = ${TOOLCHAIN_DIR}/bin/loongarch64-linux-gnu-
+# TOOLCHAIN_DIR = /home/zhubo/loongson/toolchain/LARCH_toolchain_root
+# export TOOLCHAIN_PREFIX = ${TOOLCHAIN_DIR}/bin/loongarch64-linux-gnu-
+export TOOLCHAIN_PREFIX = loongarch64-linux-gnu-
 else 
 $(error PLATFORM not define) 
 endif

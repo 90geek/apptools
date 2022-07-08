@@ -33,9 +33,9 @@ function make()
 }
 
 ################################################
-# local mips64el loongarch64 
+# host mips64el loongarch64 
 ################################################
-SUPPORT_PLATFORM=(local mips64el loongarch64)
+SUPPORT_PLATFORM=(host mips64el loongarch64)
 unset PLATFORM
 
 if [ $1 ];then 
@@ -65,12 +65,12 @@ export SDK_DIR=$(pwd)
 # modules
 ################################################
 if [ $PLATFORM ] ;then
-  if [ $PLATFORM = "local" ] ; then  
+  if [ $PLATFORM = "host" ] ; then  
     unset CAPSULE_SUPPORT
     export CAPSULE_SUPPORT=1
 
-    # unset HARDINFO_SUPPORT
-    # export HARDINFO_SUPPORT=1
+    unset HARDINFO_SUPPORT
+    export HARDINFO_SUPPORT=1
 
     unset DMIDECODE_SUPPORT
     export DMIDECODE_SUPPORT=1
@@ -80,7 +80,7 @@ if [ $PLATFORM ] ;then
     unset CAPSULE_SUPPORT
     export CAPSULE_SUPPORT=1
 
-     unset HARDINFO_SUPPORT
+    unset HARDINFO_SUPPORT
     export HARDINFO_SUPPORT=1
 
     unset DMIDECODE_SUPPORT
