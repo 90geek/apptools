@@ -1,11 +1,21 @@
 #include <ctype.h>
 #include "testtool/testtool.h"
-#include "capsule.h"
 #include "platform/platform_debug.h"
 #include "apptools.h"
 #include "platform/app_platform.h"
 #include "platform/app_spi.h"
+
+#ifdef CAPSULE_SUPPORT
+#include "capsule.h"
+#endif
+
+#ifdef DMIDECODE_SUPPORT
 #include "dmidecode_api.h"
+#endif
+
+#ifdef DMIDECODE_SUPPORT
+#include "hardinfo.h"
+#endif
 
 static void ShowUsage(void)
 {
@@ -14,6 +24,7 @@ static void ShowUsage(void)
 		"apptool [parameter] ... :explain \n"
 		"  upbios :updte uefi bios\n"
 		"  wmac 7aspi_paddr eth macaddr :write 7a flash mac addr,eg wmac 0x452a0000 0 11:22:33:44:55:66\n"
+		"  dmi :dmidecode cmd,eg dmi -t 0\n"
 		"  cmd into apptool cmdline \n");
 }
 static void write_mac_addr(int argc, char *argv[])
@@ -81,8 +92,12 @@ int main (int argc,char *argv[])
 
 	TesttoolInit(0);
 	app_platform_init();
-	// capsule_init();
+#ifdef CAPSULE_SUPPORT
+	capsule_init();
+#endif
+#ifdef HARDINFO_SUPPORT
 	hardinfo_init();
+#endif
 	if (!strcmp(argv[argv_p], "upbios"))
 	{
 		argv_c--;
@@ -108,8 +123,10 @@ int main (int argc,char *argv[])
 	{
 		argv_c--;
 		argv_p++;
+#ifdef DMIDECODE_SUPPORT
 		// dmidecode(argv_c, argv + argv_p);
 		dmidecode(argc, argv);
+#endif
 		goto cleanup;
 	}
 

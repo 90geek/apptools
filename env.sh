@@ -67,7 +67,7 @@ export SDK_DIR=$(pwd)
 if [ $PLATFORM ] ;then
   if [ $PLATFORM = "host" ] ; then  
     unset CAPSULE_SUPPORT
-    export CAPSULE_SUPPORT=1
+    # export CAPSULE_SUPPORT=1
 
     unset HARDINFO_SUPPORT
     export HARDINFO_SUPPORT=1
@@ -78,7 +78,7 @@ if [ $PLATFORM ] ;then
     echo "not define"  
   elif [ $PLATFORM = "loongarch64" ] ; then 
     unset CAPSULE_SUPPORT
-    export CAPSULE_SUPPORT=1
+    # export CAPSULE_SUPPORT=1
 
     unset HARDINFO_SUPPORT
     export HARDINFO_SUPPORT=1

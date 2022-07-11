@@ -8,17 +8,17 @@
 #include "loongson3_def.h"
 
 cpu_info_t cpu_info[] ={
-	{"3A5000", LS3A5000_VERSION, "3A5000", "14nm",0,100,"LGA",37, 37,3},
-	{"3A5000LL", LS3A5000LL_VERSION, "3A5000LL", "14nm",0,100,"LGA",37, 37,3},
-	{"3A5000M", LS3A5000M_VERSION, "3A5000M", "14nm",0,100,"LGA",37, 37,3},
-	{"3B5000", LS3B5000_VERSION, "3B5000", "14nm",0,100,"LGA",37, 37,3},
-	{"3C5000L", LS3C5000L_VERSION, "3C5000L", "14nm",0,100,"LGA",37, 37,3},
-	{"3C5000L", LS3C5000LL_VERSION, "3C5000LL", "14nm",0,100,"LGA",37, 37,3},
-	{"3C5000I", LS3A5000I_VERSION, "3A5000I", "14nm",0,100,"LGA",37, 37,3},
-	{"3C5000i", LS3A5000i_VERSION, "3A5000i", "14nm",0,100,"LGA",37, 37,3},
-	{"3A5000BM", LS3A5000BM_VERSION, "3A5000BM", "14nm",0,100,"LGA",37, 37,3},
-	{"3A5000HV", LS3A5000HV_VERSION, "3A5000HV", "14nm",0,100,"LGA",37, 37,3},
-	{NULL, 0, NULL, "14nm",0,100,"LGA",37, 37,3}
+	{"3A5000",		LS3A5000_VERSION,		"3A5000",		"14nm",0,100,"LGA",37, 37,3, 64, 256, 16384, 2000},
+	{"3A5000LL",	LS3A5000LL_VERSION, "3A5000LL", "14nm",0,100,"LGA",37, 37,3, 64, 256, 16384, 2000},
+	{"3A5000M",		LS3A5000M_VERSION,	"3A5000M",	"14nm",0,100,"LGA",37, 37,3, 64, 256, 16384, 2000},
+	{"3B5000",		LS3B5000_VERSION,		"3B5000",		"14nm",0,100,"LGA",37, 37,3, 64, 256, 16384, 2000},
+	{"3C5000L",		LS3C5000L_VERSION,	"3C5000L",	"14nm",0,100,"LGA",37, 37,3, 64, 256, 16384, 2000},
+	{"3C5000L",		LS3C5000LL_VERSION, "3C5000LL", "14nm",0,100,"LGA",37, 37,3, 64, 256, 16384, 2000},
+	{"3C5000I",		LS3A5000I_VERSION,	"3A5000I",	"14nm",0,100,"LGA",37, 37,3, 64, 256, 16384, 2000},
+	{"3C5000i",		LS3A5000i_VERSION,	"3A5000i",	"14nm",0,100,"LGA",37, 37,3, 64, 256, 16384, 2000},
+	{"3A5000BM",	LS3A5000BM_VERSION, "3A5000BM",	"14nm",0,100,"LGA",37, 37,3, 64, 256, 16384, 2000},
+	{"3A5000HV",	LS3A5000HV_VERSION, "3A5000HV", "14nm",0,100,"LGA",37, 37,3, 64, 256, 16384, 2000},
+	{NULL,				0,									NULL,				"14nm",0,100,"LGA",37, 37,3, 64, 256, 16384, 2000}
 };
 static ls7a_ver_t ls7a;
 
@@ -35,6 +35,7 @@ cpu_info_t *get_cpu_info(void)
 		// printf("cpu_name %s\n",cpu_info[i].cpu_name);
 		if(cpu_info[i].cpu_id==cpuid&&cpu_info[i].cpu_name!=NULL)
 		{
+			CpuGetFrequency (100000,&cpu_info[i].cpufreq);
 			return &cpu_info[i];
 		}
 	
@@ -93,6 +94,10 @@ int cpu_info_debug(parse_t * pars_p,char *result_p)
 	printf("cpu_l %d\n",cpu->cpu_l);
 	printf("cpu_w %d\n",cpu->cpu_w);
 	printf("cpu_h %d\n",cpu->cpu_h);
+	printf("cacheL1 %dKB\n",cpu->cacheL1);
+	printf("cacheL2 %dKB\n",cpu->cacheL2);
+	printf("cacheL3 %dKB\n",cpu->cacheL3);
+	printf("cpufreq %dMH\n",cpu->cpufreq);
 
 	return 0;
 }
@@ -114,10 +119,27 @@ int ls7a_ver_debug(parse_t * pars_p,char *result_p)
 	return 0;
 }
 
+int ls_sensors_debug(parse_t * pars_p,char *result_p)
+{
+	ls_sensors_t sen;
+	int err;
+
+	err=get_sensors(&sen);
+	if(err!=0)
+	{
+		printf("ls7a is no support!\n");
+	}
+
+	printf("cputemp0 %d\n",sen.cputemp0);
+	printf("cputemp1 %d\n",sen.cputemp1);
+
+	return 0;
+}
 void hardinfo_debug_register(void)
 {
 	register_command ("CPU_INFO" , cpu_info_debug , "<NONE>");
 	register_command ("LS7A_VER" , ls7a_ver_debug , "<NONE>");
+	register_command ("LS_SENSORS" , ls_sensors_debug , "<NONE>");
 }
 
 int hardinfo_init(void)

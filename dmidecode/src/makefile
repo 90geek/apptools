@@ -13,7 +13,7 @@ LIBS := libdmidecode
 
 DRV_LIB_OUT := ../lib/$(LINK_TYPE)
 
-OBJS := dmidecode.o dmiopt.o dmioem.o dmioutput.o util.o
+OBJS := dmidecode.o dmiopt.o dmioem.o dmioutput.o util.o dmi_app.o
 
 #===============================================================================
 # rules

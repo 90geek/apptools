@@ -13,7 +13,7 @@ LIBS := libhardinfo
 
 DRV_LIB_OUT := ../lib/$(LINK_TYPE)
 
-OBJS := hardinfo.o
+OBJS := hardinfo.o sensors.o
 
 
 #===============================================================================
