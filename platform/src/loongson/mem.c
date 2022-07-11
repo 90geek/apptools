@@ -3,11 +3,11 @@
 #include "LsRegDef.h"
 
 
-#define PWM_REG_BASE  		( LS7A_PWM0_REG_BASE )  /*LW HPS to FPGA bridge*/
+#define PWM_REG_BASE			( LS7A_PWM0_REG_BASE )	/*LW HPS to FPGA bridge*/
 
-#define GPIO_REGS_BASE 		( LS7A_GPIO_REG_BASE )  /*GPIO Address Map*/
+#define GPIO_REGS_BASE		( LS7A_GPIO_REG_BASE )	/*GPIO Address Map*/
 
-#define PWM_REG_SPAN (0x400)   /*0x400byte*/
+#define PWM_REG_SPAN (0x400)	 /*0x400byte*/
 #define PWM_REG_MASK (LWH2F_REG_SPAN -1)
 
 #define GPIO_REGS_SPAN ( 0x3000 )			/*12K*/
@@ -57,7 +57,7 @@ static void open_mem_fd(void)
 	// map the address space for the Peripheral Region Address Map into user space so we can interact with them.
 	// we'll actually map in the entire CSR span of the HPS since we want to access various registers within that span
 	if( ( fd = open( "/dev/mem", ( O_RDWR | O_SYNC ) ) ) == -1 ) {
-		printf( "ERROR: could not open  \"/dev/mem\"...\n" );
+		printf( "ERROR: could not open	\"/dev/mem\"...\n" );
 	}
 }
 
@@ -113,35 +113,34 @@ static void gpio_mem_clean(void)
 	// clean up our memory mapping and exit
 	if( munmap( gpio_mem_base, GPIO_REGS_SPAN ) != 0 )
 	{
-		printf( "ERROR:gpio_mem_clean,  munmap() failed...\n" );
+		printf( "ERROR:gpio_mem_clean,	munmap() failed...\n" );
 	}
 
 }
 
-unsigned long long memmask;
 int memoffset;
 void *p2v_mem_mapping(unsigned long long paddr,int size)
 {
-  void *vaddr = NULL;
-  memmask = paddr & ~(0xffff);//64k aline
-  memoffset = paddr & (0xffff);
-	if(size<0x10000)
-		size=0x10000;
-	vaddr = (void*)mmap(NULL,size, PROT_READ|PROT_WRITE,MAP_SHARED,fd,memmask);
+	unsigned long long memmask;
+	void *vaddr = NULL;
+
+	memoffset = paddr % getpagesize();
+	vaddr = (void*)mmap(NULL,size+memoffset, PROT_READ|PROT_WRITE,MAP_SHARED,fd,paddr-memoffset);
 	vaddr = vaddr + memoffset;
 	printf("mmap addr start : %p \n",vaddr);
-  return vaddr;
+	return vaddr;
 }
 
 int p2v_mem_clean(void *vaddr)
 {
-    int status ;
+		int status ;
 	if( vaddr == NULL)
-  {
+	{
 		status = munmap(vaddr-memoffset, 1);
-    if(status != 0){
-		  printf("ERROR: p2v_mem_clean , munmap() failed...\n");
-    }
-    return status;
-  }
+		if(status != 0){
+			printf("ERROR: p2v_mem_clean , munmap() failed...\n");
+		}
+		return status;
+	}
 }
+
