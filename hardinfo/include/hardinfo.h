@@ -2,10 +2,13 @@
 #define __HARD_INFO__
 
 #include "platform/app_types.h"
-
+typedef struct {
+    U64 l;
+    U64 h;
+} cpuid;
 typedef struct _cpu_info_t_{
 	const char *cpu_name;
-	U64 cpu_id;
+	cpuid id;
 	const char *cpu_ver;
 	const char *technics;
 	U32 cpu_tdp;
