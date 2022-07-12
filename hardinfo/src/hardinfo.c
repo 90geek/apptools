@@ -8,17 +8,17 @@
 #include "loongson3_def.h"
 
 cpu_info_t cpu_info[] ={
-	{"3A5000",		LS3A5000_VERSION,		0, "3A5000",		"14nm",0,100,"LGA",37, 37,3, 64, 256, 16384, 2000},
-	{"3A5000LL",	LS3A5000LL_VERSION, 0, "3A5000LL", "14nm",0,100,"LGA",37, 37,3, 64, 256, 16384, 2000},
-	{"3A5000M",		LS3A5000M_VERSION,	0, "3A5000M",	"14nm",0,100,"LGA",37, 37,3, 64, 256, 16384, 2000},
-	{"3B5000",		LS3B5000_VERSION,		0, "3B5000",		"14nm",0,100,"LGA",37, 37,3, 64, 256, 16384, 2000},
-	{"3C5000L",		LS3C5000L_VERSION,	0, "3C5000L",	"14nm",0,100,"LGA",37, 37,3, 64, 256, 16384, 2000},
-	{"3C5000L",		LS3C5000LL_VERSION, 0, "3C5000LL", "14nm",0,100,"LGA",37, 37,3, 64, 256, 16384, 2000},
-	{"3C5000I",		LS3A5000I_VERSION,	0, "3A5000I",	"14nm",0,100,"LGA",37, 37,3, 64, 256, 16384, 2000},
-	{"3C5000i",		LS3A5000i_VERSION,	0, "3A5000i",	"14nm",0,100,"LGA",37, 37,3, 64, 256, 16384, 2000},
-	{"3A5000BM",	LS3A5000BM_VERSION, 0, "3A5000BM",	"14nm",0,100,"LGA",37, 37,3, 64, 256, 16384, 2000},
-	{"3A5000HV",	LS3A5000HV_VERSION, 0, "3A5000HV", "14nm",0,100,"LGA",37, 37,3, 64, 256, 16384, 2000},
-	{NULL,				0,									0, NULL,				"14nm",0,100,"LGA",37, 37,3, 64, 256, 16384, 2000}
+	{"3A5000",		LS3A5000_VERSION,		0, "3A5000",		"14nm",0, 0, 100,"LGA",37, 37,3, 64, 64, 256, 16384, 2000},
+	{"3A5000LL",	LS3A5000LL_VERSION, 0, "3A5000LL",	"14nm",0, 0, 100,"LGA",37, 37,3, 64, 64, 256, 16384, 2000},
+	{"3A5000M",		LS3A5000M_VERSION,	0, "3A5000M",		"14nm",0, 0, 100,"LGA",37, 37,3, 64, 64, 256, 16384, 2000},
+	{"3B5000",		LS3B5000_VERSION,		0, "3B5000",		"14nm",0, 0, 100,"LGA",37, 37,3, 64, 64, 256, 16384, 2000},
+	{"3C5000L",		LS3C5000L_VERSION,	0, "3C5000L",		"14nm",0, 0, 100,"LGA",37, 37,3, 64, 64, 256, 16384, 2000},
+	{"3C5000L",		LS3C5000LL_VERSION, 0, "3C5000LL",	"14nm",0, 0, 100,"LGA",37, 37,3, 64, 64, 256, 16384, 2000},
+	{"3C5000I",		LS3A5000I_VERSION,	0, "3A5000I",		"14nm",0, 0, 100,"LGA",37, 37,3, 64, 64, 256, 16384, 2000},
+	{"3C5000i",		LS3A5000i_VERSION,	0, "3A5000i",		"14nm",0, 0, 100,"LGA",37, 37,3, 64, 64, 256, 16384, 2000},
+	{"3A5000BM",	LS3A5000BM_VERSION, 0, "3A5000BM",	"14nm",0, 0, 100,"LGA",37, 37,3, 64, 64, 256, 16384, 2000},
+	{"3A5000HV",	LS3A5000HV_VERSION, 0, "3A5000HV",	"14nm",0, 0, 100,"LGA",37, 37,3, 64, 64, 256, 16384, 2000},
+	{NULL,				0,									0, NULL,				"14nm",0, 0, 100,"LGA",37, 37,3, 64, 64, 256, 16384, 2000}
 };
 static ls7a_ver_t ls7a;
 
@@ -47,8 +47,7 @@ cpu_info_t *get_cpu_info(void)
 			break;
 	}
 	return NULL;
-}
-
+} 
 ls7a_ver_t *get_7a_version(void)
 {
 	U16 ls7a_id;
@@ -94,12 +93,14 @@ int cpu_info_debug(parse_t * pars_p,char *result_p)
 	printf("cpu_ver %s\n",cpu->cpu_ver);
 	printf("technics %s\n",cpu->technics);
 	printf("cpu_tdp %d\n",cpu->cpu_tdp);
-	printf("cpu_jt %d\n",cpu->cpu_jt);
+	printf("cpu_jt_l %d\n",cpu->cpu_jt_l);
+	printf("cpu_jt_h %d\n",cpu->cpu_jt_h);
 	printf("cpu_pkg; %s\n",cpu->cpu_pkg);
 	printf("cpu_l %d\n",cpu->cpu_l);
 	printf("cpu_w %d\n",cpu->cpu_w);
 	printf("cpu_h %d\n",cpu->cpu_h);
-	printf("cacheL1 %dKB\n",cpu->cacheL1);
+	printf("cacheL1d %dKB\n",cpu->cacheL1d);
+	printf("cacheL1i %dKB\n",cpu->cacheL1i);
 	printf("cacheL2 %dKB\n",cpu->cacheL2);
 	printf("cacheL3 %dKB\n",cpu->cacheL3);
 	printf("cpufreq %dMH\n",cpu->cpufreq);
