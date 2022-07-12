@@ -17,6 +17,11 @@
 #include "hardinfo.h"
 #endif
 
+#ifdef INFOUI_SUPPORT
+#include "infoui.h"
+#endif
+
+
 static void ShowUsage(void)
 {
 	puts(
@@ -130,6 +135,15 @@ int main (int argc,char *argv[])
 		goto cleanup;
 	}
 
+	if (!strcmp(argv[argv_p], "infoui"))
+	{
+		argv_c--;
+		argv_p++;
+#ifdef INFOUI_SUPPORT
+		ls_info_ui (argv_c, argv + argv_p);
+#endif
+		goto cleanup;
+	}
 	if (!strcmp(argv[argv_p], "cmd"))
 	{
 		TesttoolRun(1);
