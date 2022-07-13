@@ -477,7 +477,7 @@ void app_print_data(unsigned char *buf,int size)
 
 char* app_system(const char *cmd)
 {
-  char result[10240] = {0};
+  char result[102400] = {0};
 	char buf[1024] = {0};
   FILE *fp = NULL;
 	char *data=NULL;
@@ -491,7 +491,7 @@ char* app_system(const char *cmd)
 	while (fgets(buf, sizeof(buf), fp)) {
 			strcat(result, buf);
 			count++;
-			if(count*1024==10240)
+			if(count*1024==102400)
 			{
 				printf("result buffer is overflow!!!\n");
 				break;
@@ -531,5 +531,7 @@ U64 app_get_pcie_region(const char *dev)
 
 	base=strtoul(data,&leftover,16);
 	printf("base=0x%llx\n",base);
+	if(data!=NULL)
+		app_free(data);
 	return base;
 }

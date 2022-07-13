@@ -20,6 +20,7 @@ cpu_info_t cpu_info[] ={
 	{"3A5000HV",	LS3A5000HV_VERSION, 0, "3A5000HV",	"14nm", 35, 0, 70,"LGA",37, 37,3, 64, 64, 256, 16384, 2000},
 };
 static ls7a_ver_t ls7a;
+static char bios_ver[100];
 
 cpu_info_t *get_cpu_info(void)
 {
@@ -46,7 +47,7 @@ cpu_info_t *get_cpu_info(void)
 			break;
 	}
 	return NULL;
-} 
+}
 ls7a_ver_t *get_7a_version(void)
 {
 	U16 ls7a_id;
@@ -75,7 +76,20 @@ ls7a_ver_t *get_7a_version(void)
 
 	return &ls7a;
 }
-
+char *get_bios_version(void)
+{
+	char *data=NULL;
+	char *p;
+	
+	data=app_system("dmidecode -t bios | grep Version:");
+	p=strtok(data, ": ");
+	p=strtok(NULL, ": ");
+	strcpy(bios_ver,p);
+	
+	if(data!=NULL)
+		app_free(data);
+	return bios_ver;
+}
 int cpu_info_debug(parse_t * pars_p,char *result_p)
 {
 	cpu_info_t *cpu=NULL;
@@ -140,11 +154,20 @@ int ls_sensors_debug(parse_t * pars_p,char *result_p)
 
 	return 0;
 }
+int get_biosi_ver_debug(parse_t * pars_p,char *result_p)
+{
+
+	char *p;
+	p = get_bios_version();
+	printf("bios version : %s\n",p);
+	return 0;
+}
 void hardinfo_debug_register(void)
 {
 	register_command ("CPU_INFO" , cpu_info_debug , "<NONE>");
 	register_command ("LS7A_VER" , ls7a_ver_debug , "<NONE>");
 	register_command ("LS_SENSORS" , ls_sensors_debug , "<NONE>");
+	register_command ("LS_BIOS_VER" , get_biosi_ver_debug , "<NONE>");
 }
 
 int hardinfo_init(void)

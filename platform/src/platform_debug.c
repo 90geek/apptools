@@ -16,7 +16,7 @@ int fan_set_debug(parse_t * pars_p,char *result_p)
 		return 1;
 	}
 
-  SmartFanSet (num);
+	SmartFanSet (num);
 
 	printf("set fan %d %\n", num);
 
@@ -482,9 +482,30 @@ int mm_read_burst_debug(parse_t * pars_p,char *result_p)
 	return 0;
 }
 
+int cmd_test_debug(parse_t * pars_p,char *result_p)
+{
+	char cmd[200];
+	char *data=NULL;
+
+	/* ------------- */
+	if (cget_string(pars_p,"", cmd, sizeof(cmd))==1)
+	{
+		tag_current_line(pars_p,"Invalid cmd\n");
+		return(1);
+	}
+
+	printf("cmd  %s \n",cmd);
+	data=app_system(cmd);
+	printf("%s",data);
+
+	if(data!=NULL)
+		app_free(data);
+	return 0;
+}
+
 void platform_debug_register(void)
 {
-	register_command ("LS_FAN_WRITE" 			, fan_set_debug , "<Percent number>:0-100");
+	register_command ("LS_FAN_WRITE"			, fan_set_debug , "<Percent number>:0-100");
 	register_command ("LS_CPU_TEMP"			, read_cpu_temp_debug , "");
 	register_command ("LS_CPU_FREQ"			, read_cpu_freq_debug , "");
 	register_command ("SET_7A_SPI_BASE"			, set_7a_spi_base_addr_debug , "<base_addr_hi>,<base_addr_lo>");
@@ -501,4 +522,5 @@ void platform_debug_register(void)
 	register_command ("MM_W_W"			, mm_write_word_debug , "<base_addr_hi>,<base_addr_lo>,<data>");
 	register_command ("MM_W_DW"			, mm_write_dword_debug , "<base_addr_hi>,<base_addr_lo>,<data_hi>,<data_lo>");
 	register_command ("MM_R_BURST"			, mm_read_burst_debug , "<base_addr_hi>,<base_addr_lo>,<len>");
+	register_command ("TEST_CMD"			, cmd_test_debug , "<cmd>:eg cmd lscpu");
 }

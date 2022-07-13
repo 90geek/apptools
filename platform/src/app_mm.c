@@ -5,10 +5,12 @@
 void read_mm(U64 pbase, unsigned char * datas, int read_cnt) 
 {
 	void * vaddr = NULL;
-
-	vaddr=p2v_mem_mapping(pbase,read_cnt);
-	memcpy(datas,vaddr,read_cnt);
-	p2v_mem_clean(vaddr);
+	vaddr=ls_mem_chunk(pbase, read_cnt, "/dev/mem");
+	if(vaddr!=NULL)
+	{
+		memcpy(datas,vaddr,read_cnt);
+		app_free(vaddr);
+	}
 }
 
 void write_mm(U64 pbase, unsigned char * datas, int write_cnt)
