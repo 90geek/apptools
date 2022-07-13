@@ -17,6 +17,8 @@ void write_mm(U64 pbase, unsigned char * datas, int write_cnt)
 {
 	void * vaddr = NULL;
 	vaddr=p2v_mem_mapping(pbase,write_cnt);
+	if(vaddr==NULL)
+		return;
 	memcpy(vaddr,datas,write_cnt);
 	p2v_mem_clean(vaddr);
 }

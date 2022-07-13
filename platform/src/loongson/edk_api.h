@@ -149,6 +149,7 @@ typedef UINT16                    STRING_REF;
 typedef UINT64                    EFI_PHYSICAL_ADDRESS;
 typedef UINT64                    EFI_VIRTUAL_ADDRESS;
 
+#define MAX_BIT     0//0x8000000000000000ULL
 /**
   Produces a RETURN_STATUS code with the highest bit set.
 

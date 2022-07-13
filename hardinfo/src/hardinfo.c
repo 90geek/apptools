@@ -35,9 +35,9 @@ cpu_info_t *get_cpu_info(void)
 	for(i=0;;i++)
 	{
 		// printf("cpu_name %s\n",cpu_info[i].cpu_name);
-		if(cpu_info[i].id.l==cpuid_l&&  \
-		  cpu_info[i].id.h==cpuid_h&&  \
-        cpu_info[i].cpu_name!=NULL)
+		if(cpu_info[i].id.l==cpuid_l&&	\
+			cpu_info[i].id.h==cpuid_h&&  \
+				cpu_info[i].cpu_name!=NULL)
 		{
 			CpuGetFrequency (100000,&cpu_info[i].cpufreq);
 			return &cpu_info[i];
@@ -82,9 +82,7 @@ char *get_bios_version(void)
 	char *p;
 	
 	data=app_system("dmidecode -t bios | grep Version:");
-	p=strtok(data, ": ");
-	p=strtok(NULL, ": ");
-	strcpy(bios_ver,p);
+	sscanf(data, "%*[^ ] %s", bios_ver);
 	
 	if(data!=NULL)
 		app_free(data);

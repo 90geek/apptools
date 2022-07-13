@@ -53,6 +53,8 @@ CpuGetFrequency (
 	 void * vaddr = NULL;
 
 	 vaddr=p2v_mem_mapping(CPU_FREQ_CONFIG_BASE,4);
+	 if(vaddr==NULL)
+		return EFI_LOAD_ERROR;
 	 Data = Read32((U64)vaddr);
 	 DivRefc = (Data & 0xfc000000) >> 26; //L1 PLL PARAM: DIV_REFC
 	 Data = Read32((U64)vaddr + 0x4);

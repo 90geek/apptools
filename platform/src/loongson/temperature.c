@@ -36,8 +36,10 @@ UINT8 lscpu_tempdetect(UINT32 *temp0,UINT32 *temp1)
   void * vaddr = NULL;
 
   vaddr=p2v_mem_mapping(CPU_TEMP_SAMPLE_BASE +TEMP_SENSOR_VALUE_OFFSET,4);
+	if(vaddr==NULL)
+		return EFI_LOAD_ERROR;
 	Data = Read32((U64)vaddr);
-  p2v_mem_clean(vaddr);
+	p2v_mem_clean(vaddr);
 
 	TempSensorDigital0 = Data & 0xffff;
 	TempSensorDigital1 = (Data & (0xffff << 16)) >> 16; //48-32 16

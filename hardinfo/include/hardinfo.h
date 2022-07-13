@@ -43,6 +43,7 @@ typedef struct _ls_sensors_t_{
 
 cpu_info_t *get_cpu_info(void);
 int get_sensors(ls_sensors_t *sen);
+char *get_bios_version(void);
 int hardinfo_init(void);
 
 #endif

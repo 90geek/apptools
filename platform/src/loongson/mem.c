@@ -123,29 +123,45 @@ static void gpio_mem_clean(void)
 }
 
 int memoffset;
+static int needclose;
 void *p2v_mem_mapping(unsigned long long paddr,int size)
 {
 	unsigned long long memmask;
 	void *vaddr = NULL;
 
+	if(fd==0 || fd==-1)
+	{
+		open_mem_fd() ;
+		if(fd==-1)
+			return NULL;
+		else
+			needclose=1;
+	}
 	memoffset = paddr % getpagesize();
 	vaddr = (void*)mmap(NULL,size+memoffset, PROT_READ|PROT_WRITE,MAP_SHARED,fd,paddr-memoffset);
 	vaddr = vaddr + memoffset;
-	printf("mmap addr start : %p \n",vaddr);
+	// printf("mmap addr start : %p \n",vaddr);
 	return vaddr;
 }
 
 int p2v_mem_clean(void *vaddr)
 {
-		int status ;
-	if( vaddr == NULL)
+	int status ;
+
+	if( vaddr != NULL)
 	{
 		status = munmap(vaddr-memoffset, 1);
 		if(status != 0){
 			printf("ERROR: p2v_mem_clean , munmap() failed...\n");
 		}
-		return status;
+		if(needclose)
+		{
+			close_mem_fd();
+			needclose=0;
+		}
+		return 0;
 	}
+	return -1;
 }
 static int read_buffer(int fd, U8 *buf, U32 count, const char *prefix)
 {
