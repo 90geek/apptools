@@ -140,7 +140,7 @@ void *p2v_mem_mapping(unsigned long long paddr,int size)
 	memoffset = paddr % getpagesize();
 	vaddr = (void*)mmap(NULL,size+memoffset, PROT_READ|PROT_WRITE,MAP_SHARED,fd,paddr-memoffset);
 	vaddr = vaddr + memoffset;
-	// printf("mmap addr start : %p \n",vaddr);
+	printf("mmap addr start : %p \n",vaddr);
 	return vaddr;
 }
 
@@ -158,6 +158,7 @@ int p2v_mem_clean(void *vaddr)
 		{
 			close_mem_fd();
 			needclose=0;
+			fd=0;
 		}
 		return 0;
 	}
@@ -199,81 +200,81 @@ static int read_buffer(int fd, U8 *buf, U32 count, const char *prefix)
  */
 void *ls_mem_chunk(U64 base, U32 len, const char *devmem)
 {
-    void *p;
-    int fd;
-    struct stat statbuf;
-    U64 mmoffset;
-    void *mmp;
+		void *p;
+		int fd;
+		struct stat statbuf;
+		U64 mmoffset;
+		void *mmp;
 
-    if ((fd = open(devmem, O_RDONLY)) == -1)
-    {
-        perror(devmem);
-        return NULL;
-    }
+		if ((fd = open(devmem, O_RDONLY)) == -1)
+		{
+				perror(devmem);
+				return NULL;
+		}
 
-    if ((p = malloc(len)) == NULL)
-    {
-        perror("malloc");
-        goto out;
-    }
+		if ((p = malloc(len)) == NULL)
+		{
+				perror("malloc");
+				goto out;
+		}
 
-    if (fstat(fd, &statbuf) == -1)
-    {
-        fprintf(stderr, "%s: ", devmem);
-        perror("stat");
-        goto err_free;
-    }
+		if (fstat(fd, &statbuf) == -1)
+		{
+				fprintf(stderr, "%s: ", devmem);
+				perror("stat");
+				goto err_free;
+		}
 
-    /*
-     * mmap() will fail with SIGBUS if trying to map beyond the end of
-     * the file.
-     */
-    if (S_ISREG(statbuf.st_mode) && base + (U64)len > statbuf.st_size)
-    {
-        fprintf(stderr, "mmap: Can't map beyond end of file %s\n",
-            devmem);
-        goto err_free;
-    }
+		/*
+		 * mmap() will fail with SIGBUS if trying to map beyond the end of
+		 * the file.
+		 */
+		if (S_ISREG(statbuf.st_mode) && base + (U64)len > statbuf.st_size)
+		{
+				fprintf(stderr, "mmap: Can't map beyond end of file %s\n",
+						devmem);
+				goto err_free;
+		}
 
-    mmoffset = base % getpagesize();
-    /*
-     * Please note that we don't use mmap() for performance reasons here,
-     * but to workaround problems many people encountered when trying
-     * to read from /dev/mem using regular read() calls.
-     */
-    mmp = mmap(NULL, mmoffset + len, PROT_READ, MAP_SHARED, fd, base - mmoffset);
-    if (mmp == MAP_FAILED)
-        goto try_read;
+		mmoffset = base % getpagesize();
+		/*
+		 * Please note that we don't use mmap() for performance reasons here,
+		 * but to workaround problems many people encountered when trying
+		 * to read from /dev/mem using regular read() calls.
+		 */
+		mmp = mmap(NULL, mmoffset + len, PROT_READ, MAP_SHARED, fd, base - mmoffset);
+		if (mmp == MAP_FAILED)
+				goto try_read;
 
-    memcpy(p, (U8 *)mmp + mmoffset, len);
+		memcpy(p, (U8 *)mmp + mmoffset, len);
 
-    if (munmap(mmp, mmoffset + len) == -1)
-    {
-        fprintf(stderr, "%s: ", devmem);
-        perror("munmap");
-    }
+		if (munmap(mmp, mmoffset + len) == -1)
+		{
+				fprintf(stderr, "%s: ", devmem);
+				perror("munmap");
+		}
 
-    goto out;
+		goto out;
 
 try_read:
-    if (lseek(fd, base, SEEK_SET) == -1)
-    {
-        fprintf(stderr, "%s: ", devmem);
-        perror("lseek");
-        goto err_free;
-    }
+		if (lseek(fd, base, SEEK_SET) == -1)
+		{
+				fprintf(stderr, "%s: ", devmem);
+				perror("lseek");
+				goto err_free;
+		}
 
-    if (read_buffer(fd, p, len, devmem) == 0)
-        goto out;
+		if (read_buffer(fd, p, len, devmem) == 0)
+				goto out;
 
 err_free:
-    free(p);
-    p = NULL;
+		free(p);
+		p = NULL;
 
 out:
-    if (close(fd) == -1)
-        perror(devmem);
+		if (close(fd) == -1)
+				perror(devmem);
 
-    return p;
+		return p;
 }
 
