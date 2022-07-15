@@ -31,6 +31,8 @@
 
 #define PHYS_TO_CACHED(x)       (CACHED_MEMORY_ADDR | (x))
 #define PHYS_TO_UNCACHED(x)     (UNCACHED_MEMORY_ADDR | (x))
+#define LS3A4000_VERSION                        0x0000303030344133 /* 3A4000 */
+
 #define LS3A5000_VERSION                        0x0000303030354133 /* 3A5000 */
 #define LS3A5000LL_VERSION                      0x4C4C303030354133 /* 3A5000LL */
 #define LS3A5000M_VERSION                       0x004D303030354133 /* 3A5000M */
@@ -41,7 +43,6 @@
 #define LS3A5000i_VERSION                       0x0069303030354133 /* 3A5000i */
 #define LS3A5000BM_VERSION                      0x4D42303030354133 /* 3A5000BM */
 #define LS3A5000HV_VERSION                      0x5648303030354133 /* 3A5000HV */
-
 
 #define LSCPU_ID	0x1fe00020
 #define LS7A_VER	LS7A_CONFBUS_BASE_ADDR|0x3ff8

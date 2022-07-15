@@ -122,6 +122,20 @@ LIB +=
 CFLAGS += -fgnu89-inline
 LDFLAGS +=
 #########################################################################
+else ifeq ($(PLATFORM), mips64)
+
+INCLUDEFLAGS += -I$(SDK_DIR)/platform/src
+
+MSTAR_LIB +=
+
+LIBPATH +=
+
+LIB +=
+
+CFLAGS += -fgnu89-inline -march=mips64r2 -mabi=64
+LDFLAGS += -march=mips64r2 -mabi=64
+
+#########################################################################
 else 
 $(error PLATFORM not define) 
 endif
