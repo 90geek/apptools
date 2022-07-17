@@ -7,22 +7,22 @@ typedef struct {
 		U64 h;
 } cpuid;
 typedef struct _cpu_info_t_{
-	const char *cpu_name;
+	char cpu_name[100];
 	cpuid id;
-	const char *cpu_ver;
-	const char *technics;
-	U32 cpu_tdp;
-	U8 cpu_jt_l; //Junction Temperature
-	U8 cpu_jt_h; //Junction Temperature
-	const char *cpu_pkg;
-	U8 cpu_l;
-	U8 cpu_w;
-	U8 cpu_h;
-	U32 cacheL1d;
-	U32 cacheL1i;
-	U32 cacheL2;
-	U32 cacheL3;
-	U32 cpufreq;
+	char cpu_ver[100];
+	char technics[100];
+	char cpu_tdp[8];
+	char cpu_jt_l[8]; //Junction Temperature
+	char cpu_jt_h[8]; //Junction Temperature
+	char cpu_pkg[8];
+	char cpu_l[8];
+	char cpu_w[8];
+	char cpu_h[8];
+	char cacheL1d[100];
+	char cacheL1i[100];
+	char cacheL2[100];
+	char cacheL3[100];
+	char microarch[100];
 }cpu_info_t;
 
 
@@ -41,9 +41,23 @@ typedef struct _ls_sensors_t_{
 	U32 fan1;
 }ls_sensors_t;
 
+char *get_cpu_name(void);
+char *get_cpu_version(void);
+char *get_cpu_current_speed(void);
+char *get_cpu_max_speed(void);
+char *get_cpu_min_speed(void);
+char *get_cpu_arch(void);
+char *get_cpu_core_num(void);
+char *get_cpu_thread_num(void);
+char *get_cpu_cacheL1d(void);
+char *get_cpu_cacheL1i(void);
+char *get_cpu_cacheL2(void);
+char *get_cpu_cacheL3(void);
+
 cpu_info_t *get_cpu_info(void);
 int get_sensors(ls_sensors_t *sen);
 char *get_bios_version(void);
+char *get_product_name(void);
 int hardinfo_init(void);
 
 #endif
