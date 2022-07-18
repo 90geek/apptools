@@ -206,7 +206,7 @@ void *ls_mem_chunk(U64 base, U32 len, const char *devmem)
 		U64 mmoffset;
 		void *mmp;
 
-		if ((fd = open(devmem, O_RDONLY)) == -1)
+		if ((fd = open(devmem, O_RDONLY | O_SYNC)) == -1)
 		{
 				perror(devmem);
 				return NULL;
