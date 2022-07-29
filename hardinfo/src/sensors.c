@@ -5,7 +5,7 @@
 #include "hardinfo.h"
 #include <sys/ioctl.h>
 #include <linux/ioctl.h>
-#include "loongson3_def.h"
+#include "loongson/loongson3_def.h"
 
 int get_sensors(ls_sensors_t *sen)
 {

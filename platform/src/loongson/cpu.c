@@ -25,6 +25,7 @@
 #include "edk_api.h"
 #include "mem.h"
 #include "platform/app_platform.h"
+#include "loongson3_def.h"
 
 #define CPU_FREQ_CONFIG_BASE	PHYS_TO_UNCACHED(0x1fe001b0)	//Frequency configuration register
 
@@ -70,3 +71,43 @@ CpuGetFrequency (
 	 return EFI_SUCCESS;
 }
 
+EFI_STATUS
+EFIAPI
+GetCpuId (
+	CpuId *CpuId
+)
+{
+	 void * vaddr = NULL;
+
+	 vaddr=p2v_mem_mapping(LSCPU_ID,16);
+	 if(vaddr==NULL)
+		return EFI_LOAD_ERROR;
+
+	 CpuId->l = Read64((U64)vaddr);
+	 CpuId->h = Read64((U64)vaddr + 0x8);
+	 p2v_mem_clean(vaddr);
+	 return EFI_SUCCESS;
+}
+
+//
+//
+//
+UINT8 CheckCpu(
+	UINT64 cpuid_l,
+	UINT64 cpuid_h
+)
+{
+	CpuId CpuId;
+	EFI_STATUS Status;
+	
+	Status = GetCpuId(&CpuId);
+	if(Status!=EFI_SUCCESS)
+		return 0;
+
+	if(CpuId.l==cpuid_l&&	\
+		CpuId.h==cpuid_h)
+	{
+		return 1;
+	}
+	return 0;
+}

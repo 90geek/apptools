@@ -27,10 +27,11 @@
 #define __LS3A_DEF_H__
 
 #include "loongson/LsRegDef.h"
+#include "edk_api.h"
 #define NODE_OFFSET 44
 
-#define PHYS_TO_CACHED(x)       (CACHED_MEMORY_ADDR | (x))
-#define PHYS_TO_UNCACHED(x)     (UNCACHED_MEMORY_ADDR | (x))
+// #define PHYS_TO_CACHED(x)       (CACHED_MEMORY_ADDR | (x))
+// #define PHYS_TO_UNCACHED(x)     (UNCACHED_MEMORY_ADDR | (x))
 #define LS3A4000_VERSION                        0x0000303030344133 /* 3A4000 */
 
 #define LS3A5000_VERSION                        0x0000303030354133 /* 3A5000 */
@@ -43,10 +44,17 @@
 #define LS3A5000i_VERSION                       0x0069303030354133 /* 3A5000i */
 #define LS3A5000BM_VERSION                      0x4D42303030354133 /* 3A5000BM */
 #define LS3A5000HV_VERSION                      0x5648303030354133 /* 3A5000HV */
+#define LS3C5000_VERSION                        0x0000303030354333 /* 3C5000 */
 
 #define LSCPU_ID	0x1fe00020
 #define LS7A_VER	LS7A_CONFBUS_BASE_ADDR|0x3ff8
 #define LS7A_VER180_REG	HT_CONF_TYPE0_ADDR|0x108
+
+typedef struct {
+		UINT64 l;
+		UINT64 h;
+}CpuId;
+
 
 #endif
 

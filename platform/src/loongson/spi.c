@@ -25,6 +25,10 @@
 #include "edk_api.h"
 #include "debug.h"
 #include "spi.h"
+#include "loongson3_def.h"
+#ifdef SHOW_PROGRESS
+#include "platform/app_os.h"
+#endif
 
 #define INVALID_OFFSET(x)     ((x > 0x400000)||(x < 0x0)) ? TRUE:FALSE
 #define INVALID_NUM(x)        ((x > 0x400000)||( x <= 0x0)) ? TRUE:FALSE
@@ -54,7 +58,10 @@ SpiFlashSetCs (
 
 VOID ResetSfcParamReg()
 {
-  REGSET(REG_PARAM,0x47);
+  if(CheckCpu(LS3C5000_VERSION,0))
+    REGSET(REG_PARAM,0x27);
+  else
+    REGSET(REG_PARAM,0x47);
 }
 
 UINT8
@@ -100,12 +107,24 @@ SpiFlashInit (
     ValueRegParam = REGGET(REG_PARAM);
   }
 
-  //[spre:spr] [01:00] means clk_div=8
-  REGSET(REG_SPCR, 0x50);//[1:0] [0:0]spr
-  REGSET(REG_SPSR, 0xc0);
-  REGSET(REG_SPER, 0x05);//[1:0] [0:1]spre
-  REGSET(REG_PARAM, 0x40);
-  REGSET(REG_TIME, 0x01);
+  if(CheckCpu(LS3C5000_VERSION,0))
+  {
+    //[spre:spr] [01:00] means clk_div=8
+    REGSET(REG_SPCR, 0x52);//[1:0] [0:0]spr
+    REGSET(REG_SPSR, 0xc0);
+    REGSET(REG_SPER, 0x04);//[1:0] [0:1]spre
+    REGSET(REG_PARAM, 0x20);
+    REGSET(REG_TIME, 0x01);
+  }
+  else
+  {
+    //[spre:spr] [01:00] means clk_div=8
+    REGSET(REG_SPCR, 0x50);//[1:0] [0:0]spr
+    REGSET(REG_SPSR, 0xc0);
+    REGSET(REG_SPER, 0x05);//[1:0] [0:1]spre
+    REGSET(REG_PARAM, 0x40);
+    REGSET(REG_TIME, 0x01);
+  }
 }
 
 VOID
@@ -362,6 +381,60 @@ SpiFlashSpiWriteBuffer (
   }
 }
 
+#ifdef SHOW_PROGRESS
+VOID
+SpiFlashEraseAndWriteBlocksShow (
+  UINTN      Offset,
+  VOID       *Buffer,
+  UINTN      Num
+  )
+{
+  UINTN  Pos = Offset;
+  UINT8  *Buf = (UINT8 *) Buffer;
+  UINTN  Index = 0;
+  UINTN  Addr0;
+  UINTN  Addr1;
+  UINTN  Addr2;
+
+  /* Erase blocks step */
+  Print("Erase   : \n");
+  app_ProgressInit();
+  do {
+    if ((Pos % (4 * BLKSIZE)) == 0) {
+      app_ProgressShow(Pos * 100 / Num);
+      fflush(stdout);
+    }
+    Addr0 =  Pos & 0xff;
+    Addr1 =  (Pos >> 8) & 0xff;
+    Addr2 =  (Pos >> 16) & 0xff;
+
+    SpiFlashEraseBlock (Addr0, Addr1, Addr2);
+    SpiFlashDelayUs(1);
+    Pos += BLKSIZE;
+    SpiFlashWait();
+  } while (Pos < Num + Offset);
+  app_ProgressDone();
+
+  /* Write blocks step */
+  Pos = Offset;
+  Print("Program : \n");
+  app_ProgressInit();
+  while (Index < Num) {
+    if ((Index % 0x4000) == 0) {
+      app_ProgressShow(Index * 100 / Num);
+      fflush(stdout);
+    }
+    Addr0 = (Pos + Index) & 0xff;
+    Addr1 = ((Pos + Index) >> 8) & 0xff;
+    Addr2 = ((Pos + Index) >> 16) & 0xff;
+
+    SpiFlashWriteByte (Addr0, Addr1, Addr2, Buf[Index]);
+    Index++;
+  }
+  app_ProgressDone();
+}
+#endif
+
 VOID
 SpiFlashEraseAndWriteBlocks (
   UINTN      Offset,
@@ -552,7 +625,11 @@ UpdateBiosInSpiFlash (
   SpiFlashSetRegBase(BaseRegAddr);
   SpiFlashInit ();
   SpiFlashDisableWriteProtection ();
+#ifdef SHOW_PROGRESS
+  SpiFlashEraseAndWriteBlocksShow (Offset, Buffer, Num);
+#else
   SpiFlashEraseAndWriteBlocks (Offset, Buffer, Num);
+#endif
   SpiFlashEnableWriteProtection ();
   SpiFlashReset ();
   ResetSfcParamReg();

@@ -5,7 +5,7 @@
 #include "hardinfo.h"
 #include <sys/ioctl.h>
 #include <linux/ioctl.h>
-#include "loongson3_def.h"
+#include "loongson/loongson3_def.h"
 
 cpu_info_t cpu_info[] ={
 	{"3A5000",		{LS3A5000_VERSION,		0}, "3A5000",	"14nm",		 "35",  "0", "70", "LGA","37", "37","3", "64K", "64K", "256K", "16384K", "LA464"},

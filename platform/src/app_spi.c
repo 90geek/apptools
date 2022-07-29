@@ -14,8 +14,8 @@ void update_bios(char *file_path)
 
 	if((from_fd=open(file_path,O_RDONLY))==-1)
 	{
-					printf("Open %s Error\n",file_path);
-					return 1;
+		printf("Open %s Error\n",file_path);
+		return 1;
 	}
 
 	len=lseek(from_fd,0,SEEK_END);
@@ -29,9 +29,9 @@ void update_bios(char *file_path)
 	Ret=read(from_fd,ptr1,len);
 	if(Ret==-1)
 	{
-					printf("Load FPGA File Error\n");
-					close(from_fd);
-					return 1;
+		printf("Load FPGA File Error\n");
+		close(from_fd);
+		return 1;
 	}
 	printf("Load Bios File, Size is %d\n",Ret);
 

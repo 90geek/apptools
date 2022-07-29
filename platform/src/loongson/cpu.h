@@ -33,4 +33,8 @@ CpuGetFrequency (
 	OUT VOID				*Frequency //&UINT32 Mhz
 	);
 
+UINT8 CheckCpu(
+	UINT64 cpuid_l,
+	UINT64 cpuid_h
+);
 #endif
