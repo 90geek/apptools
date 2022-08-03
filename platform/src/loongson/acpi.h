@@ -1,11 +1,9 @@
 #ifndef __ACPI_H_
 #define __ACPI_H_
 
-#include "def.h"
+void AcpiReadOps(void);
 
-
-void AcpiInitInstance(void);
-
+void AcpiReboot(void);
 
 
 

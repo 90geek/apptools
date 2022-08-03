@@ -8,8 +8,8 @@ void memory_release(void);
 void * get_gpio_mem_base(void) ;
 void * get_pwm_mem_base(void); 
 
-void *p2v_mem_mapping(unsigned long long paddr,int size);
-int p2v_mem_clean(void *vaddr);
+void *p2v_mem_mapping(unsigned long long paddr,int size,int *pmemoffset);
+int p2v_mem_clean(void *vaddr,int memoffset);
 void *ls_mem_chunk(U64 base, U32 len, const char *devmem);
 
 #endif

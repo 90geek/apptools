@@ -15,6 +15,7 @@ DRV_LIB_OUT := ../lib/$(LINK_TYPE)
 
 OBJS := app_os.o app_platform.o platform_debug.o app_spi.o app_mac_addr.o app_mm.o
 OBJS += loongson/edk_api.o loongson/mem.o loongson/pwm.o  loongson/spi.o loongson/temperature.o loongson/cpu.o
+OBJS += loongson/gpio.o loongson/rtc.o loongson/acpi.o
 
 
 #===============================================================================

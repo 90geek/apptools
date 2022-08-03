@@ -122,12 +122,12 @@ static void gpio_mem_clean(void)
 
 }
 
-int memoffset;
 static int needclose;
-void *p2v_mem_mapping(unsigned long long paddr,int size)
+void *p2v_mem_mapping(unsigned long long paddr,int size,int *pmemoffset)
 {
 	unsigned long long memmask;
 	void *vaddr = NULL;
+	int memoffset=0;
 
 	if(fd==0 || fd==-1)
 	{
@@ -140,19 +140,21 @@ void *p2v_mem_mapping(unsigned long long paddr,int size)
 	memoffset = paddr % getpagesize();
 	vaddr = (void*)mmap(NULL,size+memoffset, PROT_READ|PROT_WRITE,MAP_SHARED,fd,paddr-memoffset);
 	vaddr = vaddr + memoffset;
-	printf("mmap addr start : %p \n",vaddr);
+	*pmemoffset=memoffset;
+	// printf("mmap addr start : %p \n",vaddr);
 	return vaddr;
 }
 
-int p2v_mem_clean(void *vaddr)
+int p2v_mem_clean(void *vaddr,int memoffset)
 {
 	int status ;
 
 	if( vaddr != NULL)
 	{
+		// printf("munmap addr : %p \n",vaddr);
 		status = munmap(vaddr-memoffset, 1);
 		if(status != 0){
-			printf("ERROR: p2v_mem_clean , munmap() failed...\n");
+			printf("ERROR: p2v_mem_clean , munmap() failed... status 0x%x\n",status);
 		}
 		if(needclose)
 		{

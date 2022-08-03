@@ -16,11 +16,12 @@ void read_mm(U64 pbase, unsigned char * datas, int read_cnt)
 void write_mm(U64 pbase, unsigned char * datas, int write_cnt)
 {
 	void * vaddr = NULL;
-	vaddr=p2v_mem_mapping(pbase,write_cnt);
+	int memoffset=0;
+	vaddr=p2v_mem_mapping(pbase,write_cnt, &memoffset);
 	if(vaddr==NULL)
 		return;
 	memcpy(vaddr,datas,write_cnt);
-	p2v_mem_clean(vaddr);
+	p2v_mem_clean(vaddr, memoffset);
 }
 
 void read_mm_byte(U64 pbase, U8 *datas) 

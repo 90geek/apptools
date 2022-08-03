@@ -46,20 +46,21 @@ CpuGetFrequency (
 	OUT VOID				*Frequency //&UINT32 Mhz
 	)
 {
-	 UINT32 Data = 0;
-	 UINT64 CpuFre = 0;
-	 UINT64 CoreLoopc = 0;
-	 UINT64 CoreDiv = 0;
-	 UINT64 DivRefc = 0;
-	 void * vaddr = NULL;
+	UINT32 Data = 0;
+	UINT64 CpuFre = 0;
+	UINT64 CoreLoopc = 0;
+	UINT64 CoreDiv = 0;
+	UINT64 DivRefc = 0;
+	void * vaddr = NULL;
+	int memoffset=0;
 
-	 vaddr=p2v_mem_mapping(CPU_FREQ_CONFIG_BASE,4);
+	 vaddr=p2v_mem_mapping(CPU_FREQ_CONFIG_BASE,4, &memoffset);
 	 if(vaddr==NULL)
 		return EFI_LOAD_ERROR;
 	 Data = Read32((U64)vaddr);
 	 DivRefc = (Data & 0xfc000000) >> 26; //L1 PLL PARAM: DIV_REFC
 	 Data = Read32((U64)vaddr + 0x4);
-	 p2v_mem_clean(vaddr);
+	 p2v_mem_clean(vaddr, memoffset);
 	 CoreLoopc = (Data & 0x1ff);//L1 PLL PARAM: DIV_LOOPC
 
 	 CoreDiv = (Data & 0xfc00) >> 10;//L1 PLL PARAM: DIV_OUT
@@ -77,15 +78,16 @@ GetCpuId (
 	CpuId *CpuId
 )
 {
-	 void * vaddr = NULL;
+	void * vaddr = NULL;
+	int memoffset=0;
 
-	 vaddr=p2v_mem_mapping(LSCPU_ID,16);
+	 vaddr=p2v_mem_mapping(LSCPU_ID,16, &memoffset);
 	 if(vaddr==NULL)
 		return EFI_LOAD_ERROR;
 
 	 CpuId->l = Read64((U64)vaddr);
 	 CpuId->h = Read64((U64)vaddr + 0x8);
-	 p2v_mem_clean(vaddr);
+	 p2v_mem_clean(vaddr, memoffset);
 	 return EFI_SUCCESS;
 }
 

@@ -1,26 +1,17 @@
-#include "acpi.h"
+#include "LsRegDef.h"
+#include "edk_api.h"
+#include "mem.h"
+#include <stdio.h>
 
-
-#define RTC_BASE_ADDR				0x50100
-
-DevNode RtcInstance = {
-    "rtc",
-    NULL,
-    LS7A_MISC_BASE_ADDR + RTC_BASE_ADDR,
-    NULL,
-    NULL
-};
-
-
-void RtcReadOps(DevNode *this,int fd)
+void RtcReadOps(void)
 {
 	void * p = NULL;
-  int status ;
+	int status ;
+	int memoffset;
 
-  /*Transfer Virtul to Phy Addr*/
-  p = vtpa(this->devaddr,fd);
-
-  /*Debug Rtc*/
+	/*Transfer Virtul to Phy Addr*/
+	p = p2v_mem_mapping(LS7A_RTC_REG_BASE,15*4, &memoffset);
+	/*Debug Rtc*/
 	printf("Rtc Reg Read Start ...\n");
 	int i = 0;
 	unsigned char j = 0;
@@ -31,25 +22,9 @@ void RtcReadOps(DevNode *this,int fd)
 	for(i = 0,j = 0; i < buflen; i++){
 		j=regbuf[i];
 		tmp_tmp = (*(volatile unsigned int *)(p + j));
-		printf("RegNum:%x    RegVal:%x \n",j,tmp_tmp);
+		printf("RegNum:%x		 RegVal:%x \n",j,tmp_tmp);
 	}
 #endif
-		status = releaseMem(p);
+		p2v_mem_clean(p, memoffset);
 }
 
-void RtcWriteOps(DevNode *this,int fd)
-{
-  printf("-w Func\n");
-}
-
-Cmd RtcCmd[3] = {
-  {"-r",RtcReadOps},
-  {"-w",RtcWriteOps},
-  {NULL,NULL}
-};
-
-void RtcInitInstance(void)
-{
-   RtcInstance.CmdInstance = RtcCmd;
-   DevInstanceInsert(&RtcInstance);
-}
