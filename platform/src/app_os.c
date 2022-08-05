@@ -525,7 +525,7 @@ char* app_system(const char *cmd)
 
 	if( (fp = popen(cmd, "r")) == NULL ) {
 			printf("popen error!\n");
-			return;
+			return NULL;
 	}
 
 	while (fgets(buf, sizeof(buf), fp)) {

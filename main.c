@@ -21,19 +21,29 @@
 #include "infoui.h"
 #endif
 
-
+static int check_sudo(void)
+{
+	if (access("/dev/mem",W_OK) != 0)
+	{
+		// printf("/dev/mem can be write\n");	
+		return 1;
+	}
+	return 0;
+}
 static void ShowUsage(void)
 {
+	printf("Application Tools Programmer\nBy 90geek <bo90geek@gmail.com>\n\n");
 	puts(
 		"Usage:\n"
 		"apptool [parameter] ... :explain \n"
+		"  help :display help infomation\n"
 		"  upbios :updte uefi bios\n"
-		"  rmac <7aspi_paddr> <eth> :eg rmac 0x452a0000 0\n"
-		"  rmac <probe> <eth> :eg rmac 0x452a0000 0\n"
+		"  rmac <7aspi_paddr> <eth> :read mac addr eg rmac 0x452a0000 0\n"
+		"  rmac <probe> <eth> :read mac addr eg rmac 0x452a0000 0\n"
 		"  wmac <7aspi_paddr> <eth> <macaddr> :write 7a flash mac addr,eg wmac 0x452a0000 0 11:22:33:44:55:66\n"
 		"  wmac <probe> <eth> <macaddr> :write 7a flash mac addr,eg wmac probe 0 11:22:33:44:55:66\n"
 		"  dmi :dmidecode cmd,eg dmi -t 0\n"
-		"  cmd into apptool cmdline \n");
+		"  cmd :into apptool cmdline \n");
 }
 static void read_mac_addr(int argc, char *argv[])
 {
@@ -142,7 +152,11 @@ int main (int argc,char *argv[])
 		ShowUsage();
 		goto cleanup;
 	}
-
+	if(check_sudo())
+	{
+		printf("you need to be root to perform this command!!!\n");
+		return Ret;
+	}
 	TesttoolInit(0);
 	app_platform_init();
 #ifdef CAPSULE_SUPPORT
@@ -151,6 +165,11 @@ int main (int argc,char *argv[])
 #ifdef HARDINFO_SUPPORT
 	hardinfo_init();
 #endif
+	if (!strcmp(argv[argv_p], "help"))
+	{
+		goto _show_usage;
+	}
+
 	if (!strcmp(argv[argv_p], "upbios"))
 	{
 		argv_c--;

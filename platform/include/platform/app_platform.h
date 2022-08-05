@@ -6,6 +6,9 @@
 #include "loongson/mem.h"
 #include "loongson/temperature.h"
 #include "loongson/cpu.h"
+#include "loongson/pwm.h"
+#include "loongson/ls7a.h"
+#include "loongson/mps.h"
 
 typedef struct app_platform_s{
   int cpu_type;

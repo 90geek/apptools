@@ -5,7 +5,7 @@
 #define FLASH_SIZE 0x400000
 U64 spi_base_addr;
 
-void update_bios(char *file_path)
+int update_bios(char *file_path)
 {
 	int from_fd=0,len=0,count=0;
 	unsigned char  *ptr1 = NULL,*ptr2 = NULL;
@@ -38,7 +38,7 @@ void update_bios(char *file_path)
 
 	vaddr=p2v_mem_mapping(GetLs3ASpiRegBaseAddr(),FLASH_SIZE, &memoffset);
 	if(vaddr==NULL)
-		return ;
+		return 1;
 
 	if(Ret>FLASH_SIZE)
 	{
@@ -47,6 +47,8 @@ void update_bios(char *file_path)
 	}
 	UpdateBiosInSpiFlash(0,ptr2,Ret,(U64)vaddr);
 	p2v_mem_clean(vaddr, memoffset);
+
+	return 0;
 }
 
 U64 get_7a_spi_base_addr(void)
@@ -73,7 +75,7 @@ void read_7a_spi(unsigned int offset, unsigned char * datas, int read_cnt)
 	if(GetLs7ASpiRegBaseAddr()==0)
 	{
 		printf("7a spi base addr is 0\n");
-		return 0;
+		return ;
 	}
 	vaddr=p2v_mem_mapping(GetLs7ASpiRegBaseAddr(),read_cnt, &memoffset);
 	if(vaddr==NULL)
@@ -89,7 +91,7 @@ void write_7a_spi(unsigned int offset, unsigned char * datas, int write_cnt)
 	if(GetLs7ASpiRegBaseAddr()==0)
 	{
 		printf("7a spi base addr is 0\n");
-		return 0;
+		return ;
 	}
 	vaddr=p2v_mem_mapping(GetLs7ASpiRegBaseAddr(),write_cnt, &memoffset);
 	if(vaddr==NULL)
@@ -107,7 +109,7 @@ void write_7a_flash_mac(unsigned int eth, unsigned char * datas)
 	if(GetLs7ASpiRegBaseAddr()==0)
 	{
 		printf("7a spi base addr is 0\n");
-		return 0;
+		return ;
 	}
 
 	offset=(eth==0?0x0:0x10);
@@ -128,7 +130,7 @@ void read_7a_flash_mac(unsigned int eth)
 	if(GetLs7ASpiRegBaseAddr()==0)
 	{
 		printf("7a spi base addr is 0\n");
-		return 0;
+		return ;
 	}
 
 	offset=(eth==0?0x0:0x10);

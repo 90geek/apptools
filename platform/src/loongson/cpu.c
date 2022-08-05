@@ -92,7 +92,7 @@ GetCpuId (
 }
 
 //
-//
+// check cpu id
 //
 UINT8 CheckCpu(
 	UINT64 cpuid_l,

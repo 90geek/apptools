@@ -3,10 +3,4 @@
 
 void platform_debug_register(void);
 
-
-#ifdef PLATFORM_MSTAR
-void mi_debug_register(void);
-#endif
-
-
 #endif
