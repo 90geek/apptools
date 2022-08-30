@@ -31,6 +31,7 @@
 #include "platform/app_os.h"
 #include "platform/app_spi.h"
 
+#define SHOW_PROGRESS
 
 #define GPIO_DATA_REG  PHYS_TO_UNCACHED(0x1fe0011c)
 #define GPIO_CTRL_REG  PHYS_TO_UNCACHED(0x1fe00120)

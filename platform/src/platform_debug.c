@@ -40,6 +40,129 @@ int read_cpu_freq_debug(parse_t * pars_p,char *result_p)
 	printf("cpu freq %d\n", freq);
 	return 0;
 }
+int dump_acpi_reg_debug(parse_t * pars_p,char *result_p)
+{
+	int num;
+	int error;
+
+	error=cget_integer(pars_p,0,&num);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->num!");
+		return 1;
+	}
+	if(num==0)
+	{
+		printf(" start read apci reg:\n");
+		AcpiReadOps();
+	}
+	else if(num==1)
+	{
+		printf(" start acpi reboot:\n");
+		AcpiReboot();	
+	}
+	else
+		printf("Num is invalid");
+	return 0;
+}
+int dump_gpio_reg_debug(parse_t * pars_p,char *result_p)
+{
+	printf("start gpio read\n");
+	GpioReadOps();
+	return 0;
+}
+int dump_rtc_reg_debug(parse_t * pars_p,char *result_p)
+{
+	printf("start rtc read\n");
+	RtcReadOps();
+	return 0;
+}
+int dump_pci_debug(parse_t * pars_p,char *result_p)
+{
+	int bdf;
+	int error;
+
+	error=cget_integer(pars_p,0,&bdf);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->bdf!");
+		return 1;
+	}
+	printf("bdf 0x%x\n",bdf);
+	PciReadOps(bdf);
+}
+
+int mps_read_debug(parse_t * pars_p,char *result_p)
+{
+	int node, mps_addr;
+	unsigned int i2cbus;
+	int error;
+
+	error=cget_integer(pars_p,0,&node);
+	if (error)
+	{
+		tag_current_line(pars_p,"--> node!");
+		return 1;
+	}
+	error=cget_integer(pars_p,0,&i2cbus);
+	if (error)
+	{
+		tag_current_line(pars_p,"--> i2cbus!");
+		return 1;
+	}
+
+	error=cget_integer(pars_p,0,&mps_addr);
+	if (error)
+	{
+		tag_current_line(pars_p,"--> mps_addr!");
+		return 1;
+	}
+	printf("node 0x%x,i2cbus 0x%x, mps_addr 0x%x\n",node,i2cbus, mps_addr);
+	I2cReadOps(node, i2cbus, mps_addr);
+}
+
+int mps_write_vddn_debug(parse_t * pars_p,char *result_p)
+{
+	int node, mps_addr,step,volmV;
+	unsigned int i2cbus;
+	int error;
+
+	error=cget_integer(pars_p,0,&node);
+	if (error)
+	{
+		tag_current_line(pars_p,"--> node!");
+		return 1;
+	}
+	error=cget_integer(pars_p,0,&i2cbus);
+	if (error)
+	{
+		tag_current_line(pars_p,"--> i2cbus!");
+		return 1;
+	}
+
+	error=cget_integer(pars_p,0,&mps_addr);
+	if (error)
+	{
+		tag_current_line(pars_p,"--> mps_addr!");
+		return 1;
+	}
+	error=cget_integer(pars_p,0,&step);
+	if (error)
+	{
+		tag_current_line(pars_p,"--> step!");
+		return 1;
+	}
+	error=cget_integer(pars_p,0,&volmV);
+	if (error)
+	{
+		tag_current_line(pars_p,"--> volmV!");
+		return 1;
+	}
+
+	printf("node 0x%x,i2cbus 0x%x, mps_addr 0x%x, step %d, volmV %d\n",node,i2cbus, mps_addr, step, volmV);
+	I2cWriteOps(node,i2cbus, mps_addr, step, volmV);
+}
+
 int set_7a_spi_base_addr_debug(parse_t * pars_p,char *result_p)
 {
 	unsigned int addr_h,addr_l;
@@ -508,6 +631,12 @@ void platform_debug_register(void)
 	register_command ("LS_FAN_WRITE"			, fan_set_debug , "<Percent number>:0-100");
 	register_command ("LS_CPU_TEMP"			, read_cpu_temp_debug , "");
 	register_command ("LS_CPU_FREQ"			, read_cpu_freq_debug , "");
+	register_command ("LS_DUMP_ACPI"			, dump_acpi_reg_debug , "<num>:0dump acpi reg,1apci reboot");
+	register_command ("LS_DUMP_GPIO"			, dump_gpio_reg_debug , "");
+	register_command ("LS_DUMP_RTC"			, dump_rtc_reg_debug , "");
+	register_command ("LS_DUMP_PCI"			, dump_pci_debug , "<bdf>:eg.spi 00:16.0 bdf for b000");
+	register_command ("LS_MPS_READ"			, mps_read_debug , "<node> <i2cbus> <mps_addr>,node 0/4/8/16,i2cbus 1fe00120/1fe00130, mps_addr 3b/4b");
+	register_command ("LS_MPS_WRITE_VDDN"			, mps_write_vddn_debug , "<node> <i2cbus> <mps_addr> <step> <volmV>,node 0/4/8/16,i2cbus 1fe00120/1fe00130 mps_addr 3b/4b step +5/+10 volmV +950~+1250");
 	register_command ("SET_7A_SPI_BASE"			, set_7a_spi_base_addr_debug , "<base_addr_hi>,<base_addr_lo>");
 	register_command ("SPI_READ"			, spi_read_debug , "<spi_dev>,<offset>,<len>:spi_dev 0cpuflash/17a");
 	register_command ("SPI_WRITE"			, spi_write_debug , "<spi_dev>,<offset>,<data>:spi_dev 0cpuflash/17a,data 32bit");

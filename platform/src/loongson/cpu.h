@@ -21,52 +21,20 @@
 #
 ##
 */
-#include "LsRegDef.h"
+#ifndef  _CPU_FREQ_H_
+#define  _CPU_FREQ_H_
+
 #include "edk_api.h"
-#include "mem.h"
-#include "platform/app_platform.h"
 
-#define CPU_FREQ_CONFIG_BASE	PHYS_TO_UNCACHED(0x1fe001b0)	//Frequency configuration register
-
-/**
-	This module is Get the operating frequency of the processor.
-
-	@param[in] This						Point to the processor interface.
-	@param[in] Buffer					Read processor frequency to buffer.
-
-	@retval EFI_SUCCESS				The entry point is executed successfully.
-	@retval other							Some error occurs when executing this entry point.
-
-**/
 EFI_STATUS
 EFIAPI
 CpuGetFrequency (
 	IN UINT32	clk_ref,
 	OUT VOID				*Frequency //&UINT32 Mhz
-	)
-{
-	 UINT32 Data = 0;
-	 UINT64 CpuFre = 0;
-	 UINT64 CoreLoopc = 0;
-	 UINT64 CoreDiv = 0;
-	 UINT64 DivRefc = 0;
-	 void * vaddr = NULL;
+	);
 
-	 vaddr=p2v_mem_mapping(CPU_FREQ_CONFIG_BASE,4);
-	 if(vaddr==NULL)
-		return EFI_LOAD_ERROR;
-	 Data = Read32((U64)vaddr);
-	 DivRefc = (Data & 0xfc000000) >> 26; //L1 PLL PARAM: DIV_REFC
-	 Data = Read32((U64)vaddr + 0x4);
-	 p2v_mem_clean(vaddr);
-	 CoreLoopc = (Data & 0x1ff);//L1 PLL PARAM: DIV_LOOPC
-
-	 CoreDiv = (Data & 0xfc00) >> 10;//L1 PLL PARAM: DIV_OUT
-
-	 CpuFre = (clk_ref / DivRefc * CoreLoopc * 1000)/(CoreDiv);//CLK_REF default 100MHZ
-
-	 *(UINT32*)Frequency = CpuFre / 1000000;
-
-	 return EFI_SUCCESS;
-}
-
+UINT8 CheckCpu(
+	UINT64 cpuid_l,
+	UINT64 cpuid_h
+);
+#endif

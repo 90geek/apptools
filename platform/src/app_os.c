@@ -475,6 +475,46 @@ void app_print_data(unsigned char *buf,int size)
 	printf("\n\n");
 }
 
+//
+//rate of progress output
+//
+void app_ProgressInit(void)
+{
+	char prog[] = "[                                                                        ]   0%";
+
+	printf("%s", prog);
+}
+
+void app_ProgressShow(int percentage)
+{
+	char prog[] = "[                                                                        ]   0%";
+	char per[5];
+	int count;
+	int i;
+
+	if (percentage > 100) percentage = 100;
+	if (percentage < 0) percentage = 0;
+
+	count = percentage * 72 / 100 - 1;
+
+	for (i = 1; i <= count; i++)
+		prog[i] = '=';
+	prog[i] = '>';
+
+	sprintf(per, "%u%%", percentage);
+
+	memcpy(prog + strlen(prog) - strlen(per), per, strlen(per));
+
+	printf("\r%s", prog);
+}
+
+void app_ProgressDone(void)
+{
+	char prog[] = "[========================================================================] 100%";
+
+	printf("\r%s\n", prog);
+}
+
 char* app_system(const char *cmd)
 {
   char result[102400] = {0};
@@ -485,7 +525,7 @@ char* app_system(const char *cmd)
 
 	if( (fp = popen(cmd, "r")) == NULL ) {
 			printf("popen error!\n");
-			return;
+			return NULL;
 	}
 
 	while (fgets(buf, sizeof(buf), fp)) {

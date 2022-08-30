@@ -5,7 +5,7 @@
 #include "hardinfo.h"
 #include <sys/ioctl.h>
 #include <linux/ioctl.h>
-#include "loongson3_def.h"
+#include "loongson/loongson3_def.h"
 
 cpu_info_t cpu_info[] ={
 	{"3A5000",		{LS3A5000_VERSION,		0}, "3A5000",	"14nm",		 "35",  "0", "70", "LGA","37", "37","3", "64K", "64K", "256K", "16384K", "LA464"},
@@ -29,13 +29,18 @@ char *get_cpu_name(void)
 	char *data=NULL;
   char *tmp=NULL;
 	
-	data=app_system("lscpu | grep 'Model name:'");
+	data=app_system("cat /proc/cpuinfo | grep 'model name'");
 	// printf("***%s***\n",data);
+	if(data==NULL)
+	{
+		sprintf(buffer,"%s","unknow");
+		goto done;
+	}
 	sprintf(buffer,"%s",strstr(data,":")+1+strspn(strstr(data,":")+1," "));
 	// printf("***%s***\n",buffer);
 	if((tmp = strstr(buffer, "\n")))
 		*tmp = '\0';
-	
+done:
 	if(data!=NULL)
 		app_free(data);
 	return buffer;
@@ -46,10 +51,15 @@ char *get_cpu_version(void)
   char *tmp=NULL;
 	
 	data=app_system("dmidecode -t processor | grep 'Version:'");
+	if(data==NULL)
+	{
+		sprintf(buffer,"%s","unknow");
+		goto done;
+	}
 	sprintf(buffer,"%s",strstr(data,":")+1+strspn(strstr(data,":")+1," "));
 	if((tmp = strstr(buffer, "\n")))
 		*tmp = '\0';
-	
+done:
 	if(data!=NULL)
 		app_free(data);
 	return buffer;
@@ -59,11 +69,21 @@ char *get_cpu_current_speed(void)
 	char *data=NULL;
   char *tmp=NULL;
 	
-	data=app_system("lscpu | grep 'CPU MHz:'");
+	data=app_system("cat /proc/cpuinfo | grep 'cpu MHz'");
+	if(data==NULL)
+	{
+		if(data==NULL)
+		data=app_system("cat /proc/cpuinfo | grep 'CPU MHz'");
+		if(data==NULL)
+		{
+			sprintf(buffer,"%s","unknow");
+			goto done;
+		}
+	}
 	sprintf(buffer,"%s",strstr(data,":")+1+strspn(strstr(data,":")+1," "));
 	if((tmp = strstr(buffer, "\n")))
 		*tmp = '\0';
-	
+done:
 	if(data!=NULL)
 		app_free(data);
 	return buffer;
@@ -73,11 +93,16 @@ char *get_cpu_max_speed(void)
 	char *data=NULL;
   char *tmp=NULL;
 	
-	data=app_system("lscpu | grep 'CPU max MHz:'");
+	data=app_system("dmidecode -t 4 | grep 'Max Speed:'");
+	if(data==NULL)
+	{
+		sprintf(buffer,"%s","unknow");
+		goto done;
+	}
 	sprintf(buffer,"%s",strstr(data,":")+1+strspn(strstr(data,":")+1," "));
 	if((tmp = strstr(buffer, "\n")))
 		*tmp = '\0';
-	
+done:
 	if(data!=NULL)
 		app_free(data);
 	return buffer;
@@ -88,10 +113,15 @@ char *get_cpu_min_speed(void)
   char *tmp=NULL;
 	
 	data=app_system("lscpu | grep 'CPU min MHz:'");
+	if(data==NULL)
+	{
+		sprintf(buffer,"%s","unknow");
+		goto done;
+	}
 	sprintf(buffer,"%s",strstr(data,":")+1+strspn(strstr(data,":")+1," "));
 	if((tmp = strstr(buffer, "\n")))
 		*tmp = '\0';
-	
+done:
 	if(data!=NULL)
 		app_free(data);
 	return buffer;
@@ -102,10 +132,22 @@ char *get_cpu_arch(void)
   char *tmp=NULL;
 	
 	data=app_system("lscpu | grep 'Architecture:'");
-	sprintf(buffer,"%s",strstr(data,":")+1+strspn(strstr(data,":")+1," "));
+	if(data==NULL)
+  {
+		data=app_system("lscpu | grep '架构：'");
+		if(data==NULL)
+		{
+			sprintf(buffer,"%s","unknow");
+			goto done;
+		}
+		else
+			sprintf(buffer,"%s",strstr(data,"：")+3+strspn(strstr(data,"：")+3," "));
+	}
+	else
+		sprintf(buffer,"%s",strstr(data,":")+1+strspn(strstr(data,":")+1," "));
 	if((tmp = strstr(buffer, "\n")))
 		*tmp = '\0';
-	
+done:
 	if(data!=NULL)
 		app_free(data);
 	return buffer;
@@ -117,10 +159,22 @@ char *get_cpu_core_num(void)
   char *tmp=NULL;
 	
 	data=app_system("lscpu | grep 'Core(s) per socket:'");
-	sprintf(buffer,"%s",strstr(data,":")+1+strspn(strstr(data,":")+1," "));
+	if(data==NULL)
+	{
+		data=app_system("lscpu | grep '每个座的核数：'");
+		if(data==NULL)
+		{
+			sprintf(buffer,"%s","unknow");
+			goto done;
+		}
+		else
+			sprintf(buffer,"%s",strstr(data,"：")+3+strspn(strstr(data,"：")+3," "));
+	}
+	else
+		sprintf(buffer,"%s",strstr(data,":")+1+strspn(strstr(data,":")+1," "));
 	if((tmp = strstr(buffer, "\n")))
 		*tmp = '\0';
-	
+done:
 	if(data!=NULL)
 		app_free(data);
 	return buffer;
@@ -131,10 +185,22 @@ char *get_cpu_thread_num(void)
   char *tmp=NULL;
 	
 	data=app_system("lscpu | grep 'Thread(s) per core:'");
-	sprintf(buffer,"%s",strstr(data,":")+1+strspn(strstr(data,":")+1," "));
+	if(data==NULL)
+	{
+		data=app_system("lscpu | grep '每个核的线程数：'");
+		if(data==NULL)
+		{
+			sprintf(buffer,"%s","unknow");
+			goto done;
+		}
+		else
+			sprintf(buffer,"%s",strstr(data,"：")+3+strspn(strstr(data,"：")+3," "));
+	}
+	else
+		sprintf(buffer,"%s",strstr(data,":")+1+strspn(strstr(data,":")+1," "));
 	if((tmp = strstr(buffer, "\n")))
 		*tmp = '\0';
-	
+done:
 	if(data!=NULL)
 		app_free(data);
 	return buffer;
@@ -143,12 +209,23 @@ char *get_cpu_cacheL1d(void)
 {
 	char *data=NULL;
   char *tmp=NULL;
-	
-	data=app_system("lscpu | grep 'L1d cache:'");
-	sprintf(buffer,"%s",strstr(data,":")+1+strspn(strstr(data,":")+1," "));
+	data = app_system("lscpu | grep 'L1d cache:'");
+	if(data==NULL)
+	{
+		data = app_system("lscpu | grep 'L1d 缓存：'");
+		if(data==NULL)
+		{
+			sprintf(buffer,"%s","unknow");
+			goto done;
+		}
+		else
+			sprintf(buffer,"%s",strstr(data,"：")+3+strspn(strstr(data,"：")+3," "));
+	}
+	else
+		sprintf(buffer,"%s",strstr(data,":")+1+strspn(strstr(data,":")+1," "));
 	if((tmp = strstr(buffer, "\n")))
 		*tmp = '\0';
-	
+done:
 	if(data!=NULL)
 		app_free(data);
 	return buffer;
@@ -159,10 +236,22 @@ char *get_cpu_cacheL1i(void)
   char *tmp=NULL;
 	
 	data=app_system("lscpu | grep 'L1i cache:'");
-	sprintf(buffer,"%s",strstr(data,":")+1+strspn(strstr(data,":")+1," "));
+	if(data==NULL)
+	{
+		data = app_system("lscpu | grep 'L1i 缓存：'");
+		if(data==NULL)
+		{
+			sprintf(buffer,"%s","unknow");
+			goto done;
+		}
+		else
+			sprintf(buffer,"%s",strstr(data,"：")+3+strspn(strstr(data,"：")+3," "));
+	}
+	else
+		sprintf(buffer,"%s",strstr(data,":")+1+strspn(strstr(data,":")+1," "));
 	if((tmp = strstr(buffer, "\n")))
 		*tmp = '\0';
-	
+done:
 	if(data!=NULL)
 		app_free(data);
 	return buffer;
@@ -173,10 +262,22 @@ char *get_cpu_cacheL2(void)
   char *tmp=NULL;
 	
 	data=app_system("lscpu | grep 'L2 cache:'");
-	sprintf(buffer,"%s",strstr(data,":")+1+strspn(strstr(data,":")+1," "));
+	if(data==NULL)
+	{
+		data = app_system("lscpu | grep 'L2 缓存：'");
+		if(data==NULL)
+		{
+			sprintf(buffer,"%s","unknow");
+			goto done;
+		}
+		else
+			sprintf(buffer,"%s",strstr(data,"：")+3+strspn(strstr(data,"：")+3," "));
+	}
+	else
+		sprintf(buffer,"%s",strstr(data,":")+1+strspn(strstr(data,":")+1," "));
 	if((tmp = strstr(buffer, "\n")))
 		*tmp = '\0';
-	
+done:
 	if(data!=NULL)
 		app_free(data);
 	return buffer;
@@ -187,10 +288,22 @@ char *get_cpu_cacheL3(void)
   char *tmp=NULL;
 	
 	data=app_system("lscpu | grep 'L3 cache:'");
-	sprintf(buffer,"%s",strstr(data,":")+1+strspn(strstr(data,":")+1," "));
+	if(data==NULL)
+	{
+		data = app_system("lscpu | grep 'L3 缓存：'");
+		if(data==NULL)
+		{
+			sprintf(buffer,"%s","unknow");
+			goto done;
+		}
+		else
+			sprintf(buffer,"%s",strstr(data,"：")+3+strspn(strstr(data,"：")+3," "));
+	}
+	else
+		sprintf(buffer,"%s",strstr(data,":")+1+strspn(strstr(data,":")+1," "));
 	if((tmp = strstr(buffer, "\n")))
 		*tmp = '\0';
-	
+done:
 	if(data!=NULL)
 		app_free(data);
 	return buffer;
@@ -285,6 +398,7 @@ int cpu_info_debug(parse_t * pars_p,char *result_p)
 	if(cpu==NULL)
 	{
 		printf("cpu info is no support!\n");
+		return 1;
 	}
 	printf("cpu_name: %s\n",cpu->cpu_name);
 	printf("cpu_idh: 0x%llx\n",cpu->id.h);

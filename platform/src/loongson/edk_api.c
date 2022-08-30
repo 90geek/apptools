@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include "platform/app_types.h"
+#include "platform/app_os.h"
 #include "edk_api.h"
 
 VOID *

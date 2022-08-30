@@ -264,6 +264,9 @@ int  app_msg_receive(int msg_id,msg_buf_t  *msg_buf,int len,int flag);
 
 void app_print_data(unsigned char *buf,int size);
 
+void app_ProgressInit(void);
+void app_ProgressShow(int percentage);
+void app_ProgressDone(void);
 char* app_system(const char *cmd);
 U64 app_get_pcie_region(const char *dev);
 #endif
