@@ -3,7 +3,7 @@
 #include "LsRegDef.h"
 
 
-#define PWM_REG_BASE			( LS7A_PWM0_REG_BASE )	/*LW HPS to FPGA bridge*/
+#define PWM_REG_BASE			( LS7A_PWM_REG_BASE )	/*LW HPS to FPGA bridge*/
 
 #define GPIO_REGS_BASE		( LS7A_GPIO_REG_BASE )	/*GPIO Address Map*/
 

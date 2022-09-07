@@ -6,9 +6,15 @@
 
 int fan_set_debug(parse_t * pars_p,char *result_p)
 {
-	int num,level;
+	int num,pwm;
 	unsigned char buf[20]={0};
 	int error;
+	error=cget_integer(pars_p,0,&pwm);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->pwm!");
+		return 1;
+	}
 	error=cget_integer(pars_p,0,&num);
 	if (error)
 	{
@@ -16,13 +22,34 @@ int fan_set_debug(parse_t * pars_p,char *result_p)
 		return 1;
 	}
 
-	SmartFanSet (num);
+	SmartFanSet (pwm, num);
 
-	printf("set fan %d %\n", num);
+	printf("set pwm %d fan %d %\n", pwm, num);
 
 	return 0;
 }
+int fan_speed_get_debug(parse_t * pars_p,char *result_p)
+{
+	int pwm;
+	int error;
+	unsigned int speed;
 
+	error=cget_integer(pars_p,0,&pwm);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->pwm!");
+		return 1;
+	}
+	speed = SmartFanSpeedGet (pwm);
+	printf("get pwm %d fan speed %d RPM\n", pwm, speed);
+
+	return 0;
+}
+int fan_ctrl_debug(parse_t * pars_p,char *result_p)
+{
+	FanCtrl();
+	return 0;
+}
 int read_cpu_temp_debug(parse_t * pars_p,char *result_p)
 {
 	U32 temp0,temp1;
@@ -628,7 +655,9 @@ int cmd_test_debug(parse_t * pars_p,char *result_p)
 
 void platform_debug_register(void)
 {
-	register_command ("LS_FAN_WRITE"			, fan_set_debug , "<Percent number>:0-100");
+	register_command ("LS_FAN_SET"			, fan_set_debug , "<Pwm>:0-3, <Percent number>:0-100");
+	register_command ("LS_FAN_SPEED"		, fan_speed_get_debug , "<Pwm>:0-3");
+	register_command ("LS_FAN_CTRL"		, fan_ctrl_debug , "<NONE>");
 	register_command ("LS_CPU_TEMP"			, read_cpu_temp_debug , "");
 	register_command ("LS_CPU_FREQ"			, read_cpu_freq_debug , "");
 	register_command ("LS_DUMP_ACPI"			, dump_acpi_reg_debug , "<num>:0dump acpi reg,1apci reboot");

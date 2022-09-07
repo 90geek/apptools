@@ -26,7 +26,8 @@
 
 #include "edk_api.h"
 
-int SmartFanSet (UINT8 Percent);
-UINT8 ls132_tempdetect();
+int SmartFanSet (UINT8 Pwm, UINT8 Percent);
+UINT32 SmartFanSpeedGet (UINT8 Pwm);
+void FanCtrl(void);
 
 #endif

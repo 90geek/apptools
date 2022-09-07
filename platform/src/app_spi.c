@@ -47,6 +47,7 @@ int update_bios(char *file_path)
 	}
 	UpdateBiosInSpiFlash(0,ptr2,Ret,(U64)vaddr);
 	p2v_mem_clean(vaddr, memoffset);
+	// close(from_fd);
 
 	return 0;
 }
