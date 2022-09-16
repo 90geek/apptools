@@ -41,14 +41,6 @@
 
 UINT64 PwmRegBaseAddr;
 UINT64 TempRegBaseAddr;
-//
-// Ls7a-SmartFan
-//
-typedef struct {
-	UINT32	MinRpm;
-	UINT32	MaxRpm;
-}LS7A_SMARTFAN_CFG_TABLE;
-LS7A_SMARTFAN_CFG_TABLE  SmartFanParameter;
 
 EFI_STATUS
 Ls7aPwm (
@@ -390,17 +382,10 @@ UINT8 ls132_tempdetect_to_pwm()
 	return fanflag;
 }
 
-int SmartFanSet (UINT8 Pwm, UINT8 Percent)
+int SmartFanSet (UINT8 Pwm, LS7A_SMARTFAN_CFG_TABLE SmartFanParameter)
 {
 	int Status=0;
-
-	if(Percent>100)
-	{
-		printf("Percent is error %d\n",Percent);
-		return -1;
-	}
-	SmartFanParameter.MinRpm = 100 * (100-Percent);
-	SmartFanParameter.MaxRpm = 10000;
+	
 	printf ("SmartFan Init, MinRpm:%d ,MaxRpm;%d \n",\
 					SmartFanParameter.MinRpm,SmartFanParameter.MaxRpm);
 	switch(Pwm)
@@ -447,10 +432,13 @@ UINT32 SmartFanSpeedGet (UINT8 Pwm)
 	return 0;
 }
 
-UINT8 TempToPercent(void)
+UINT8 TempToPercent(
+	LS7A_SMARTFAN_CFG_TABLE *Parameter
+	)
 {
 	int Status=0;
 	UINT32 temp0,temp1, temp;
+	UINT8 Percent;
 
 	Status = lscpu_tempdetect(&temp0,&temp1);
 	if(Status!=EFI_SUCCESS)
@@ -459,43 +447,104 @@ UINT8 TempToPercent(void)
 	printf("temp0 %d temp1 %d\n", temp0,temp1);
 	temp=(temp0+temp1)/2;
 	if(temp<LS_TEMP0){
-		return 30;
+		Percent =30;
 	}else if(temp<LS_TEMP1){
-		return 35;
+		Percent = 35;
 	}else if(temp<LS_TEMP2){
-		return 40;
+		Percent = 40;
 	}else if(temp<LS_TEMP3){
-		return 45;
+		Percent = 45;
 	}else if(temp<LS_TEMP4){
-		return 50;
+		Percent = 50;
 	}else if(temp<LS_TEMP5){
-		return 55;
+		Percent = 55;
 	}else if(temp<LS_TEMP6){
-		return 60;
+		Percent = 60;
 	}else if(temp<LS_TEMP7){
-		return 65;
+		Percent = 65;
 	}else if(temp<LS_TEMP8){
-		return 70;
+		Percent = 70;
 	}else if(temp<LS_TEMP9){
-		return 75;
+		Percent = 75;
 	}else if(temp<LS_TEMP10){
-		return 80;
+		Percent = 80;
 	}else if(temp<LS_TEMP11){
-		return 90;
+		Percent = 90;
 	}else if(temp<LS_TEMP12){
-		return 100;
+		Percent = 100;
 	}else{
-		return 100;
+		Percent = 100;
 	}
+
+	Parameter->MinRpm = 100 * (100-Percent);
+	Parameter->MaxRpm = 10000;
+	return Percent;
 }
+
+UINT8 TempToPercent_LangChao(
+	LS7A_SMARTFAN_CFG_TABLE *Parameter
+	)
+{
+	int Status=0;
+	UINT32 temp0,temp1, temp;
+	UINT8 Percent;
+
+	Status = lscpu_tempdetect(&temp0,&temp1);
+	if(Status!=EFI_SUCCESS)
+		return 50;
+
+	printf("temp0 %d temp1 %d\n", temp0,temp1);
+	temp=(temp0+temp1)/2;
+	if(temp<64){
+		Percent = 30;
+	}else if(temp<66){
+		Percent = 30;
+	}else if(temp<69){
+		Percent = 35;
+	}else if(temp<71){
+		Percent = 40;
+	}else if(temp<72){
+		Percent = 45;
+	}else if(temp<73){
+		Percent = 50;
+	}else if(temp<74){
+		Percent = 55;
+	}else if(temp<75){
+		Percent = 60;
+	}else if(temp<76){
+		Percent = 65;
+	}else if(temp<77){
+		Percent = 70;
+	}else if(temp<78){
+		return 75;
+	}else if(temp<79){
+		Percent = 80;
+	}else if(temp<80){
+		Percent = 90;
+	}else{
+		Percent = 100;
+	}
+
+	Parameter->MinRpm = 255 * (100-Percent);
+	Parameter->MaxRpm = 25500;
+	return Percent;
+}
+
 void FanCtrl(void)
 {
 	UINT8 Percent;
 	unsigned int Speed;
+	LS7A_SMARTFAN_CFG_TABLE Parameter;
 
-	Percent = TempToPercent();
+	Percent = TempToPercent_LangChao(&Parameter);
+	// Percent = TempToPercent(&Parameter);
+	if(Percent>100)
+	{
+		printf("Percent is error %d\n",Percent);
+		return ;
+	}
 	// pwm0 set fan
-	SmartFanSet (0, Percent);
+	SmartFanSet (0, Parameter);
 	// pwm1 read speed
 	Speed = SmartFanSpeedGet (1);
 	printf("fan speed %d RPM\n", Speed);

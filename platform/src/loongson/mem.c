@@ -154,7 +154,7 @@ int p2v_mem_clean(void *vaddr,int memoffset)
 		// printf("munmap addr : %p \n",vaddr);
 		status = munmap(vaddr-memoffset, 1);
 		if(status != 0){
-			printf("ERROR: p2v_mem_clean , munmap() failed... status 0x%x\n",status);
+			printf("ERROR: p2v_mem_clean , munmap() failed... status 0x%x, vaddr:%p, memoffset=0x%x\n",vaddr,memoffset);
 		}
 		if(needclose)
 		{

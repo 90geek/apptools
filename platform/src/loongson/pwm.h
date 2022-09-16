@@ -26,7 +26,15 @@
 
 #include "edk_api.h"
 
-int SmartFanSet (UINT8 Pwm, UINT8 Percent);
+//
+// Ls7a-SmartFan
+//
+typedef struct {
+	UINT32	MinRpm;
+	UINT32	MaxRpm;
+}LS7A_SMARTFAN_CFG_TABLE;
+
+int SmartFanSet (UINT8 Pwm, LS7A_SMARTFAN_CFG_TABLE SmartFanParameter);
 UINT32 SmartFanSpeedGet (UINT8 Pwm);
 void FanCtrl(void);
 

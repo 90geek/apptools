@@ -9,6 +9,8 @@ int fan_set_debug(parse_t * pars_p,char *result_p)
 	int num,pwm;
 	unsigned char buf[20]={0};
 	int error;
+	LS7A_SMARTFAN_CFG_TABLE Parameter;
+
 	error=cget_integer(pars_p,0,&pwm);
 	if (error)
 	{
@@ -21,8 +23,14 @@ int fan_set_debug(parse_t * pars_p,char *result_p)
 		tag_current_line(pars_p,"-->num!");
 		return 1;
 	}
-
-	SmartFanSet (pwm, num);
+	if(num>100)
+	{
+		printf("Percent num is error %d\n",num);
+		return 1;
+	}
+	Parameter.MinRpm = 100 * (100-num);
+	Parameter.MaxRpm = 10000;
+	SmartFanSet (pwm, Parameter);
 
 	printf("set pwm %d fan %d %\n", pwm, num);
 
