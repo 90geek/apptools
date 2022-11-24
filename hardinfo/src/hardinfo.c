@@ -8,17 +8,17 @@
 #include "loongson/loongson3_def.h"
 
 cpu_info_t cpu_info[] ={
-	{"3A5000",		{LS3A5000_VERSION,		0}, "3A5000",	"14nm",		 "35",  "0", "70", "LGA","37", "37","3", "64K", "64K", "256K", "16384K", "LA464"},
-	{"3A5000LL",	{LS3A5000LL_VERSION,	0}, "3A5000LL",	"14nm",  "30",  "0", "70", "LGA","37", "37","3", "64K", "64K", "256K", "16384K", "LA464"},
-	{"3A5000M",		{LS3A5000M_VERSION,		0}, "3A5000M",	"14nm",  "18",  "0", "70", "LGA","37", "37","3", "64K", "64K", "256K", "16384K", "LA464"},
-	{"3B5000",		{LS3B5000_VERSION,		0}, "3B5000",	"14nm",		 "25",  "0", "70", "LGA","37", "37","3", "64K", "64K", "256K", "16384K", "LA464"},
+	{"3A5000",		{LS3A5000_VERSION,		0}, "3A5000",	"14nm",		 "35",	"0", "70", "LGA","37", "37","3", "64K", "64K", "256K", "16384K", "LA464"},
+	{"3A5000LL",	{LS3A5000LL_VERSION,	0}, "3A5000LL",	"14nm",  "30",	"0", "70", "LGA","37", "37","3", "64K", "64K", "256K", "16384K", "LA464"},
+	{"3A5000M",		{LS3A5000M_VERSION,		0}, "3A5000M",	"14nm",  "18",	"0", "70", "LGA","37", "37","3", "64K", "64K", "256K", "16384K", "LA464"},
+	{"3B5000",		{LS3B5000_VERSION,		0}, "3B5000",	"14nm",		 "25",	"0", "70", "LGA","37", "37","3", "64K", "64K", "256K", "16384K", "LA464"},
 	{"3C5000L",		{LS3C5000L_VERSION,		0}, "3C5000L",	"14nm",  "200", "0", "70", "LGA","70", "44","4", "64K", "64K", "256K", "16384K", "LA464"},
 	{"3C5000L",		{LS3C5000LL_VERSION,	0}, "3C5000LL",	"14nm",  "160", "0", "85", "LGA","70", "44","4", "64K", "64K", "256K", "16384K", "LA464"},
-	{"3C5000I",		{LS3A5000I_VERSION,		0}, "3A5000I",	"14nm",  "18",  "0", "85", "LGA","37", "37","3", "64K", "64K", "256K", "16384K", "LA464"},
+	{"3C5000I",		{LS3A5000I_VERSION,		0}, "3A5000I",	"14nm",  "18",	"0", "85", "LGA","37", "37","3", "64K", "64K", "256K", "16384K", "LA464"},
 	{"3C5000i",		{LS3A5000i_VERSION,		0}, "3A5000i",	"14nm",  "18" , "0", "85", "LGA","37", "37","3", "64K", "64K", "256K", "16384K", "LA464"},
-	{"3A5000BM",	{LS3A5000BM_VERSION,	0}, "3A5000BM",	"14nm",  "18",  "0", "70", "LGA","37", "37","3", "64K", "64K", "256K", "16384K", "LA464"},
-	{"3A5000HV",	{LS3A5000HV_VERSION,	0}, "3A5000HV",	"14nm",  "35",  "0", "70", "LGA","37", "37","3", "64K", "64K", "256K", "16384K", "LA464"},
-	{"3A4000",		{LS3A4000_VERSION,		0}, "3A4000",	"28nm",		 "35",  "0", "70", "LGA","37", "37","3", "64K", "64K", "256K", "16384K", "GS464V"},
+	{"3A5000BM",	{LS3A5000BM_VERSION,	0}, "3A5000BM",	"14nm",  "18",	"0", "70", "LGA","37", "37","3", "64K", "64K", "256K", "16384K", "LA464"},
+	{"3A5000HV",	{LS3A5000HV_VERSION,	0}, "3A5000HV",	"14nm",  "35",	"0", "70", "LGA","37", "37","3", "64K", "64K", "256K", "16384K", "LA464"},
+	{"3A4000",		{LS3A4000_VERSION,		0}, "3A4000",	"28nm",		 "35",	"0", "70", "LGA","37", "37","3", "64K", "64K", "256K", "16384K", "GS464V"},
 	{"UNKNOW",		{0,										0},	"UNKNOW",		"0nm",		"0",	"0", "0",		"LGA","0", "0","0", "0K", "0K", "0K", "0K", "UNKNOW"}
 };
 static ls7a_ver_t ls7a;
@@ -27,7 +27,7 @@ static char buffer[100];
 char *get_cpu_name(void)
 {
 	char *data=NULL;
-  char *tmp=NULL;
+	char *tmp=NULL;
 	
 	data=app_system("cat /proc/cpuinfo | grep 'model name'");
 	// printf("***%s***\n",data);
@@ -48,7 +48,7 @@ done:
 char *get_cpu_version(void)
 {
 	char *data=NULL;
-  char *tmp=NULL;
+	char *tmp=NULL;
 	
 	data=app_system("dmidecode -t processor | grep 'Version:'");
 	if(data==NULL)
@@ -67,7 +67,7 @@ done:
 char *get_cpu_current_speed(void)
 {
 	char *data=NULL;
-  char *tmp=NULL;
+	char *tmp=NULL;
 	
 	data=app_system("cat /proc/cpuinfo | grep 'cpu MHz'");
 	if(data==NULL)
@@ -91,7 +91,7 @@ done:
 char *get_cpu_max_speed(void)
 {
 	char *data=NULL;
-  char *tmp=NULL;
+	char *tmp=NULL;
 	
 	data=app_system("dmidecode -t 4 | grep 'Max Speed:'");
 	if(data==NULL)
@@ -110,7 +110,7 @@ done:
 char *get_cpu_min_speed(void)
 {
 	char *data=NULL;
-  char *tmp=NULL;
+	char *tmp=NULL;
 	
 	data=app_system("lscpu | grep 'CPU min MHz:'");
 	if(data==NULL)
@@ -129,11 +129,11 @@ done:
 char *get_cpu_arch(void)
 {
 	char *data=NULL;
-  char *tmp=NULL;
+	char *tmp=NULL;
 	
 	data=app_system("lscpu | grep 'Architecture:'");
 	if(data==NULL)
-  {
+	{
 		data=app_system("lscpu | grep '架构：'");
 		if(data==NULL)
 		{
@@ -156,7 +156,7 @@ done:
 char *get_cpu_core_num(void)
 {
 	char *data=NULL;
-  char *tmp=NULL;
+	char *tmp=NULL;
 	
 	data=app_system("lscpu | grep 'Core(s) per socket:'");
 	if(data==NULL)
@@ -182,7 +182,7 @@ done:
 char *get_cpu_thread_num(void)
 {
 	char *data=NULL;
-  char *tmp=NULL;
+	char *tmp=NULL;
 	
 	data=app_system("lscpu | grep 'Thread(s) per core:'");
 	if(data==NULL)
@@ -208,7 +208,7 @@ done:
 char *get_cpu_cacheL1d(void)
 {
 	char *data=NULL;
-  char *tmp=NULL;
+	char *tmp=NULL;
 	data = app_system("lscpu | grep 'L1d cache:'");
 	if(data==NULL)
 	{
@@ -233,7 +233,7 @@ done:
 char *get_cpu_cacheL1i(void)
 {
 	char *data=NULL;
-  char *tmp=NULL;
+	char *tmp=NULL;
 	
 	data=app_system("lscpu | grep 'L1i cache:'");
 	if(data==NULL)
@@ -259,7 +259,7 @@ done:
 char *get_cpu_cacheL2(void)
 {
 	char *data=NULL;
-  char *tmp=NULL;
+	char *tmp=NULL;
 	
 	data=app_system("lscpu | grep 'L2 cache:'");
 	if(data==NULL)
@@ -285,7 +285,7 @@ done:
 char *get_cpu_cacheL3(void)
 {
 	char *data=NULL;
-  char *tmp=NULL;
+	char *tmp=NULL;
 	
 	data=app_system("lscpu | grep 'L3 cache:'");
 	if(data==NULL)
@@ -366,6 +366,13 @@ ls7a_ver_t *get_7a_version(void)
 	ls7a.ls7a_108reg = ls7a_108reg;
 
 	return &ls7a;
+}
+void read_cpu_old_id(void)
+{
+	U32 cpuid=0;
+	app_mm_read(0x1fe00464, (U32 *)&cpuid, 4);
+	cpuid=(cpuid>>13)&0xff;
+	printf("check cpu old id 0x%x!\n",cpuid);
 }
 char *get_bios_version(void)
 {

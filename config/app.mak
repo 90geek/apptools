@@ -93,6 +93,20 @@ LDFLAGS += `pkg-config --libs gtk+-3.0`
 else
 
 endif
+ifeq ($(DEVMEM_SUPPORT), 1) 
+DMIDECODE_INCLUDE =  $(SDK_DIR)/devmem/include
+INCLUDEFLAGS += -I$(DMIDECODE_INCLUDE)
+CFLAGS += -DDEVMEM_SUPPORT
+
+LIBPATH += -L$(SDK_DIR)/devmem/lib/$(LINK_TYPE)
+LIB += -ldevmem
+
+SUBDIRS += devmem/src
+# CFLAGS += -W -Wall -Wshadow -Wstrict-prototypes -Wpointer-arith -Wcast-qual \
+          -Wcast-align -Wwrite-strings -Wmissing-prototypes -Winline -Wundef
+else
+
+endif
 
 ##########################################################################
 INCLUDEFLAGS += -I${PLATFORM_INCLUDE} -I${TESTTOOL_INCLUDE}

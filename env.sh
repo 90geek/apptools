@@ -33,9 +33,9 @@ function make()
 }
 
 ################################################
-# host mips64el loongarch64 
+# host mips64 loongarch64 
 ################################################
-SUPPORT_PLATFORM=(host mips64el loongarch64)
+SUPPORT_PLATFORM=(host mips64 loongarch64)
 unset PLATFORM
 
 if [ $1 ];then 
@@ -77,6 +77,9 @@ if [ $PLATFORM ] ;then
 
 		unset INFOUI_SUPPORT
 		# export INFOUI_SUPPORT=1
+		
+		unset DEVMEM_SUPPORT
+		export DEVMEM_SUPPORT=1
 	elif [ $PLATFORM = "mips64" ] ; then	 
 		unset CAPSULE_SUPPORT
 		# export CAPSULE_SUPPORT=1
@@ -89,6 +92,9 @@ if [ $PLATFORM ] ;then
 		
 		unset INFOUI_SUPPORT
 		# export INFOUI_SUPPORT=1
+		
+		unset DEVMEM_SUPPORT
+		export DEVMEM_SUPPORT=1
 	elif [ $PLATFORM = "loongarch64" ] ; then 
 		unset CAPSULE_SUPPORT
 		# export CAPSULE_SUPPORT=1
@@ -101,6 +107,9 @@ if [ $PLATFORM ] ;then
 		
 		unset INFOUI_SUPPORT
 		# export INFOUI_SUPPORT=1
+		
+		unset DEVMEM_SUPPORT
+		export DEVMEM_SUPPORT=1
 	else 
 		echo "PLATFORM not define"	
 fi

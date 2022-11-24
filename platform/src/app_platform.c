@@ -18,6 +18,6 @@ void app_platform_deinit(void)
 
 app_platform_t* get_app_platform_info(void)
 {
-        return &platform;
+				return &platform;
 }
 

@@ -58,6 +58,7 @@ cpu_info_t *get_cpu_info(void);
 int get_sensors(ls_sensors_t *sen);
 char *get_bios_version(void);
 char *get_product_name(void);
+void read_cpu_old_id(void);
 int hardinfo_init(void);
 
 #endif

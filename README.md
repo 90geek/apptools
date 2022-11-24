@@ -12,3 +12,9 @@ make
 source env.sh loongarch64
 make
 ```
+
+### Add new module
+1. env.sh add *_SUPPORT
+2.Add dir
+3. min.c add call
+4. app.mak add compile

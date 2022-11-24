@@ -4,6 +4,7 @@
 #include "apptools.h"
 #include "platform/app_platform.h"
 #include "platform/app_spi.h"
+#include "vers.h"
 
 #ifdef CAPSULE_SUPPORT
 #include "capsule.h"
@@ -21,6 +22,10 @@
 #include "infoui.h"
 #endif
 
+#ifdef DEVMEM_SUPPORT
+#include "devmem.h"
+#endif
+
 static int check_sudo(void)
 {
 	if (access("/dev/mem",W_OK) != 0)
@@ -32,7 +37,10 @@ static int check_sudo(void)
 }
 static void ShowUsage(void)
 {
-	printf("Application Tools Programmer\nBy 90geek <bo90geek@gmail.com>\n\n");
+	printf("Application Tools Programmer\nBy 90geek <bo90geek@gmail.com>\n");
+	printf("Version %s\n",VERS);
+	printf("Build Time %s\n",BLD);
+	printf("%s\n\n",CMMT);
 	puts(
 		"Usage:\n"
 		"apptool [parameter] ... :explain \n"
@@ -43,6 +51,8 @@ static void ShowUsage(void)
 		"  wmac <7aspi_paddr> <eth> <macaddr> :write 7a flash mac addr,eg wmac 0x452a0000 0 11:22:33:44:55:66\n"
 		"  wmac <probe> <eth> <macaddr> :write 7a flash mac addr,eg wmac probe 0 11:22:33:44:55:66\n"
 		"  dmi :dmidecode cmd,eg dmi -t 0\n"
+		"  rcpuid :read cpu old id\n"
+		"  devmem :devmem cmd,eg devmem addr\n"
 		"  cmd :into apptool cmdline \n");
 }
 static void read_mac_addr(int argc, char *argv[])
@@ -157,6 +167,23 @@ int main (int argc,char *argv[])
 		printf("you need to be root to perform this command!!!\n");
 		return Ret;
 	}
+
+	if (!strcmp(argv[argv_p], "dmi"))
+	{
+#ifdef DMIDECODE_SUPPORT
+		dmidecode(argv_c, argv + argv_p);
+#endif
+		return Ret;
+	}
+
+	if (!strcmp(argv[argv_p], "devmem"))
+	{
+#ifdef DEVMEM_SUPPORT
+		devmem_init (argv_c, argv + argv_p);
+#endif
+		return Ret;
+	}
+
 	TesttoolInit(0);
 	app_platform_init();
 #ifdef CAPSULE_SUPPORT
@@ -200,17 +227,6 @@ int main (int argc,char *argv[])
 		goto cleanup;
 	}
 
-	if (!strcmp(argv[argv_p], "dmi"))
-	{
-		argv_c--;
-		argv_p++;
-#ifdef DMIDECODE_SUPPORT
-		// dmidecode(argv_c, argv + argv_p);
-		dmidecode(argc, argv);
-#endif
-		goto cleanup;
-	}
-
 	if (!strcmp(argv[argv_p], "infoui"))
 	{
 		argv_c--;
@@ -220,6 +236,15 @@ int main (int argc,char *argv[])
 #endif
 		goto cleanup;
 	}
+
+	if (!strcmp(argv[argv_p], "rcpuid"))
+	{
+#ifdef HARDINFO_SUPPORT
+	read_cpu_old_id();
+#endif
+		goto cleanup;
+	}
+
 	if (!strcmp(argv[argv_p], "cmd"))
 	{
 		TesttoolRun(1);
