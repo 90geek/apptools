@@ -4,6 +4,101 @@
 #include "platform/platform_debug.h"
 #include "platform/app_platform.h"
 
+int lpc_io_read_debug(parse_t * pars_p,char *result_p)
+{
+	int count;
+	unsigned int port;
+	unsigned char buf[100]={0};
+	int error;
+
+	error=cget_integer(pars_p,0,&port);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->port!");
+		return 1;
+	}
+	error=cget_integer(pars_p,0,&count);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->count!");
+		return 1;
+	}
+	if(count>100)
+	{
+		printf("Percent count is error %d\n",count);
+		return 1;
+	}
+	ChipsetLpcIoRead (NULL,1,port,count,buf);
+	printf("lpc io read read value :\n");
+	app_print_data(buf,count);
+	return 0;
+}
+int sio_dev_reg_debug(parse_t * pars_p,char *result_p)
+{
+	unsigned int dev,reg,data,flag;
+	unsigned char buf;
+	int error;
+
+	error=cget_integer(pars_p,0,&dev);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->dev!");
+		return 1;
+	}
+	error=cget_integer(pars_p,0,&reg);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->reg!");
+		return 1;
+	}
+	error=cget_integer(pars_p,0,&flag);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->flag!");
+		return 1;
+	}
+	error=cget_integer(pars_p,0,&data);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->data!");
+		return 1;
+	}
+
+	printf("dev 0x%x, reg 0x%x flag %d data 0x%x\n",dev,reg,flag, data);
+	if(data>0xff)
+	{
+		printf("Percent data is error 0x%x\n",data);
+	}
+	buf=0xa5;
+	ChipsetLpcIoWrite (NULL,1,0x2e,1,&buf);
+	ChipsetLpcIoWrite (NULL,1,0x2e,1,&buf);
+	buf=0x07;
+	ChipsetLpcIoWrite (NULL,1,0x2e,1,&buf);
+	ChipsetLpcIoWrite (NULL,1,0x2f,1,&dev);
+	buf=0x30;
+	ChipsetLpcIoWrite (NULL,1,0x2e,1,&buf);
+	buf=0x01;
+	ChipsetLpcIoWrite (NULL,1,0x2f,1,&buf);
+	buf=0x60;
+	ChipsetLpcIoWrite (NULL,1,0x2e,1,&buf);
+	buf=0x8;
+	ChipsetLpcIoWrite (NULL,1,0x2f,1,&buf);
+	buf=0x61;
+	ChipsetLpcIoWrite (NULL,1,0x2e,1,&buf);
+	buf=0xc0;
+	ChipsetLpcIoWrite (NULL,1,0x2f,1,&buf);
+	buf=0xaa;
+	ChipsetLpcIoWrite (NULL,1,0x2e,1,&buf);
+	if(flag==0)
+		ChipsetLpcIoWrite (NULL,1,0x8c0+reg,1,&data);
+	else
+	{
+		buf=0x0;
+		ChipsetLpcIoRead (NULL,1,0x8c0+reg,1,&buf);
+		printf(":0x%x\n",buf);
+	}
+	return 0;
+}
 int fan_set_debug(parse_t * pars_p,char *result_p)
 {
 	int num,pwm;
@@ -689,4 +784,6 @@ void platform_debug_register(void)
 	register_command ("MM_W_DW"			, mm_write_dword_debug , "<base_addr_hi>,<base_addr_lo>,<data_hi>,<data_lo>");
 	register_command ("MM_R_BURST"			, mm_read_burst_debug , "<base_addr_hi>,<base_addr_lo>,<len>");
 	register_command ("TEST_CMD"			, cmd_test_debug , "<cmd>:eg cmd lscpu");
+	register_command ("LS_LPC_IO_READ"			, lpc_io_read_debug , "<prot> <count>");
+	register_command ("LS_SIO_DEV_REG"			, sio_dev_reg_debug , "<dev> <reg> <0(write)/1(read)> <data>");
 }
