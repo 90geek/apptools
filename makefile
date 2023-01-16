@@ -23,6 +23,7 @@ app:$(OBJS)
 	$(SDK_DIR)/vers.sh
 	$(AT)$(CC) $(LDFLAGS) -o $(APP) $(OBJS) ${LIB}
 subdirs:
+	$(SDK_DIR)/vers.sh
 	for dir in $(SUBDIRS);\
 	do make -C $$dir all || exit 1;\
 	done
