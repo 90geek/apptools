@@ -131,6 +131,34 @@ int fan_set_debug(parse_t * pars_p,char *result_p)
 
 	return 0;
 }
+int fan_set_freq_debug(parse_t * pars_p,char *result_p)
+{
+	int max;
+	int error;
+	LS7A_SMARTFAN_CFG_TABLE Parameter;
+
+	error=cget_integer(pars_p,0,&max);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->max!");
+		return 1;
+	}
+	if(max<100)
+	{
+		printf("max is error %d\n",max);
+		return 1;
+	}
+	Parameter.MinRpm = max/2;// use 50% pwd test
+	Parameter.MaxRpm = max;
+	SmartFanSet (0, Parameter);
+  // max 10000  is  5kHz
+  // max 5000  is   10kHz
+  // max 2500  is   20kHz
+  // max 2000  is   25kHz
+	printf("set min %d max %d %\n", Parameter.MinRpm, Parameter.MaxRpm);
+
+	return 0;
+}
 int fan_speed_get_debug(parse_t * pars_p,char *result_p)
 {
 	int pwm;
@@ -759,6 +787,7 @@ int cmd_test_debug(parse_t * pars_p,char *result_p)
 void platform_debug_register(void)
 {
 	register_command ("LS_FAN_SET"			, fan_set_debug , "<Pwm>:0-3, <Percent number>:0-100");
+	register_command ("LS_FAN_TEST_FREQ"			, fan_set_freq_debug , "max rpm 100~");
 	register_command ("LS_FAN_SPEED"		, fan_speed_get_debug , "<Pwm>:0-3");
 	register_command ("LS_FAN_CTRL"		, fan_ctrl_debug , "<NONE>");
 	register_command ("LS_CPU_TEMP"			, read_cpu_temp_debug , "");
