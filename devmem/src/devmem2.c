@@ -57,6 +57,7 @@ int devmem_init(int argc, char **argv) {
 		int access_type = 'w';
 		char fmt_str[128];
 		size_t data_size;
+		int memoffset=0;
 
 		if(argc < 2) {
 				fprintf(stderr, "\nUsage:\t%s { address } [ type [ data ] ]\n"
@@ -76,8 +77,9 @@ int devmem_init(int argc, char **argv) {
 		// printf("/dev/mem opened.\n");
 		// fflush(stdout);
 
+		memoffset = target % getpagesize();
 		/* Map one page */
-		map_base = mmap(0, MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, target & ~MAP_MASK);
+		map_base = mmap(0, MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, target & ~memoffset);
 		if(map_base == (void *) -1) FATAL;
 		printf("Memory mapped at address %p.\n", map_base);
 		fflush(stdout);
