@@ -108,6 +108,20 @@ else
 
 endif
 
+ifeq ($(RUNTIME_SUPPORT), 1) 
+RUNTIME_INCLUDE =  $(SDK_DIR)/runtime/include
+INCLUDEFLAGS += -I$(RUNTIME_INCLUDE)
+CFLAGS += -DRUNTIME_SUPPORT
+
+LIBPATH += -L$(SDK_DIR)/runtime/lib/$(LINK_TYPE)
+LIB += -lruntime
+
+SUBDIRS +=  runtime/src
+
+else
+
+endif
+
 ##########################################################################
 INCLUDEFLAGS += -I${PLATFORM_INCLUDE} -I${TESTTOOL_INCLUDE}
 LIB += -l${TESTTOOL_LIB} -l${PLATFORM_LIB}

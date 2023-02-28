@@ -10,6 +10,10 @@
 #include "capsule.h"
 #endif
 
+#ifdef RUNTIME_SUPPORT
+#include "fwts_efi_runtime.h"
+#endif
+
 #ifdef DMIDECODE_SUPPORT
 #include "dmidecode_api.h"
 #endif
@@ -53,6 +57,8 @@ static void ShowUsage(void)
 		"  dmi :dmidecode cmd,eg dmi -t 0\n"
 		"  rcpuid :read cpu old id\n"
 		"  devmem :devmem cmd,eg devmem addr\n"
+		"  beepon :beep on\n"
+		"  beepoff :beep off\n"
 		"  cmd :into apptool cmdline \n");
 }
 static void read_mac_addr(int argc, char *argv[])
@@ -184,10 +190,18 @@ int main (int argc,char *argv[])
 		return Ret;
 	}
 
+	if (!strcmp(argv[argv_p], "rt"))
+	{
+#ifdef RUNTIME_SUPPORT
+		runtime_start (argv_c, argv + argv_p);
+#endif
+		return Ret;
+	}
+
 	TesttoolInit(0);
 	app_platform_init();
 #ifdef CAPSULE_SUPPORT
-	capsule_init();
+	// capsule_init();
 #endif
 #ifdef HARDINFO_SUPPORT
 	hardinfo_init();
@@ -242,6 +256,18 @@ int main (int argc,char *argv[])
 #ifdef HARDINFO_SUPPORT
 	read_cpu_old_id();
 #endif
+		goto cleanup;
+	}
+
+	if (!strcmp(argv[argv_p], "beepon"))
+	{
+		BeepOn ();
+		goto cleanup;
+	}
+
+	if (!strcmp(argv[argv_p], "beepoff"))
+	{
+		BeepOff ();
 		goto cleanup;
 	}
 

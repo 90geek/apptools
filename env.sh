@@ -80,6 +80,9 @@ if [ $PLATFORM ] ;then
 		
 		unset DEVMEM_SUPPORT
 		export DEVMEM_SUPPORT=1
+
+		unset CAPSULE_SUPPORT
+		export CAPSULE_SUPPORT=1
 	elif [ $PLATFORM = "mips64" ] ; then	 
 		unset CAPSULE_SUPPORT
 		# export CAPSULE_SUPPORT=1
@@ -95,6 +98,9 @@ if [ $PLATFORM ] ;then
 		
 		unset DEVMEM_SUPPORT
 		export DEVMEM_SUPPORT=1
+
+		unset RUNTIME_SUPPORT
+		export RUNTIME_SUPPORT=1
 	elif [ $PLATFORM = "loongarch64" ] ; then 
 		unset CAPSULE_SUPPORT
 		# export CAPSULE_SUPPORT=1
@@ -110,6 +116,9 @@ if [ $PLATFORM ] ;then
 		
 		unset DEVMEM_SUPPORT
 		export DEVMEM_SUPPORT=1
+		
+		unset RUNTIME_SUPPORT
+		export RUNTIME_SUPPORT=1
 	else 
 		echo "PLATFORM not define"	
 fi

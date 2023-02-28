@@ -4,6 +4,19 @@
 #include "platform/platform_debug.h"
 #include "platform/app_platform.h"
 
+int ls7agpio_beep_on_debug(parse_t * pars_p,char *result_p)
+{
+  BeepOn ();
+	printf("beep on :\n");
+	return 0;
+}
+
+int ls7agpio_beep_off_debug(parse_t * pars_p,char *result_p)
+{
+	BeepOff ();
+	printf("beep off :\n");
+	return 0;
+}
 int lpc_io_read_debug(parse_t * pars_p,char *result_p)
 {
 	int count;
@@ -815,4 +828,6 @@ void platform_debug_register(void)
 	register_command ("TEST_CMD"			, cmd_test_debug , "<cmd>:eg cmd lscpu");
 	register_command ("LS_LPC_IO_READ"			, lpc_io_read_debug , "<prot> <count>");
 	register_command ("LS_SIO_DEV_REG"			, sio_dev_reg_debug , "<dev> <reg> <0(write)/1(read)> <data>");
+	register_command ("LS7A_GPIO_BEEP_ON"			, ls7agpio_beep_on_debug , "<none> ");
+	register_command ("LS7A_GPIO_BEEP_OFF"			, ls7agpio_beep_off_debug , "<none> ");
 }
