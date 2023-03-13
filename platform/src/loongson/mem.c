@@ -137,6 +137,7 @@ void *p2v_mem_mapping(unsigned long long paddr,int size,int *pmemoffset)
 		else
 			needclose=1;
 	}
+	// printf("paddr start : %p \n",paddr);
 	memoffset = paddr % getpagesize();
 	vaddr = (void*)mmap(NULL,size+memoffset, PROT_READ|PROT_WRITE,MAP_SHARED,fd,paddr-memoffset);
 	vaddr = vaddr + memoffset;

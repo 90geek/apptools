@@ -26,6 +26,7 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/time.h>
+#include <time.h>
 
 #include "app_types.h"
 #include "app_debug.h"
@@ -269,4 +270,7 @@ void app_ProgressShow(int percentage);
 void app_ProgressDone(void);
 char* app_system(const char *cmd);
 U64 app_get_pcie_region(const char *dev);
+U64 app_get_time_s(void);
+U64 app_get_time_us(void);
+U64 app_get_time_ns(void);
 #endif

@@ -25,21 +25,12 @@
 #include "edk_api.h"
 #include "Ls7aGpio.h"
 #include "Beep.h"
+#include "CpuGpioLib.h"
+#include "platform/app_os.h"
+#include "LsRegDef.h"
 
 #define GPIO0                          0
 //#define PWM_FREQ                       2000 //2Khz
-// UINT32
-// EFIAPI
-// GetFreq (
-//   VOID
-//   );
-
-// UINTN
-// EFIAPI
-// CsrReadTime (
-//   VOID
-//   );
-
 VOID
 GpioSimulatePwm (
     UINT16  GpioNum,
@@ -48,19 +39,41 @@ GpioSimulatePwm (
     )
 {
     UINTN  Count, Ticks, Start, End;
-    UINT64 FreqCoverTime = 1000000 / PwmFreq / 2; // 1000000 = 1Mhz
+    UINT64 FreqCoverTime = 1000*1000 / PwmFreq / 2; // 1/pwmFreq=cycle,cycle*1000*1000=us
 
-    // Count = GetFreq ();
-    Count = Count * KeepMs / 1000;
-    // Start = CsrReadTime();
+    Count = KeepMs * 1000;
+    Start = app_get_time_us();
     End = Start + Count;
 
     do {
         Ls7aGpioSetVal (GpioNum,0);
-        // MicroSecondDelay (FreqCoverTime);
+        app_sleep_us(FreqCoverTime);
         Ls7aGpioSetVal (GpioNum,1);
-        // MicroSecondDelay (FreqCoverTime);
-        // Ticks =  CsrReadTime();
+        app_sleep_us(FreqCoverTime);
+        Ticks = app_get_time_us();
+    } while (Ticks < End);
+}
+
+VOID
+LsCpuGpioSimulatePwm (
+    UINT16  GpioNum,
+    UINT32  PwmFreq,  //unit hz
+    UINT32  KeepMs    //unit ms
+    )
+{
+    UINTN  Count, Ticks, Start, End;
+    UINT64 FreqCoverTime = 1000*1000 / PwmFreq / 2; // 1/pwmFreq=cycle,cycle*1000*1000=us
+
+    Count = KeepMs * 1000;
+    Start = app_get_time_us();
+    End = Start + Count;
+
+    do {
+        GpioSetOutLow(CPU_GPIO_BASE,0);
+        app_sleep_us(FreqCoverTime);
+        GpioSetOutHigh(CPU_GPIO_BASE,0);
+        app_sleep_us(FreqCoverTime);
+        Ticks = app_get_time_us();
     } while (Ticks < End);
 }
 
@@ -74,6 +87,15 @@ BeepPwmOn (
   return EFI_SUCCESS;
 }
 
+EFI_STATUS
+LsCpuBeepPwmOn (
+  UINT32   KeepMs,
+  UINT32   PwmFreq
+  )
+{
+  LsCpuGpioSimulatePwm (GPIO0,PwmFreq,KeepMs);
+  return EFI_SUCCESS;
+}
 EFI_STATUS
 BeepOn (
   VOID

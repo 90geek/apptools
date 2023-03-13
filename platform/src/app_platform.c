@@ -6,7 +6,7 @@
 static app_platform_t platform;
 void app_platform_init(void) 
 {
-	memory_mapping();
+	// memory_mapping();
 	app_spi_init();
 	platform_debug_register();
 	

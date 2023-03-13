@@ -36,4 +36,15 @@ EFI_STATUS
 BeepOff (
   VOID
   );
+EFI_STATUS
+BeepPwmOn (
+  UINT32   KeepMs,
+  UINT32   PwmFreq
+  );
+
+EFI_STATUS
+LsCpuBeepPwmOn (
+  UINT32   KeepMs,
+  UINT32   PwmFreq
+  );
 #endif

@@ -4,9 +4,98 @@
 #include "platform/platform_debug.h"
 #include "platform/app_platform.h"
 
+int cpu_gpio_set_debug(parse_t * pars_p,char *result_p)
+{
+	int error;
+	int mode;
+	int num;
+	int reg;
+
+	error=cget_integer(pars_p,0,&mode);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->mode!");
+		return 1;
+	}
+	error=cget_integer(pars_p,0,&num);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->num!");
+		return 1;
+	}
+
+	if(num>32)
+		printf("input num is error :%d \n",mode);
+
+	printf("mode %d num %d \n",mode,num);
+	if(mode==0)
+	{
+		GpioSetOutLow(CPU_GPIO_BASE, num);
+	}
+	else if(mode==1)
+	{
+		GpioSetOutHigh(CPU_GPIO_BASE, num);
+	}
+	else if(mode==2)
+	{
+		reg=GpioSetInMode(CPU_GPIO_BASE, num);
+		printf("Gpio%d=%d \n",num,reg);
+	}
+	else
+		printf("input mode is error :%d \n",mode);
+	app_get_time_us();
+	return 0;
+}
+int lscpu_gpio_pwmbeep_on_debug(parse_t * pars_p,char *result_p)
+{
+	int error;
+	int keepms;
+	int pwmfreq;
+
+	error=cget_integer(pars_p,0,&keepms);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->keepms!");
+		return 1;
+	}
+	error=cget_integer(pars_p,0,&pwmfreq);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->pwmfreq!");
+		return 1;
+	}
+	printf("keep time %dms,pwm freq %d\n",keepms,pwmfreq);
+	LsCpuBeepPwmOn (keepms,pwmfreq);
+	printf("lscpu beep pwm success :\n");
+	return 0;
+}
+
+int ls7a_gpio_pwmbeep_on_debug(parse_t * pars_p,char *result_p)
+{
+	int error;
+	int keepms;
+	int pwmfreq;
+
+	error=cget_integer(pars_p,0,&keepms);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->keepms!");
+		return 1;
+	}
+	error=cget_integer(pars_p,0,&pwmfreq);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->pwmfreq!");
+		return 1;
+	}
+	printf("keep time %dms,pwm freq %d\n",keepms,pwmfreq);
+	BeepPwmOn (keepms,pwmfreq);
+	printf("ls7a beep pwm success :\n");
+	return 0;
+}
 int ls7agpio_beep_on_debug(parse_t * pars_p,char *result_p)
 {
-  BeepOn ();
+	BeepOn ();
 	printf("beep on :\n");
 	return 0;
 }
@@ -15,6 +104,47 @@ int ls7agpio_beep_off_debug(parse_t * pars_p,char *result_p)
 {
 	BeepOff ();
 	printf("beep off :\n");
+	return 0;
+}
+int ls7a_gpio_debug(parse_t * pars_p,char *result_p)
+{
+	int error;
+	int mode;
+	int num;
+	int reg;
+
+	error=cget_integer(pars_p,0,&mode);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->mode!");
+		return 1;
+	}
+	error=cget_integer(pars_p,0,&num);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->num!");
+		return 1;
+	}
+
+	if(num>64)
+		printf("input num is error :%d \n",mode);
+
+	printf("mode %d num %d \n",mode,num);
+	if(mode==0)
+	{
+		Ls7aGpioSetVal(num, 0);
+	}
+	else if(mode==1)
+	{
+		Ls7aGpioSetVal(num, 1);
+	}
+	else if(mode==2)
+	{
+		reg = Ls7aGpioGetVal(num);
+		printf("Gpio%d=%d \n",num,reg);
+	}
+	else
+		printf("input mode is error :%d \n",mode);
 	return 0;
 }
 int lpc_io_read_debug(parse_t * pars_p,char *result_p)
@@ -164,10 +294,10 @@ int fan_set_freq_debug(parse_t * pars_p,char *result_p)
 	Parameter.MinRpm = max/2;// use 50% pwd test
 	Parameter.MaxRpm = max;
 	SmartFanSet (0, Parameter);
-  // max 10000  is  5kHz
-  // max 5000  is   10kHz
-  // max 2500  is   20kHz
-  // max 2000  is   25kHz
+	// max 10000	is	5kHz
+	// max 5000  is		10kHz
+	// max 2500  is		20kHz
+	// max 2000  is		25kHz
 	printf("set min %d max %d %\n", Parameter.MinRpm, Parameter.MaxRpm);
 
 	return 0;
@@ -830,4 +960,8 @@ void platform_debug_register(void)
 	register_command ("LS_SIO_DEV_REG"			, sio_dev_reg_debug , "<dev> <reg> <0(write)/1(read)> <data>");
 	register_command ("LS7A_GPIO_BEEP_ON"			, ls7agpio_beep_on_debug , "<none> ");
 	register_command ("LS7A_GPIO_BEEP_OFF"			, ls7agpio_beep_off_debug , "<none> ");
+	register_command ("LS7A_GPIO_PWMBEEP"			, ls7a_gpio_pwmbeep_on_debug , "<keepms>1~,<pwmfreq>1~ ");
+	register_command ("LS7A_GPIO_SET"			, ls7a_gpio_debug , "<mode>0:low,1:hi,2:get,<gpionum>0~63 ");
+	register_command ("LSCPU_GPIO_SET"			, cpu_gpio_set_debug , "<mode>0:low,1:hi,2:get,<gpionum>0~31 ");
+	register_command ("LSCPU_GPIO_PWMBEEP"			, lscpu_gpio_pwmbeep_on_debug , "<keepms>1~,<pwmfreq>1~ ");
 }

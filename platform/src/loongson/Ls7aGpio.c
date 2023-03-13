@@ -25,6 +25,7 @@
 #include "Ls7aGpio.h"
 #include "debug.h"
 #include "LsRegDef.h"
+#include "loongson3_def.h"
 
 #define WritelBit(addr, BitValue, Area, StartBit) \
   (*(volatile UINT32*)(addr)) &= (~(Area<<StartBit)); \
@@ -150,10 +151,17 @@ VOID Ls7aGpioSetVal(UINT8 Gpio, UINT8 Value)
 {
   void * vaddr = NULL;
   int memoffset=0;
-  vaddr=p2v_mem_mapping(LS7A_GPIOn_REG_ADDR_DIR(Gpio),4, &memoffset);
+
+  if(CheckCpu(LS2K2000_VERSION,0))
+    vaddr=p2v_mem_mapping(LS7A_GPIOn_REG_ADDR_DIR(Gpio)& (~HT1_MEM_BASE_ADDR),4, &memoffset);
+  else
+    vaddr=p2v_mem_mapping(LS7A_GPIOn_REG_ADDR_DIR(Gpio),4, &memoffset);
   Writeb(vaddr, LS7A_GPIO_REG_VAL_DIR_OUT);
   p2v_mem_clean(vaddr, memoffset);
-  vaddr=p2v_mem_mapping(LS7A_GPIOn_REG_ADDR_OUT(Gpio),4, &memoffset);
+  if(CheckCpu(LS2K2000_VERSION,0))
+    vaddr=p2v_mem_mapping((LS7A_GPIOn_REG_ADDR_OUT(Gpio)& (~HT1_MEM_BASE_ADDR)),4, &memoffset);
+  else
+    vaddr=p2v_mem_mapping(LS7A_GPIOn_REG_ADDR_OUT(Gpio),4, &memoffset);
   Writeb(vaddr, !!Value);
   p2v_mem_clean(vaddr, memoffset);
 }
@@ -165,7 +173,17 @@ VOID Ls7aGpioSetVal(UINT8 Gpio, UINT8 Value)
  *************************************/
 UINT8 Ls7aGpioGetVal(UINT8 Gpio)
 {
-  return Readb(LS7A_GPIOn_REG_ADDR_IN(Gpio));
+  UINT8 Value;
+  void * vaddr = NULL;
+  int memoffset=0;
+
+  if(CheckCpu(LS2K2000_VERSION,0))
+    vaddr=p2v_mem_mapping(LS7A_GPIOn_REG_ADDR_IN(Gpio)& (~HT1_MEM_BASE_ADDR),4, &memoffset);
+  else
+    vaddr=p2v_mem_mapping(LS7A_GPIOn_REG_ADDR_IN(Gpio),4, &memoffset);
+  Value = Readb(vaddr);
+  p2v_mem_clean(vaddr, memoffset);
+  return Value;
 }
 
 /*************************************

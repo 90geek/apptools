@@ -45,6 +45,7 @@
 #define LS3A5000BM_VERSION                      0x4D42303030354133 /* 3A5000BM */
 #define LS3A5000HV_VERSION                      0x5648303030354133 /* 3A5000HV */
 #define LS3C5000_VERSION                        0x0000303030354333 /* 3C5000 */
+#define LS2K2000_VERSION                        0x303030324b32 /* 2K2000 */
 
 #define LSCPU_ID	0x1fe00020
 #define LS7A_VER	LS7A_CONFBUS_BASE_ADDR|0x3ff8
