@@ -31,13 +31,13 @@ void memory_mapping(void)
 {
 	open_mem_fd() ;
 	pwm_mem_mapping();
-	gpio_mem_mapping();
+	// gpio_mem_mapping();
 }
 
 void memory_release(void)
 {
 	pwm_mem_clean();
-	gpio_mem_clean();
+	// gpio_mem_clean();
 	close_mem_fd();
 }
 

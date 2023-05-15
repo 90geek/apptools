@@ -49,7 +49,10 @@ UINT8 lscpu_tempdetect(UINT32 *temp0,UINT32 *temp1)
 	TempSensorAnalog1 = TempSensorDigital1 * 731 / 0x4000 - 273 ;
 	// *(INT8 *)Temperature = (TempSensorAnalog0 + TempSensorAnalog1) / 2;
 	*temp0=TempSensorAnalog0;
-	*temp1=TempSensorAnalog1;
+	if(CheckCpu(LS2K2000_VERSION,0))
+		*temp1=TempSensorAnalog0;
+	else
+		*temp1=TempSensorAnalog1;
 
 	return EFI_SUCCESS;
 }

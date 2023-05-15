@@ -154,7 +154,7 @@ static void write_mac_addr(int argc, char *argv[])
 
 static void apptools_release(void)
 {
-		// memory_release();
+		memory_release();
 		return;
 }
 

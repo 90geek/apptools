@@ -25,6 +25,8 @@
 #ifndef __LS_REG_DEF_H__
 #define __LS_REG_DEF_H__
 
+#include "cpu.h"
+#include "loongson3_def.h"
 
 //
 // loongarch memory map definition
@@ -59,7 +61,7 @@
  *****************************************************************************/
 #define HT_CONF_TYPE0_ADDR              PHYS_TO_UNCACHED(0xefdfe000000)
 #define HT_CONF_TYPE1_ADDR              PHYS_TO_UNCACHED(0xefdff000000)
-#define HT1_MEM_BASE_ADDR               PHYS_TO_UNCACHED(0xe0000000000)
+#define HT1_MEM_BASE_ADDR               (CheckCpu(LS2K2000_VERSION,0)==1?PHYS_TO_UNCACHED(0x00000000000) : PHYS_TO_UNCACHED(0xe0000000000))
 #define HT1_CONTROLLER_CONF_BASE_ADDR   PHYS_TO_UNCACHED(0xefdfb000000)
 #define CONFBUS_BASE_ADDR               0x10010000
 #define INT_BASE_ADDR                   0x10000000
