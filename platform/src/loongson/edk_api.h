@@ -434,8 +434,37 @@ typedef UINT64                    EFI_VIRTUAL_ADDRESS;
 #define EFI_WARN_STALE_DATA       RETURN_WARN_STALE_DATA
 #define EFI_WARN_FILE_SYSTEM      RETURN_WARN_FILE_SYSTEM
 
+///
+/// Last Attempt Status Values
+///
+#define LAST_ATTEMPT_STATUS_SUCCESS                       0x00000000
+#define LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL            0x00000001
+#define LAST_ATTEMPT_STATUS_ERROR_INSUFFICIENT_RESOURCES  0x00000002
+#define LAST_ATTEMPT_STATUS_ERROR_INCORRECT_VERSION       0x00000003
+#define LAST_ATTEMPT_STATUS_ERROR_INVALID_FORMAT          0x00000004
+#define LAST_ATTEMPT_STATUS_ERROR_AUTH_ERROR              0x00000005
+#define LAST_ATTEMPT_STATUS_ERROR_PWR_EVT_AC              0x00000006
+#define LAST_ATTEMPT_STATUS_ERROR_PWR_EVT_BATT            0x00000007
+
+typedef struct {
+	UINT32	Data1;
+	UINT16	Data2;
+	UINT16	Data3;
+	UINT8		Data4[8];
+} __attribute__ ((packed)) EFI_GUID;
+
+#define EFI_ERROR(A)              RETURN_ERROR(A)
+#define GUID_STRING_LENGTH  36
+#define PcdMaximumUnicodeStringLength 1000000
+#define PcdMaximumAsciiStringLength 1000000
+#define PcdGet32(x) x
 #endif
 
+VOID *
+EFIAPI
+AllocatePool (
+  IN UINTN  AllocationSize
+  );
 
 VOID *
 EFIAPI
@@ -457,5 +486,15 @@ CopyMem (
   IN UINTN       Length
   );
 
+VOID *
+EFIAPI
+SetMem (
+  OUT VOID  *Buffer,
+  IN UINTN  Length,
+  IN UINT8  Value
+  );
+
 void Print(const char *format,...);
+BOOLEAN CompareGuid(const EFI_GUID *guid1, const EFI_GUID *guid2);
+
 #endif

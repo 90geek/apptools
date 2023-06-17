@@ -217,5 +217,7 @@ enum {
         FWTS_UEFI_VARIABLE_ENHANCED_AUTHENTICATED_ACCESS =              0x00000080
 };
 
+
+int runtime_start(int argc, char **argv);
 #endif /* _FWTS_EFI_RUNTIME_H_ */
 

@@ -422,7 +422,7 @@ static int getnextvariable_test(void)
                 if (found_name && found_guid)
                         break;
 
-		#if 0
+		#if 1
 		for (i=0; i<variablenamesize;i++)
 			printf("%c",variablename[i]);
 		printf("-%x-%x-%x-%x%x%x%x%x%x%x%x\n", 

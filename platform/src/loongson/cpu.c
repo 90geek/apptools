@@ -27,7 +27,8 @@
 #include "platform/app_platform.h"
 #include "loongson3_def.h"
 
-#define CPU_FREQ_CONFIG_BASE	PHYS_TO_UNCACHED(0x1fe001b0)	//Frequency configuration register
+#define LS3A_CPU_FREQ_CONFIG_BASE  PHYS_TO_UNCACHED(0x1fe001b0)  //Frequency configuration register
+#define LS2K_CPU_FREQ_CONFIG_BASE  PHYS_TO_UNCACHED(0x100104a0)  //Frequency configuration register
 
 /**
 	This module is Get the operating frequency of the processor.
@@ -54,20 +55,38 @@ CpuGetFrequency (
 	void * vaddr = NULL;
 	int memoffset=0;
 
-	 vaddr=p2v_mem_mapping(CPU_FREQ_CONFIG_BASE,4, &memoffset);
-	 if(vaddr==NULL)
-		return EFI_LOAD_ERROR;
-	 Data = Read32((U64)vaddr);
-	 DivRefc = (Data & 0xfc000000) >> 26; //L1 PLL PARAM: DIV_REFC
-	 Data = Read32((U64)vaddr + 0x4);
-	 p2v_mem_clean(vaddr, memoffset);
-	 CoreLoopc = (Data & 0x1ff);//L1 PLL PARAM: DIV_LOOPC
+	if(CheckCpu(LS2K2000_VERSION,0))
+	{
+		 vaddr=p2v_mem_mapping(LS2K_CPU_FREQ_CONFIG_BASE,4, &memoffset);
+		 if(vaddr==NULL)
+			return EFI_LOAD_ERROR;
 
-	 CoreDiv = (Data & 0xfc00) >> 10;//L1 PLL PARAM: DIV_OUT
+		 Data = Read32((U64)vaddr);
+		 CoreDiv = (Data & 0x3f80) >> 7;//L1 PLL PARAM: DIV_OUT
+		 CoreLoopc = (Data & 0x3fec0000) >> 21;//L1 PLL PARAM: DIV_LOOPC
 
-	 CpuFre = (clk_ref / DivRefc * CoreLoopc * 1000)/(CoreDiv);//CLK_REF default 100MHZ
+		 Data = Read32((U64)vaddr + 0x4);
+		 DivRefc = (Data & 0x7f); //L1 PLL PARAM: DIV_REFC
+		 p2v_mem_clean(vaddr, memoffset);
+	}
+	else
+	{
+		 vaddr=p2v_mem_mapping(LS3A_CPU_FREQ_CONFIG_BASE,4, &memoffset);
+		 if(vaddr==NULL)
+			return EFI_LOAD_ERROR;
 
-	 *(UINT32*)Frequency = CpuFre / 1000000;
+		 Data = Read32((U64)vaddr);
+		 DivRefc = (Data & 0xfc000000) >> 26; //L1 PLL PARAM: DIV_REFC
+		 Data = Read32((U64)vaddr + 0x4);
+		 p2v_mem_clean(vaddr, memoffset);
+		 CoreLoopc = (Data & 0x1ff);//L1 PLL PARAM: DIV_LOOPC
+
+		 CoreDiv = (Data & 0xfc00) >> 10;//L1 PLL PARAM: DIV_OUT
+	}
+
+	CpuFre = (clk_ref / DivRefc * CoreLoopc * 1000)/(CoreDiv);//CLK_REF default 100MHZ
+
+	*(UINT32*)Frequency = CpuFre / 1000000;
 
 	 return EFI_SUCCESS;
 }

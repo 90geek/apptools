@@ -30,8 +30,8 @@
 #include "platform/app_os.h"
 #endif
 
-#define INVALID_OFFSET(x)     ((x > 0x400000)||(x < 0x0)) ? TRUE:FALSE
-#define INVALID_NUM(x)        ((x > 0x400000)||( x <= 0x0)) ? TRUE:FALSE
+#define INVALID_OFFSET(x)     ((x > 0x800000)||(x < 0x0)) ? TRUE:FALSE
+#define INVALID_NUM(x)        ((x > 0x800000)||( x <= 0x0)) ? TRUE:FALSE
 #define IS_SST25VF032B(M,D,C) ((M == 0xBF)&&(D == 0x25)&&(C == 0x4A)) ? TRUE:FALSE
 
 STATIC UINT8 ValueRegSpcr  = 0xFF;

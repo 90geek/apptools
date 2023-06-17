@@ -9,48 +9,37 @@ include $(SDK_DIR)/config/app.mak
 # local variable
 #===============================================================================
 
+LIBS := libupflash
 
-APP =apptools
-OBJS = main.o
+DRV_LIB_OUT := ../lib/$(LINK_TYPE)
+
+OBJS := upflash.o PlatformFlashAccessLibDxe.o iniparser.o dictionary.o
+
 
 #===============================================================================
 # rules
 #===============================================================================
-.PHONY: all clean  install uninstall info subdirs app
-all: subdirs app
+.PHONY: all clean install uninstall
 
-app:$(OBJS)
-	$(SDK_DIR)/vers.sh
-	$(AT)$(CC) $(LDFLAGS) -o $(APP) $(OBJS) ${LIB} -static
-subdirs:
-	$(SDK_DIR)/vers.sh
-	for dir in $(SUBDIRS);\
-	do make -C $$dir all || exit 1;\
-	done
-
-gdb:
-	$(TOOLCHAIN_PREFIX)-gdb $(APP)
-
-strip:
-
-.PHONY:clean 
+all:	$(LIBS)
+	
 clean:
-	for dir in $(SUBDIRS);do make -C $$dir clean||exit 1;done
-	-$(AT)rm -f  $(OBJS)
-	-$(AT)rm -f $(APP)
-	-$(AT)rm -f *~
+	$(AT)rm -rf $(OBJS)
+	$(AT)rm -rf $(LIBS).a
+	$(AT)rm -rf $(LIBS).so
+	$(AT)rm -rf *~
+
+$(LIBS) : $(OBJS)
+ifeq ($(LINK_TYPE), static)
+	$(AT)$(AR) -rs $@.a $^
+	$(AT)test -d $(DRV_LIB_OUT) || mkdir -p $(DRV_LIB_OUT)
+	$(AT)mv $@.a $(DRV_LIB_OUT)
+else
+	$(AT)$(CC) $^ $(CFLAGS) -shared -o $@.so 
+	$(AT)test -d $(DRV_LIB_OUT) || mkdir -p $(DRV_LIB_OUT)
+	$(AT)mv $@.so $(DRV_LIB_OUT)
+endif
 
 install:
 
 uninstall:
-
-info:
-	$(SDK_DIR)/config/setenv_info.sh
-	
-libs:
-	$(SDK_DIR)/lib/update_lib.sh
-
-	
-
-	
-

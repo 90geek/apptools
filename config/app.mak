@@ -93,6 +93,7 @@ LDFLAGS += `pkg-config --libs gtk+-3.0`
 else
 
 endif
+##########################################################################
 ifeq ($(DEVMEM_SUPPORT), 1) 
 DMIDECODE_INCLUDE =  $(SDK_DIR)/devmem/include
 INCLUDEFLAGS += -I$(DMIDECODE_INCLUDE)
@@ -108,6 +109,7 @@ else
 
 endif
 
+##########################################################################
 ifeq ($(RUNTIME_SUPPORT), 1) 
 RUNTIME_INCLUDE =  $(SDK_DIR)/runtime/include
 INCLUDEFLAGS += -I$(RUNTIME_INCLUDE)
@@ -117,6 +119,20 @@ LIBPATH += -L$(SDK_DIR)/runtime/lib/$(LINK_TYPE)
 LIB += -lruntime
 
 SUBDIRS +=  runtime/src
+
+else
+
+endif
+##########################################################################
+ifeq ($(UPFLASH_SUPPORT), 1) 
+UPFLASH_INCLUDE =  $(SDK_DIR)/upflash/include
+INCLUDEFLAGS += -I$(UPFLASH_INCLUDE)
+CFLAGS += -DUPFLASH_SUPPORT
+
+LIBPATH += -L$(SDK_DIR)/upflash/lib/$(LINK_TYPE)
+LIB += -lupflash
+
+SUBDIRS +=  upflash/src
 
 else
 
@@ -182,7 +198,7 @@ CFLAGS += -Wl,--gc-sections  -O0 -g
 # CFLAGS += -Wall -Werror -Wfatal-errors -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function  -Wno-unused-but-set-variable -Wno-sign-compare -Wno-unused-but-set-parameter -Wno-unused-label -Wno-empty-body -Wno-undef 
 
 ifeq ($(LINK_TYPE), static)
-
+CFLAGS += -static
 else
 CFLAGS += -fPIC
 endif	

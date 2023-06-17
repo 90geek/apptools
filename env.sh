@@ -83,6 +83,9 @@ if [ $PLATFORM ] ;then
 
 		unset CAPSULE_SUPPORT
 		export CAPSULE_SUPPORT=1
+		
+		unset UPFLASH_SUPPORT
+		export UPFLASH_SUPPORT=1
 	elif [ $PLATFORM = "mips64" ] ; then	 
 		unset CAPSULE_SUPPORT
 		# export CAPSULE_SUPPORT=1
@@ -119,6 +122,9 @@ if [ $PLATFORM ] ;then
 		
 		unset RUNTIME_SUPPORT
 		export RUNTIME_SUPPORT=1
+		
+		unset UPFLASH_SUPPORT
+		export UPFLASH_SUPPORT=1
 	else 
 		echo "PLATFORM not define"	
 fi

@@ -4,7 +4,8 @@
 #include "platform/app_debug.h"
 #include "platform/app_os.h"
 
-#define MDEPKG_NDEBUG 1
+// #define MDEPKG_NDEBUG
+#define DebugCodeEnabled() 0
 
 #define DebugPrint(n, format, args...)	printf(format, ##args)
 
@@ -30,8 +31,8 @@ do {                                             \
   #define ASSERT(Expression)        \
     do {                            \
         if (!(Expression)) {        \
-          _DEBUG (Expression);     \
-		while(1);
+          printf("%s-%d-%d\n",__FUNCTION__,__LINE__,Expression);  \
+          while(1){}              \
         }                           \
     } while (FALSE)
 #else
@@ -80,5 +81,28 @@ do {                                             \
 #else
 #define DBGPRINT(Expression)
 #endif
+
+/**
+  Macro that marks the beginning of debug source code.
+
+  If the DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugProperyMask is set,
+  then this macro marks the beginning of source code that is included in a module.
+  Otherwise, the source lines between DEBUG_CODE_BEGIN() and DEBUG_CODE_END()
+  are not included in a module.
+
+**/
+#define DEBUG_CODE_BEGIN()  do { if (DebugCodeEnabled ()) { UINT8  __DebugCodeLocal
+
+
+/**
+  The macro that marks the end of debug source code.
+
+  If the DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugProperyMask is set,
+  then this macro marks the end of source code that is included in a module.
+  Otherwise, the source lines between DEBUG_CODE_BEGIN() and DEBUG_CODE_END()
+  are not included in a module.
+
+**/
+#define DEBUG_CODE_END()    __DebugCodeLocal = 0; __DebugCodeLocal++; } } while (FALSE)
 
 #endif

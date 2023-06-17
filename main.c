@@ -11,7 +11,7 @@
 #endif
 
 #ifdef RUNTIME_SUPPORT
-#include "fwts_efi_runtime.h"
+#include "runtime.h"
 #endif
 
 #ifdef DMIDECODE_SUPPORT
@@ -28,6 +28,10 @@
 
 #ifdef DEVMEM_SUPPORT
 #include "devmem.h"
+#endif
+
+#ifdef UPFLASH_SUPPORT
+#include "upflash.h"
 #endif
 
 static int check_sudo(void)
@@ -50,6 +54,7 @@ static void ShowUsage(void)
 		"apptool [parameter] ... :explain \n"
 		"  help :display help infomation\n"
 		"  upbios :updte uefi bios\n"
+		"  upbiosnovar :updte uefi bios and reserve configuration parameters\n"
 		"  rmac <7aspi_paddr> <eth> :read mac addr eg rmac 0x452a0000 0\n"
 		"  rmac <probe> <eth> :read mac addr eg rmac 0x452a0000 0\n"
 		"  wmac <7aspi_paddr> <eth> <macaddr> :write 7a flash mac addr,eg wmac 0x452a0000 0 11:22:33:44:55:66\n"
@@ -206,20 +211,43 @@ int main (int argc,char *argv[])
 #ifdef HARDINFO_SUPPORT
 	hardinfo_init();
 #endif
+#ifdef UPFLASH_SUPPORT
+  update_flash_init() ;
+#endif
 	if (!strcmp(argv[argv_p], "help"))
 	{
 		goto _show_usage;
 	}
 
+#ifdef UPFLASH_SUPPORT
 	if (!strcmp(argv[argv_p], "upbios"))
 	{
 		argv_c--;
 		argv_p++;
 		if (argv_c < 1)
 			goto _show_usage;
-		update_bios(argv[argv_p]);
+		update_bios_img(argv[argv_p]);
 		goto cleanup;
 	}
+	if (!strcmp(argv[argv_p], "upbiosnovar"))
+	{
+		argv_c--;
+		argv_p++;
+		if (argv_c < 1)
+			goto _show_usage;
+		update_bios_novar(argv[argv_p]);
+		goto cleanup;
+	}
+	if (!strcmp(argv[argv_p], "fwupdate"))
+	{
+		argv_c--;
+		argv_p++;
+		if (argv_c < 1)
+			goto _show_usage;
+		system_fw_update(argv[argv_p]);
+		goto cleanup;
+	}
+#endif
 
 	if (!strcmp(argv[argv_p], "rmac"))
 	{

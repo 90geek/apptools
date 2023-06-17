@@ -2,6 +2,8 @@
 #define _PLATFORM_H_
 
 #include "app_types.h"
+#include "loongson/edk_api.h"
+#include "loongson/debug.h"
 #include "loongson/spi.h"
 #include "loongson/mem.h"
 #include "loongson/temperature.h"

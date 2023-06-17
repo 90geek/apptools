@@ -480,14 +480,14 @@ void app_print_data(unsigned char *buf,int size)
 //
 void app_ProgressInit(void)
 {
-	char prog[] = "[																																				]		0%";
+	char prog[] = "[                                                                        ]   0%";
 
 	printf("%s", prog);
 }
 
 void app_ProgressShow(int percentage)
 {
-	char prog[] = "[																																				]		0%";
+	char prog[] = "[                                                                        ]   0%";
 	char per[5];
 	int count;
 	int i;

@@ -567,21 +567,6 @@ int spi_write_debug(parse_t * pars_p,char *result_p)
 	return 0;
 }
 
-int update_bios_debug(parse_t * pars_p,char *result_p)
-{
-	char path[200];
-
-	/* ------------- */
-	if (cget_string(pars_p,"", path, sizeof(path))==1)
-	{
-		tag_current_line(pars_p,"Invalid path\n");
-		return(1);
-	}
-
-	printf("bios path  %s \n",path);
-	update_bios(path);
-	return 0;
-}
 int spi_write_7a_flash_mac_debug(parse_t * pars_p,char *result_p)
 {
 	int eth;
@@ -944,7 +929,6 @@ void platform_debug_register(void)
 	register_command ("SET_7A_SPI_BASE"			, set_7a_spi_base_addr_debug , "<base_addr_hi>,<base_addr_lo>");
 	register_command ("SPI_READ"			, spi_read_debug , "<spi_dev>,<offset>,<len>:spi_dev 0cpuflash/17a");
 	register_command ("SPI_WRITE"			, spi_write_debug , "<spi_dev>,<offset>,<data>:spi_dev 0cpuflash/17a,data 32bit");
-	register_command ("SPI_BIOS"			, update_bios_debug , "<path>:eg ./LS3A50007A.fd");
 	register_command ("SPI_WRITE_MAC"			, spi_write_7a_flash_mac_debug , "<eth> <macaddr>, eg 0 11:22:33:44:55:66");
 	register_command ("MM_R_B"			, mm_read_byte_debug , "<base_addr_hi>,<base_addr_lo>");
 	register_command ("MM_R_HW"			, mm_read_hword_debug , "<base_addr_hi>,<base_addr_lo>");

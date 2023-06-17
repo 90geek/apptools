@@ -1,56 +1,9 @@
 #include "platform/app_os.h"
 #include "platform/app_spi.h"
 #include "platform/app_platform.h"
+#include "loongson/debug.h"
 
-#define FLASH_SIZE 0x400000
 U64 spi_base_addr;
-
-int update_bios(char *file_path)
-{
-	int from_fd=0,len=0,count=0;
-	unsigned char  *ptr1 = NULL,*ptr2 = NULL;
-	int Ret = 0;
-	void * vaddr = NULL;
-	int memoffset=0;
-
-	if((from_fd=open(file_path,O_RDONLY))==-1)
-	{
-		printf("Open %s Error\n",file_path);
-		return 1;
-	}
-
-	len=lseek(from_fd,0,SEEK_END);
-	lseek(from_fd,0,SEEK_SET);
-
-	count=len;
-	ptr1=app_malloc(len*sizeof(char));
-	memset(ptr1,0x0,len*sizeof(char));
-	ptr2=ptr1;
-
-	Ret=read(from_fd,ptr1,len);
-	if(Ret==-1)
-	{
-		printf("Load FPGA File Error\n");
-		close(from_fd);
-		return 1;
-	}
-	printf("Load Bios File, Size is %d\n",Ret);
-
-	vaddr=p2v_mem_mapping(GetLs3ASpiRegBaseAddr(),FLASH_SIZE, &memoffset);
-	if(vaddr==NULL)
-		return 1;
-
-	if(Ret>FLASH_SIZE)
-	{
-		printf("file size > flash size\n");
-		return 1;
-	}
-	UpdateBiosInSpiFlash(0,ptr2,Ret,(U64)vaddr);
-	p2v_mem_clean(vaddr, memoffset);
-	// close(from_fd);
-
-	return 0;
-}
 
 U64 get_7a_spi_base_addr(void)
 {
@@ -165,6 +118,66 @@ void write_cpu_spi_flash(unsigned int offset, unsigned char * datas, int write_c
 	if(vaddr==NULL)
 		return;
 	SpiFlashSafeWrite ((U64)offset, (void *)datas, (U64)write_cnt,(U64)vaddr);
+	p2v_mem_clean(vaddr, memoffset);
+}
+void write_block_cpu_spi_flash(unsigned int offset, unsigned char * datas, int write_cnt)
+{
+	void * vaddr = NULL;
+	int memoffset=0;
+	if((offset&0xfff!=0) || (write_cnt&0xfff!=0))
+	{
+		printf("Not is Block size\n");
+		return;
+	}
+	vaddr=p2v_mem_mapping(GetLs3ASpiRegBaseAddr(),write_cnt, &memoffset);
+	if(vaddr==NULL)
+		return;
+	SpiFlashWrite ((U64)offset, (void *)datas, (U64)write_cnt,(U64)vaddr);
+	p2v_mem_clean(vaddr, memoffset);
+}
+void erase_cpu_spi_flash(unsigned int offset, int byte_cnt)
+{
+	void * vaddr = NULL;
+	int memoffset=0;
+	UINT64	SectorStart;
+	UINT64	SectorNum;
+	UINT8		*Buff;
+	UINT64	Num = byte_cnt;
+
+	if (byte_cnt == 0) {
+		return ;
+	}
+	vaddr=p2v_mem_mapping(GetLs3ASpiRegBaseAddr(),byte_cnt, &memoffset);
+	if(vaddr==NULL)
+		return;
+	SectorStart = offset / BLKSIZE;
+	SectorNum		= ((offset + Num - 1) / BLKSIZE) - (offset / BLKSIZE) + 1;
+	Buff = malloc (SectorNum * BLKSIZE);
+	if(!Buff){
+		ASSERT(0);
+	}
+
+	SpiFlashRead (SectorStart * BLKSIZE, Buff, SectorNum * BLKSIZE, (U64)vaddr);
+	memset (Buff + offset % BLKSIZE, Num, 0xFF);
+	SpiFlashErase ((U64)offset, Num,(U64)vaddr);
+	SpiFlashWrite (SectorStart * BLKSIZE, Buff, SectorNum * BLKSIZE, (U64)vaddr);
+	free(Buff);
+
+	p2v_mem_clean(vaddr, memoffset);
+}
+void erase_block_cpu_spi_flash(unsigned int offset, int byte_cnt)
+{
+	void * vaddr = NULL;
+	int memoffset=0;
+	if((offset&0xfff!=0) || (byte_cnt&0xfff!=0))
+	{
+		printf("Not is Block size\n");
+		return;
+	}
+	vaddr=p2v_mem_mapping(GetLs3ASpiRegBaseAddr(),byte_cnt, &memoffset);
+	if(vaddr==NULL)
+		return;
+	SpiFlashErase ((U64)offset, byte_cnt,(U64)vaddr);
 	p2v_mem_clean(vaddr, memoffset);
 }
 #define NOT_USED printf("%s not used\n", __FUNCTION__)
