@@ -161,4 +161,12 @@ VOID
 SpiFlashSetCs (
   INTN Bit
   );
+
+UINTN
+SpiTcmRead (
+  UINTN      Offset,
+  VOID       *Buffer,
+  UINTN      Num,
+  UINTN      BaseRegAddr
+  );
 #endif

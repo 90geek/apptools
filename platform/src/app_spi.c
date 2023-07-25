@@ -20,7 +20,22 @@ void set_7a_spi_base_addr(U64 base_addr)
 {
 	spi_base_addr=base_addr;
 }
+void read_7a_tcm(unsigned int offset, unsigned char * datas, int read_cnt) 
+{
+	void * vaddr = NULL;
+	int memoffset=0;
 
+	if(GetLs7ASpiRegBaseAddr()==0)
+	{
+		printf("7a spi base addr is 0\n");
+		return ;
+	}
+	vaddr=p2v_mem_mapping(GetLs7ASpiRegBaseAddr(),read_cnt, &memoffset);
+	if(vaddr==NULL)
+		return ;
+	SpiTcmRead ((U64)offset,(void *)datas,(U64)read_cnt,(U64)vaddr);
+	p2v_mem_clean(vaddr, memoffset);
+}
 void read_7a_spi(unsigned int offset, unsigned char * datas, int read_cnt) 
 {
 	void * vaddr = NULL;

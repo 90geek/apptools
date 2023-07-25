@@ -15,6 +15,7 @@
 #include "loongson/Beep.h"
 #include "loongson/CpuGpioLib.h"
 #include "loongson/Ls7aGpio.h"
+#include "loongson/LsAsm.h"
 
 typedef struct app_platform_s{
   int cpu_type;

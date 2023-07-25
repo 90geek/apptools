@@ -4,6 +4,24 @@
 #include "platform/platform_debug.h"
 #include "platform/app_platform.h"
 
+int read_cpucfg_debug(parse_t * pars_p,char *result_p)
+{
+	int error;
+	int mode;
+	int reg;
+  unsigned int val;
+	error=cget_integer(pars_p,0,&reg);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->reg!");
+		return 1;
+	}
+
+  ReadCpucfg(val, reg);
+  printf("cpucfg 0x%x=0x%x\n",reg, val );
+	return 0;
+}
+
 int cpu_gpio_set_debug(parse_t * pars_p,char *result_p)
 {
 	int error;
@@ -494,6 +512,35 @@ int set_7a_spi_base_addr_debug(parse_t * pars_p,char *result_p)
 	return 0;
 }
 
+int spi_read_tcm_debug(parse_t * pars_p,char *result_p)
+{
+	int len,offset;
+	unsigned char buf[100]={0};
+	int i=0, error;
+
+	error=cget_integer(pars_p,0,&offset);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->offset!");
+		return 1;
+	}
+
+	error=cget_integer(pars_p,0,&len);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->len!");
+		return 1;
+	}
+
+	if(len>100)
+		len = 100;
+
+	read_7a_tcm(offset, buf, len);
+
+	printf("spi_read read value :\n");
+	app_print_data(buf,len);
+	return 0;
+}
 int spi_read_debug(parse_t * pars_p,char *result_p)
 {
 	int dev,len,offset;
@@ -939,6 +986,7 @@ void platform_debug_register(void)
 	register_command ("MM_W_W"			, mm_write_word_debug , "<base_addr_hi>,<base_addr_lo>,<data>");
 	register_command ("MM_W_DW"			, mm_write_dword_debug , "<base_addr_hi>,<base_addr_lo>,<data_hi>,<data_lo>");
 	register_command ("MM_R_BURST"			, mm_read_burst_debug , "<base_addr_hi>,<base_addr_lo>,<len>");
+	register_command ("READ_TCM"			, spi_read_tcm_debug , "<offset>,<len>");
 	register_command ("TEST_CMD"			, cmd_test_debug , "<cmd>:eg cmd lscpu");
 	register_command ("LS_LPC_IO_READ"			, lpc_io_read_debug , "<prot> <count>");
 	register_command ("LS_SIO_DEV_REG"			, sio_dev_reg_debug , "<dev> <reg> <0(write)/1(read)> <data>");
@@ -948,4 +996,5 @@ void platform_debug_register(void)
 	register_command ("LS7A_GPIO_SET"			, ls7a_gpio_debug , "<mode>0:low,1:hi,2:get,<gpionum>0~63 ");
 	register_command ("LSCPU_GPIO_SET"			, cpu_gpio_set_debug , "<mode>0:low,1:hi,2:get,<gpionum>0~31 ");
 	register_command ("LSCPU_GPIO_PWMBEEP"			, lscpu_gpio_pwmbeep_on_debug , "<keepms>1~,<pwmfreq>1~ ");
+	register_command ("READ_CPUCFG"			, read_cpucfg_debug , "<reg>");
 }

@@ -31,6 +31,7 @@
 #endif
 
 #define INVALID_OFFSET(x)     ((x > 0x800000)||(x < 0x0)) ? TRUE:FALSE
+#define TCM_INVALID_OFFSET(x)     ((x > 0xffffffff)||(x < 0x0)) ? TRUE:FALSE
 #define INVALID_NUM(x)        ((x > 0x800000)||( x <= 0x0)) ? TRUE:FALSE
 #define IS_SST25VF032B(M,D,C) ((M == 0xBF)&&(D == 0x25)&&(C == 0x4A)) ? TRUE:FALSE
 
@@ -671,3 +672,61 @@ SpiFlashSafeWrite (
   FreePool(Buff);
 }
 
+UINTN
+SpiTcmRead (
+  UINTN      Offset,
+  VOID       *Buffer,
+  UINTN      Num,
+  UINTN      BaseRegAddr
+  )
+{
+  // UINTN Ret;
+  UINTN      addr=Offset;
+  UINTN      count=0;
+  UINT8      data[4]={0};
+
+  if(!Buffer ||(TCM_INVALID_OFFSET(Offset)) || INVALID_NUM(Num)){
+    // ASSERT(0);
+    return 0;
+  }
+  DEBUG((DEBUG_INFO,"func %a,BaseRegAddr=0x%lx, offset=0x%x,num=%d\n",__FUNCTION__,BaseRegAddr,Offset,Num));
+  SpiFlashSetRegBase(BaseRegAddr);
+  SpiFlashInit ();
+  REGSET(REG_SPER, 0x01);//spre:01  mode 0
+  REGSET(REG_SOFTCS ,0x02);  //enable cs1
+
+  // addr
+  REGSET(REG_SPDR,((addr >> 24)&0xff));
+  while(((REGGET(REG_SPSR))&SPI_BUSY) == SPI_BUSY ){
+  }
+  REGGET(REG_SPDR);
+  REGSET(REG_SPDR,((addr >> 16)&0xff));
+  while(((REGGET(REG_SPSR))&SPI_BUSY)  == SPI_BUSY ){
+  }
+  REGGET(REG_SPDR);
+  REGSET(REG_SPDR,((addr >> 8)&0xff));
+  while(((REGGET(REG_SPSR))&SPI_BUSY) == SPI_BUSY ){
+  }
+  REGGET(REG_SPDR);
+  REGSET(REG_SPDR,(addr & 0xff));
+  while(((REGGET(REG_SPSR))&SPI_BUSY) == SPI_BUSY ){
+  }
+  REGGET(REG_SPDR);// addr end
+
+  // REGSET(REG_SPDR,0x00);
+  for(count=0;count<Num;count++)
+  {
+    REGSET(REG_SPDR,0x00);
+    while(((REGGET(REG_SPSR))&SPI_BUSY)  == SPI_BUSY ){
+    }
+    data[count] = REGGET(REG_SPDR);
+    // printf("0x%x\n",data[count]);
+  }
+  REGSET(REG_SOFTCS ,0x22); //disable cs1
+
+  memcpy(Buffer,data,4);
+  SpiFlashReset ();
+  ResetSfcParamReg();
+
+  return 0;
+}
