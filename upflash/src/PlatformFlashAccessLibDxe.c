@@ -109,7 +109,7 @@ PerformFlashWrite (
 {
   EFI_STATUS          Status;
   UINTN               SectorNum;
-  UINTN               UpdateCount=-1;
+  UINTN               UpdateCount=0;
   UINTN               Index;
   UINTN               NumBytes;
   VOID                *TempBuffer;

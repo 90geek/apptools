@@ -26,6 +26,7 @@
 
 #include "LsRegDef.h"
 #include "edk_api.h"
+#include "mem.h"
 
 #define   HT1_MEM_BASE              PHYS_TO_UNCACHED(0xe0000000000)
 #define   CHIPSET_LPC_IO_BASE       PHYS_TO_UNCACHED(0xefdfc000000)

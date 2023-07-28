@@ -26,6 +26,7 @@
 #include "debug.h"
 #include "LsRegDef.h"
 #include "loongson3_def.h"
+#include "mem.h"
 
 #define WritelBit(addr, BitValue, Area, StartBit) \
   (*(volatile UINT32*)(addr)) &= (~(Area<<StartBit)); \

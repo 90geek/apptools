@@ -53,8 +53,9 @@ static void ShowUsage(void)
 		"Usage:\n"
 		"apptool [parameter] ... :explain \n"
 		"  help :display help infomation\n"
-		"  upbios :updte uefi bios\n"
-		"  upbiosnovar :updte uefi bios and reserve configuration parameters\n"
+		"  upbiosall <imgfile>:updte uefi bios img to flash\n"
+		"  upbios <imgfile>:updte uefi bios img to flash but reserve configuration parameters\n"
+		"  fwupdate <imgfile> <inifile>:Parses the ./SystemFirmwareUpdateConfig.ini to update the firmware \n"
 		"  rmac <7aspi_paddr> <eth> :read mac addr eg rmac 0x452a0000 0\n"
 		"  rmac <probe> <eth> :read mac addr eg rmac 0x452a0000 0\n"
 		"  wmac <7aspi_paddr> <eth> <macaddr> :write 7a flash mac addr,eg wmac 0x452a0000 0 11:22:33:44:55:66\n"
@@ -220,7 +221,7 @@ int main (int argc,char *argv[])
 	}
 
 #ifdef UPFLASH_SUPPORT
-	if (!strcmp(argv[argv_p], "upbios"))
+	if (!strcmp(argv[argv_p], "upbiosall"))
 	{
 		argv_c--;
 		argv_p++;
@@ -229,7 +230,7 @@ int main (int argc,char *argv[])
 		update_bios_img(argv[argv_p]);
 		goto cleanup;
 	}
-	if (!strcmp(argv[argv_p], "upbiosnovar"))
+	if (!strcmp(argv[argv_p], "upbios"))
 	{
 		argv_c--;
 		argv_p++;
@@ -244,7 +245,11 @@ int main (int argc,char *argv[])
 		argv_p++;
 		if (argv_c < 1)
 			goto _show_usage;
-		system_fw_update(argv[argv_p]);
+    printf("%d--%s--%s\n",argv_c,argv[argv_p],argv[argv_p+1]);
+		if (argv_c == 2)
+		  system_fw_update(argv[argv_p],argv[argv_p+1]);
+    else
+		  system_fw_update(argv[argv_p],NULL);
 		goto cleanup;
 	}
 #endif

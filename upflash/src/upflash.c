@@ -33,7 +33,7 @@ ParseUpdateDataFile (
   //
   // First process the data buffer and get all sections and entries
   //
-  ini = iniparser_load(INI_FILE_PATH);
+  ini = iniparser_load(DataBuffer);
   if (ini==NULL) {
       fprintf(stderr, "cannot parse file: %s\n", INI_FILE_PATH);
       return -1 ;
@@ -57,7 +57,7 @@ ParseUpdateDataFile (
     // Get the section name of each update
     //
     sprintf(Entry, "%s:%s%d","Head","Update",Index);
-    SectionName = iniparser_getstring(ini, Entry, NULL);
+    SectionName = (CHAR8 *)iniparser_getstring(ini, Entry, NULL);
     printf("%s\n", SectionName);
     if (SectionName == NULL) {
       DEBUG((DEBUG_ERROR, "[%d] %a not found\n", Index, Entry));
@@ -217,8 +217,7 @@ UpdateImage (
   CONFIG_HEADER                         ConfigHeader;
   UINTN                                 Index;
 
-  // if (ConfigImage == NULL) {
-  if((access(INI_FILE_PATH,F_OK))==-1) {
+  if ((ConfigImage == NULL) && ((access(INI_FILE_PATH,F_OK))==-1)) {
     DEBUG((DEBUG_INFO, "PlatformUpdate (NoConfig):"));
     DEBUG((DEBUG_INFO, "  BaseAddress - 0x%x,", 0));
     DEBUG((DEBUG_INFO, "  Length - 0x%x\n", SystemFirmwareImageSize));
@@ -238,8 +237,11 @@ UpdateImage (
     }
     return Status;
   }
+  else if((ConfigImage == NULL) && ((access(INI_FILE_PATH,F_OK))!=-1)){
+    ConfigImage = INI_FILE_PATH,F_OK;
+  }
 
-  DEBUG((DEBUG_INFO, "PlatformUpdate (With Config):\n"));
+  DEBUG((DEBUG_INFO, "PlatformUpdate (With Config):%s\n",ConfigImage));
   ConfigData        = NULL;
   memset (&ConfigHeader, 0,sizeof(ConfigHeader));
   // ZeroMem (&ConfigHeader, sizeof(ConfigHeader));
@@ -286,7 +288,7 @@ UpdateImage (
 
   return Status;
 }
-int system_fw_update(char *file_path)
+int system_fw_update(char *file_path,char *ini_path)
 {
 	int from_fd=0,len=0,count=0;
 	unsigned char  *ptr1 = NULL,*ptr2 = NULL;
@@ -318,7 +320,7 @@ int system_fw_update(char *file_path)
 		return 1;
 	}
 	printf("Load Bios File, Size is %d\n",Ret);
-	UpdateImage((void *)ptr2, Ret, NULL, 0, &LastAttemptVersion, &LastAttemptStatus);
+	UpdateImage((void *)ptr2, Ret, ini_path, 0, &LastAttemptVersion, &LastAttemptStatus);
 	return 0;
 }
 int update_bios_novar(char *file_path)
