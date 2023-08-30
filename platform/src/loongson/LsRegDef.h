@@ -55,6 +55,7 @@
 
 #define CPU_TEMP_SAMPLE_BASE  PHYS_TO_UNCACHED(0x1fe00198)  //Temperature sampling register
 #define TEMP_SENSOR_VALUE_OFFSET    0x4
+#define LS7A_TEMP_SAMPLE_BASE  0x10000414 | HT1_MEM_BASE_ADDR  //Temperature sampling register
 
 /*****************************************************************************
  *                                Common                                     *

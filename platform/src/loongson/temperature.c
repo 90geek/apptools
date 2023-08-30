@@ -57,3 +57,18 @@ UINT8 lscpu_tempdetect(UINT32 *temp0,UINT32 *temp1)
 	return EFI_SUCCESS;
 }
 
+UINT8 ls7a_tempdetect(UINT32 *temp0)
+{
+	UINT32 Data = 0;
+	void * vaddr = NULL;
+	int memoffset;
+
+  vaddr=p2v_mem_mapping(LS7A_TEMP_SAMPLE_BASE,4,&memoffset);
+	if(vaddr==NULL)
+		return EFI_LOAD_ERROR;
+	Data = Read32((U64)vaddr);
+	p2v_mem_clean(vaddr,memoffset);
+
+	*temp0 = (Data >> 24)&0xff; //56-63bit
+	return EFI_SUCCESS;
+}

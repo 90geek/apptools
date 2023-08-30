@@ -167,6 +167,7 @@ SpiTcmRead (
   UINTN      Offset,
   VOID       *Buffer,
   UINTN      Num,
-  UINTN      BaseRegAddr
+  UINTN      BaseRegAddr,
+  UINT8      Cs
   );
 #endif

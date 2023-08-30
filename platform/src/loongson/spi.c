@@ -677,7 +677,8 @@ SpiTcmRead (
   UINTN      Offset,
   VOID       *Buffer,
   UINTN      Num,
-  UINTN      BaseRegAddr
+  UINTN      BaseRegAddr,
+  UINT8      Cs
   )
 {
   // UINTN Ret;
@@ -689,11 +690,16 @@ SpiTcmRead (
     // ASSERT(0);
     return 0;
   }
-  DEBUG((DEBUG_INFO,"func %a,BaseRegAddr=0x%lx, offset=0x%x,num=%d\n",__FUNCTION__,BaseRegAddr,Offset,Num));
+  // DEBUG((DEBUG_INFO,"func %a,BaseRegAddr=0x%lx, offset=0x%x,num=%d\n",__FUNCTION__,BaseRegAddr,Offset,Num));
   SpiFlashSetRegBase(BaseRegAddr);
   SpiFlashInit ();
   REGSET(REG_SPER, 0x01);//spre:01  mode 0
-  REGSET(REG_SOFTCS ,0x02);  //enable cs1
+  if(Cs==0)
+    REGSET(REG_SOFTCS ,0x01);  //enable cs0
+  else if(Cs==1)
+    REGSET(REG_SOFTCS ,0x02);  //enable cs1
+  else
+    DEBUG((DEBUG_INFO,"No support cs %d\n",Cs));
 
   // addr
   REGSET(REG_SPDR,((addr >> 24)&0xff));
@@ -722,7 +728,12 @@ SpiTcmRead (
     data[count] = REGGET(REG_SPDR);
     // printf("0x%x\n",data[count]);
   }
-  REGSET(REG_SOFTCS ,0x22); //disable cs1
+  if(Cs==0)
+    REGSET(REG_SOFTCS ,0x11); //disable cs0
+  else if(Cs==1)
+    REGSET(REG_SOFTCS ,0x22); //disable cs1
+  else
+    DEBUG((DEBUG_INFO,"No support cs %d\n",Cs));
 
   memcpy(Buffer,data,4);
   SpiFlashReset ();

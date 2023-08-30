@@ -350,6 +350,14 @@ int read_cpu_temp_debug(parse_t * pars_p,char *result_p)
 	printf("cpu temp0 %d ,temp1 %d\n", temp0,temp1);
 	return 0;
 }
+int read_7a_temp_debug(parse_t * pars_p,char *result_p)
+{
+	U32 temp0;
+
+  ls7a_tempdetect(&temp0);
+	printf("7a temp0 %d \n", temp0);
+	return 0;
+}
 
 int read_cpu_freq_debug(parse_t * pars_p,char *result_p)
 {
@@ -514,7 +522,7 @@ int set_7a_spi_base_addr_debug(parse_t * pars_p,char *result_p)
 
 int spi_read_tcm_debug(parse_t * pars_p,char *result_p)
 {
-	int len,offset;
+	int len,offset,cs;
 	unsigned char buf[100]={0};
 	int i=0, error;
 
@@ -522,6 +530,13 @@ int spi_read_tcm_debug(parse_t * pars_p,char *result_p)
 	if (error)
 	{
 		tag_current_line(pars_p,"-->offset!");
+		return 1;
+	}
+
+  error=cget_integer(pars_p,0,&cs);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->cs!");
 		return 1;
 	}
 
@@ -535,7 +550,7 @@ int spi_read_tcm_debug(parse_t * pars_p,char *result_p)
 	if(len>100)
 		len = 100;
 
-	read_7a_tcm(offset, buf, len);
+	read_7a_tcm(offset, buf, len, cs);
 
 	printf("spi_read read value :\n");
 	app_print_data(buf,len);
@@ -965,11 +980,12 @@ void platform_debug_register(void)
 	register_command ("LS_FAN_TEST_FREQ"			, fan_set_freq_debug , "max rpm 100~");
 	register_command ("LS_FAN_SPEED"		, fan_speed_get_debug , "<Pwm>:0-3");
 	register_command ("LS_FAN_CTRL"		, fan_ctrl_debug , "<NONE>");
-	register_command ("LS_CPU_TEMP"			, read_cpu_temp_debug , "");
-	register_command ("LS_CPU_FREQ"			, read_cpu_freq_debug , "");
+	register_command ("LS_CPU_TEMP"			, read_cpu_temp_debug , "<NONE>");
+	register_command ("LS_7A_TEMP"			, read_7a_temp_debug , "<NONE>");
+	register_command ("LS_CPU_FREQ"			, read_cpu_freq_debug , "<NONE>");
 	register_command ("LS_DUMP_ACPI"			, dump_acpi_reg_debug , "<num>:0dump acpi reg,1apci reboot");
-	register_command ("LS_DUMP_GPIO"			, dump_gpio_reg_debug , "");
-	register_command ("LS_DUMP_RTC"			, dump_rtc_reg_debug , "");
+	register_command ("LS_DUMP_GPIO"			, dump_gpio_reg_debug , "<NONE>");
+	register_command ("LS_DUMP_RTC"			, dump_rtc_reg_debug , "<NONE>");
 	register_command ("LS_DUMP_PCI"			, dump_pci_debug , "<bdf>:eg.spi 00:16.0 bdf for b000");
 	register_command ("LS_MPS_READ"			, mps_read_debug , "<node> <i2cbus> <mps_addr>,node 0/4/8/16,i2cbus 1fe00120/1fe00130, mps_addr 3b/4b");
 	register_command ("LS_MPS_WRITE_VDDN"			, mps_write_vddn_debug , "<node> <i2cbus> <mps_addr> <step> <volmV>,node 0/4/8/16,i2cbus 1fe00120/1fe00130 mps_addr 3b/4b step +5/+10 volmV +950~+1250");
@@ -986,7 +1002,7 @@ void platform_debug_register(void)
 	register_command ("MM_W_W"			, mm_write_word_debug , "<base_addr_hi>,<base_addr_lo>,<data>");
 	register_command ("MM_W_DW"			, mm_write_dword_debug , "<base_addr_hi>,<base_addr_lo>,<data_hi>,<data_lo>");
 	register_command ("MM_R_BURST"			, mm_read_burst_debug , "<base_addr_hi>,<base_addr_lo>,<len>");
-	register_command ("READ_TCM"			, spi_read_tcm_debug , "<offset>,<len>");
+	register_command ("READ_TCM"			, spi_read_tcm_debug , "<offset>,<cs>,<len>");
 	register_command ("TEST_CMD"			, cmd_test_debug , "<cmd>:eg cmd lscpu");
 	register_command ("LS_LPC_IO_READ"			, lpc_io_read_debug , "<prot> <count>");
 	register_command ("LS_SIO_DEV_REG"			, sio_dev_reg_debug , "<dev> <reg> <0(write)/1(read)> <data>");

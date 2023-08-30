@@ -65,6 +65,7 @@ static void ShowUsage(void)
 		"  devmem :devmem cmd,eg devmem addr\n"
 		"  beepon :beep on\n"
 		"  beepoff :beep off\n"
+		"  tpmid :read 7a spi tpm id \n"
 		"  cmd :into apptool cmdline \n");
 }
 static void read_mac_addr(int argc, char *argv[])
@@ -274,6 +275,11 @@ int main (int argc,char *argv[])
 		goto cleanup;
 	}
 
+  if (!strcmp(argv[argv_p], "tpmid"))
+	{
+    read_7a_tcm_id();
+		goto cleanup;
+	}
 	if (!strcmp(argv[argv_p], "infoui"))
 	{
 		argv_c--;
