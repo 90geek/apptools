@@ -61,14 +61,31 @@ UINT8 ls7a_tempdetect(UINT32 *temp0)
 {
 	UINT32 Data = 0;
 	void * vaddr = NULL;
-	int memoffset;
+	int memoffset,i;
+	UINT32 ConfReg,ConfRegSet;
+	INT8	TempSensorAnalog1[5];		//INT8 (-40 - 125)
+	INT32	TempAll=0;
 
-  vaddr=p2v_mem_mapping(LS7A_TEMP_SAMPLE_BASE,4,&memoffset);
+  vaddr=p2v_mem_mapping(LS7A_TEMP_SAMPLE_BASE,0x20,&memoffset);
 	if(vaddr==NULL)
 		return EFI_LOAD_ERROR;
-	Data = Read32((U64)vaddr);
+	ConfReg = Read32((U64)vaddr);
+	for(i=0x0;i<=4;i++)
+	{
+		ConfRegSet = ConfReg & ~(0x3 << 2) | (i << 4) | 0x3;
+		Write32((U64)vaddr, ConfReg);
+		sleep(1);
+		Data = Read32((U64)vaddr+0x14);
+		if((Data>>14)&1)
+			printf("overfolw\n");
+		else
+			Data=Data & 0x3fff;
+		TempSensorAnalog1[i] = Data * 731 / 0x4000 - 273 ;
+		printf("TempSensorAnalog1[%d]=%d\n",i,TempSensorAnalog1[i]);
+		TempAll+=TempSensorAnalog1[i];
+	}
 	p2v_mem_clean(vaddr,memoffset);
 
-	*temp0 = (Data >> 24)&0xff; //56-63bit
+	*temp0 = TempAll/5;
 	return EFI_SUCCESS;
 }
