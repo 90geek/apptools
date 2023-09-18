@@ -127,7 +127,8 @@ void *p2v_mem_mapping(unsigned long long paddr,int size,int *pmemoffset)
 {
 	unsigned long long memmask;
 	void *vaddr = NULL;
-	int memoffset=0;
+	unsigned int page_size,mapped_size;
+	unsigned int memoffset;
 
 	if(fd==0 || fd==-1)
 	{
@@ -138,10 +139,16 @@ void *p2v_mem_mapping(unsigned long long paddr,int size,int *pmemoffset)
 			needclose=1;
 	}
 	// printf("paddr start : %p \n",paddr);
-	memoffset = paddr % getpagesize();
-	vaddr = (void*)mmap(NULL,size+memoffset, PROT_READ|PROT_WRITE,MAP_SHARED,fd,paddr-memoffset);
+	page_size = getpagesize();
+	memoffset = paddr % page_size;
+	mapped_size = memoffset + size;
+	if(mapped_size > page_size)
+		mapped_size +=page_size;
+	vaddr = (void*)mmap(NULL,mapped_size, PROT_READ|PROT_WRITE,MAP_SHARED,fd,paddr-memoffset);
+	if (vaddr == MAP_FAILED)
+		printf("ERROR:mmap() failed... vaddr:%p, memoffset=0x%x\n",vaddr,memoffset);
 	vaddr = vaddr + memoffset;
-	*pmemoffset=memoffset;
+	*pmemoffset = memoffset;
 	// printf("mmap addr start : %p \n",vaddr);
 	return vaddr;
 }
@@ -153,9 +160,9 @@ int p2v_mem_clean(void *vaddr,int memoffset)
 	if( vaddr != NULL)
 	{
 		// printf("munmap addr : %p \n",vaddr);
-		status = munmap(vaddr-memoffset, 1);
+		status = munmap(vaddr-memoffset, 1); //长度单位是 以字节为单位，不足一内存页按一内存页处理
 		if(status != 0){
-			printf("ERROR: p2v_mem_clean , munmap() failed... status 0x%x, vaddr:%p, memoffset=0x%x\n",vaddr,memoffset);
+			printf("ERROR: p2v_mem_clean , munmap() failed... status 0x%x, vaddr:%p, memoffset=0x%x\n",status, vaddr,memoffset);
 		}
 		if(needclose)
 		{
@@ -207,6 +214,7 @@ void *ls_mem_chunk(U64 base, U32 len, const char *devmem)
 		int fd;
 		struct stat statbuf;
 		U64 mmoffset;
+		unsigned int page_size,mapped_size;
 		void *mmp;
 
 		if ((fd = open(devmem, O_RDONLY | O_SYNC)) == -1)
@@ -238,20 +246,24 @@ void *ls_mem_chunk(U64 base, U32 len, const char *devmem)
 						devmem);
 				goto err_free;
 		}
-
-		mmoffset = base % getpagesize();
+		page_size = getpagesize();
+		mmoffset = base % page_size;
+		if(mmoffset + len > page_size)
+			mapped_size=mmoffset + len +page_size;
+		else
+			mapped_size=mmoffset + len;
 		/*
 		 * Please note that we don't use mmap() for performance reasons here,
 		 * but to workaround problems many people encountered when trying
 		 * to read from /dev/mem using regular read() calls.
 		 */
-		mmp = mmap(NULL, mmoffset + len, PROT_READ, MAP_SHARED, fd, base - mmoffset);
+		mmp = mmap(NULL, mapped_size, PROT_READ, MAP_SHARED, fd, base - mmoffset);
 		if (mmp == MAP_FAILED)
 				goto try_read;
 
 		memcpy(p, (U8 *)mmp + mmoffset, len);
 
-		if (munmap(mmp, mmoffset + len) == -1)
+		if (munmap(mmp, mapped_size) == -1)
 		{
 				fprintf(stderr, "%s: ", devmem);
 				perror("munmap");
