@@ -24,12 +24,17 @@
 
 #include "i2c.h"
 #include "edk_api.h"
+#include "LsRegDef.h"
 #include "platform/app_os.h"
 #include "platform/app_types.h"
+#include "mem.h"
 
+#define CPU_I2C0_REG_BASE  PHYS_TO_UNCACHED(0x1fe00120) 
+#define CPU_I2C1_REG_BASE  PHYS_TO_UNCACHED(0x1fe00130)
 #define ALGORITHM_3A 0x3a
 #define ALGORITHM_7A 0x7a
-
+#define I2C_CTL_CLK        100000         //BASE_CLK (Unit Khz)  
+#define I2C_BUS_RATE       42
 /**
   Initialize and set the I2c Control Information.
 
@@ -247,3 +252,23 @@ again:
 
   return 0;
 }
+
+void LsCpuI2cRead(
+   UINT8                                NodeId,
+   UINTN                                BaseAddr,
+   UINTN                                DevAddr,
+   UINTN                                Reg,
+   UINT8                                Size,
+   VOID                                 *Buffer
+    )
+{
+  void * vaddr = NULL;
+  int memoffset=0;
+  BaseAddr = BaseAddr | (NodeId << 44);
+  // printf("Nodeid %d i2cbase 0x%llx,devaddr 0x%x, reg 0x%x, size %d\n",NodeId,BaseAddr,DevAddr,Reg,Size);
+  vaddr=p2v_mem_mapping(BaseAddr,0x100, &memoffset);
+  I2cInitSetFreq ((UINTN)vaddr, I2C_CTL_CLK, I2C_BUS_RATE, ALGORITHM_3A);
+  I2cCtlRead ((UINTN)vaddr, DevAddr, Reg, Size, Buffer);
+  p2v_mem_clean(vaddr, memoffset);
+}
+

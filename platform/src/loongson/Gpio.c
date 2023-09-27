@@ -26,6 +26,7 @@
 #include "LsRegDef.h"
 #include "CpuGpioLib.h"
 #include "Gpio.h"
+#include "mem.h"
 
 /**
   This function is to set Cpu's Gpio to high level.

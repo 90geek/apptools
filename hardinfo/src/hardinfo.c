@@ -370,7 +370,7 @@ ls7a_ver_t *get_7a_version(void)
 void read_cpu_old_id(void)
 {
 	U32 cpuid=0;
-	app_mm_read(0x1fe00464, (U32 *)&cpuid, 4);
+	app_mm_read(0x1fe00464, (U64 *)&cpuid, 4);
 	cpuid=(cpuid>>13)&0xff;
 	printf("check cpu old id 0x%x!\n",cpuid);
 }

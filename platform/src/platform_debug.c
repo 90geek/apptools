@@ -4,12 +4,57 @@
 #include "platform/platform_debug.h"
 #include "platform/app_platform.h"
 
+int read_cpu_i2c_debug(parse_t * pars_p,char *result_p)
+{
+	int error;
+	int nodeid=0,base,dev,size;
+	int reg;
+	unsigned char buf[100]={0};
+
+	error=cget_integer(pars_p,0,&nodeid);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->nodeid!");
+		return 1;
+	}
+	error=cget_integer(pars_p,0,&base);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->base!");
+		return 1;
+	}
+	error=cget_integer(pars_p,0,&dev);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->dev!");
+		return 1;
+	}
+	error=cget_integer(pars_p,0,&reg);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->reg!");
+		return 1;
+	}
+	error=cget_integer(pars_p,0,&size);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->size!");
+		return 1;
+	}
+	if(size>100)
+		size=100;
+	printf("usage:\napptool>READ_CPU_I2C 0 1fe00130 4b 8b 2\n");
+	LsCpuI2cRead(nodeid,base,dev,reg,size,(void *)buf);
+	printf("read cpu %d i2cbase 0x%x,devaddr 0x%x, reg 0x%x, size %d\n",nodeid,base,dev,reg,size);
+	app_print_data(buf,size);
+	return 0;
+}
 int read_cpucfg_debug(parse_t * pars_p,char *result_p)
 {
 	int error;
 	int mode;
 	int reg;
-  unsigned int val;
+	unsigned int val;
 	error=cget_integer(pars_p,0,&reg);
 	if (error)
 	{
@@ -17,8 +62,8 @@ int read_cpucfg_debug(parse_t * pars_p,char *result_p)
 		return 1;
 	}
 
-  ReadCpucfg(val, reg);
-  printf("cpucfg 0x%x=0x%x\n",reg, val );
+	ReadCpucfg(val, reg);
+	printf("cpucfg 0x%x=0x%x\n",reg, val );
 	return 0;
 }
 
@@ -354,7 +399,7 @@ int read_7a_temp_debug(parse_t * pars_p,char *result_p)
 {
 	U32 temp0;
 
-  ls7a_tempdetect(&temp0);
+	ls7a_tempdetect(&temp0);
 	printf("7a temp0 %d \n", temp0);
 	return 0;
 }
@@ -444,6 +489,8 @@ int mps_read_debug(parse_t * pars_p,char *result_p)
 		tag_current_line(pars_p,"--> mps_addr!");
 		return 1;
 	}
+
+	printf("usage:\napptool>MPS_READ 0 1fe00130 4b\n");
 	printf("node 0x%x,i2cbus 0x%x, mps_addr 0x%x\n",node,i2cbus, mps_addr);
 	I2cReadOps(node, i2cbus, mps_addr);
 }
@@ -533,7 +580,7 @@ int spi_read_tcm_debug(parse_t * pars_p,char *result_p)
 		return 1;
 	}
 
-  error=cget_integer(pars_p,0,&cs);
+	error=cget_integer(pars_p,0,&cs);
 	if (error)
 	{
 		tag_current_line(pars_p,"-->cs!");
@@ -987,8 +1034,6 @@ void platform_debug_register(void)
 	register_command ("LS_DUMP_GPIO"			, dump_gpio_reg_debug , "<NONE>");
 	register_command ("LS_DUMP_RTC"			, dump_rtc_reg_debug , "<NONE>");
 	register_command ("LS_DUMP_PCI"			, dump_pci_debug , "<bdf>:eg.spi 00:16.0 bdf for b000");
-	register_command ("LS_MPS_READ"			, mps_read_debug , "<node> <i2cbus> <mps_addr>,node 0/4/8/16,i2cbus 1fe00120/1fe00130, mps_addr 3b/4b");
-	register_command ("LS_MPS_WRITE_VDDN"			, mps_write_vddn_debug , "<node> <i2cbus> <mps_addr> <step> <volmV>,node 0/4/8/16,i2cbus 1fe00120/1fe00130 mps_addr 3b/4b step +5/+10 volmV +950~+1250");
 	register_command ("SET_7A_SPI_BASE"			, set_7a_spi_base_addr_debug , "<base_addr_hi>,<base_addr_lo>");
 	register_command ("SPI_READ"			, spi_read_debug , "<spi_dev>,<offset>,<len>:spi_dev 0cpuflash/17a");
 	register_command ("SPI_WRITE"			, spi_write_debug , "<spi_dev>,<offset>,<data>:spi_dev 0cpuflash/17a,data 32bit");
@@ -1013,4 +1058,7 @@ void platform_debug_register(void)
 	register_command ("LSCPU_GPIO_SET"			, cpu_gpio_set_debug , "<mode>0:low,1:hi,2:get,<gpionum>0~31 ");
 	register_command ("LSCPU_GPIO_PWMBEEP"			, lscpu_gpio_pwmbeep_on_debug , "<keepms>1~,<pwmfreq>1~ ");
 	register_command ("READ_CPUCFG"			, read_cpucfg_debug , "<reg>");
+	register_command ("READ_CPU_I2C"			, read_cpu_i2c_debug , "<nodeid>,<i2cbase>,<i2cdev>,<reg>,<size>");
+	register_command ("MPS_READ"			, mps_read_debug , "<node> <i2cbus> <mps_addr>,node 0/4/8/16,i2cbus 1fe00120/1fe00130, mps_addr 3b/4b");
+	register_command ("MPS_WRITE_VDDN"			, mps_write_vddn_debug , "<node> <i2cbus> <mps_addr> <step> <volmV>,node 0/4/8/16,i2cbus 1fe00120/1fe00130 mps_addr 3b/4b step +5/+10 volmV +950~+1250");
 }

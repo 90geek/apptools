@@ -86,4 +86,13 @@ I2cInitSetFreq (
    UINTN                                Frequency, //Bus clk frequency
    UINT8                                Algorithm
   );
+
+void LsCpuI2cRead(
+   UINT8                                NodeId,
+   UINTN                                BaseAddr,
+   UINTN                                DevAddr,
+   UINTN                                Reg,
+   UINT8                                Size,
+   VOID                                 *Buffer
+    );
 #endif
