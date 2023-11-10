@@ -104,6 +104,9 @@ if [ $PLATFORM ] ;then
 
 		unset RUNTIME_SUPPORT
 		export RUNTIME_SUPPORT=1
+
+		unset UPFLASH_SUPPORT
+		export UPFLASH_SUPPORT=1
 	elif [ $PLATFORM = "loongarch64" ] ; then 
 		unset CAPSULE_SUPPORT
 		# export CAPSULE_SUPPORT=1

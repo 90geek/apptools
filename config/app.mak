@@ -152,6 +152,17 @@ INCLUDEFLAGS += -I$(SDK_DIR)/platform/src
 LIB +=
 CFLAGS += -fgnu89-inline
 
+ARCH := $(shell uname -m)
+ifeq ($(ARCH),x86_64)
+CFLAGS += -DPLATFORM_X86
+else ifeq ($(ARCH),loongarch64)
+CFLAGS += -fgnu89-inline -DPLATFORM_LA64
+else ifeq ($(ARCH),mips64)
+CFLAGS += -fgnu89-inline -march=mips64r2 -mabi=64 -DPLATFORM_MIPS64
+LDFLAGS += -march=mips64r2 -mabi=64
+else
+    $(error Unsupported architecture: $(ARCH))
+endif
 #########################################################################
 else ifeq ($(PLATFORM), loongarch64)
 
@@ -163,7 +174,7 @@ LIBPATH +=
 
 LIB +=
 
-CFLAGS += -fgnu89-inline
+CFLAGS += -fgnu89-inline -DPLATFORM_LA64
 LDFLAGS +=
 #########################################################################
 else ifeq ($(PLATFORM), mips64)
@@ -176,7 +187,7 @@ LIBPATH +=
 
 LIB +=
 
-CFLAGS += -fgnu89-inline -march=mips64r2 -mabi=64
+CFLAGS += -fgnu89-inline -march=mips64r2 -mabi=64 -DPLATFORM_MIPS64
 LDFLAGS += -march=mips64r2 -mabi=64
 
 #########################################################################

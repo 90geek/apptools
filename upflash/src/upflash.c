@@ -6,7 +6,7 @@
 #include "PlatformFlashAccessLib.h"
 #include "iniparser.h"
 
-#define MAX_LINE_LENGTH           512
+#define MAX_LINE_LENGTH						512
 #define FLASH_SIZE 0x800000
 BOOLEAN  mNvRamUpdated = FALSE;
 #define INI_FILE_PATH "./SystemFirmwareUpdateConfig.ini"
@@ -14,279 +14,279 @@ BOOLEAN  mNvRamUpdated = FALSE;
 
 EFI_STATUS
 ParseUpdateDataFile (
-  IN      UINT8                         *DataBuffer,
-  IN      UINTN                         BufferSize,
-  IN OUT  CONFIG_HEADER                 *ConfigHeader,
-  IN OUT  UPDATE_CONFIG_DATA            **UpdateArray
-  )
+	IN			UINT8													*DataBuffer,
+	IN			UINTN													BufferSize,
+	IN OUT	CONFIG_HEADER									*ConfigHeader,
+	IN OUT	UPDATE_CONFIG_DATA						**UpdateArray
+	)
 {
-  EFI_STATUS                            Status;
-  CHAR8                                 *SectionName;
-  CHAR8                                 Entry[MAX_LINE_LENGTH];
-  INTN                                 Num;
-  UINT64                                Num64;
-  UINTN                                 Index;
-  EFI_GUID                              FileGuid;
-  VOID                                  *Context;
-  dictionary  *                         ini;
+	EFI_STATUS														Status;
+	CHAR8																	*SectionName;
+	CHAR8																	Entry[MAX_LINE_LENGTH];
+	INTN																 Num;
+	UINT64																Num64;
+	UINTN																	Index;
+	EFI_GUID															FileGuid;
+	VOID																	*Context;
+	dictionary	*													ini;
 
-  //
-  // First process the data buffer and get all sections and entries
-  //
-  ini = iniparser_load(DataBuffer);
-  if (ini==NULL) {
-      fprintf(stderr, "cannot parse file: %s\n", INI_FILE_PATH);
-      return -1 ;
-  }
-  iniparser_dump(ini, stderr);
-  Num = iniparser_getint(ini, "Head:NumOfUpdate", -1);
-  printf("NumOfUpdate:      [%d]\n", Num);
-  if (Num == -1) {
-    DEBUG((DEBUG_ERROR, "NumOfUpdate not found\n"));
-    return EFI_NOT_FOUND;
-  }
+	//
+	// First process the data buffer and get all sections and entries
+	//
+	ini = iniparser_load(DataBuffer);
+	if (ini==NULL) {
+			fprintf(stderr, "cannot parse file: %s\n", INI_FILE_PATH);
+			return -1 ;
+	}
+	iniparser_dump(ini, stderr);
+	Num = iniparser_getint(ini, "Head:NumOfUpdate", -1);
+	printf("NumOfUpdate:			[%d]\n", Num);
+	if (Num == -1) {
+		DEBUG((DEBUG_ERROR, "NumOfUpdate not found\n"));
+		return EFI_NOT_FOUND;
+	}
 
-  ConfigHeader->NumOfUpdates = Num;
-  *UpdateArray = AllocateZeroPool ((sizeof (UPDATE_CONFIG_DATA) * Num));
-  if (*UpdateArray == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
+	ConfigHeader->NumOfUpdates = Num;
+	*UpdateArray = AllocateZeroPool ((sizeof (UPDATE_CONFIG_DATA) * Num));
+	if (*UpdateArray == NULL) {
+		return EFI_OUT_OF_RESOURCES;
+	}
 
-  for (Index = 0 ; Index < ConfigHeader->NumOfUpdates ; Index++) {
-    //
-    // Get the section name of each update
-    //
-    sprintf(Entry, "%s:%s%d","Head","Update",Index);
-    SectionName = (CHAR8 *)iniparser_getstring(ini, Entry, NULL);
-    printf("%s\n", SectionName);
-    if (SectionName == NULL) {
-      DEBUG((DEBUG_ERROR, "[%d] %a not found\n", Index, Entry));
-      return EFI_NOT_FOUND;
-    }
-    //
-    // The section name of this update has been found.
-    // Now looks for all the config data of this update
-    //
-    (*UpdateArray)[Index].Index = Index;
-    sprintf(Entry, "%s:%s",SectionName,"FirmwareType");
-    Num = iniparser_getint(ini, Entry, -1);
-    printf("%s:      [%d]\n",Entry, Num);
-    if (Num == -1) {
-        DEBUG((DEBUG_ERROR, "[%d] FirmwareType not found\n", Index));
-      return EFI_NOT_FOUND;
-    }
+	for (Index = 0 ; Index < ConfigHeader->NumOfUpdates ; Index++) {
+		//
+		// Get the section name of each update
+		//
+		sprintf(Entry, "%s:%s%d","Head","Update",Index);
+		SectionName = (CHAR8 *)iniparser_getstring(ini, Entry, NULL);
+		printf("%s\n", SectionName);
+		if (SectionName == NULL) {
+			DEBUG((DEBUG_ERROR, "[%d] %a not found\n", Index, Entry));
+			return EFI_NOT_FOUND;
+		}
+		//
+		// The section name of this update has been found.
+		// Now looks for all the config data of this update
+		//
+		(*UpdateArray)[Index].Index = Index;
+		sprintf(Entry, "%s:%s",SectionName,"FirmwareType");
+		Num = iniparser_getint(ini, Entry, -1);
+		printf("%s:			 [%d]\n",Entry, Num);
+		if (Num == -1) {
+				DEBUG((DEBUG_ERROR, "[%d] FirmwareType not found\n", Index));
+			return EFI_NOT_FOUND;
+		}
 
-    (*UpdateArray)[Index].FirmwareType = (PLATFORM_FIRMWARE_TYPE) Num;
-    sprintf(Entry, "%s:%s",SectionName,"AddressType");
-    Num = iniparser_getint(ini, Entry, -1);
-    printf("%s:      [%d]\n",Entry, Num);
-    if (Num == -1) {
-      DEBUG((DEBUG_ERROR, "[%d] AddressType not found\n", Index));
-      return EFI_NOT_FOUND;
-    }
-    (*UpdateArray)[Index].AddressType = (FLASH_ADDRESS_TYPE) Num;
+		(*UpdateArray)[Index].FirmwareType = (PLATFORM_FIRMWARE_TYPE) Num;
+		sprintf(Entry, "%s:%s",SectionName,"AddressType");
+		Num = iniparser_getint(ini, Entry, -1);
+		printf("%s:			 [%d]\n",Entry, Num);
+		if (Num == -1) {
+			DEBUG((DEBUG_ERROR, "[%d] AddressType not found\n", Index));
+			return EFI_NOT_FOUND;
+		}
+		(*UpdateArray)[Index].AddressType = (FLASH_ADDRESS_TYPE) Num;
 
-    sprintf(Entry, "%s:%s",SectionName,"BaseAddress");
-    Num64 = iniparser_getint(ini, Entry, -1);
-    printf("%s:      [%d]\n",Entry, Num);
-    if (Num64 == -1) {
-      DEBUG((DEBUG_ERROR, "[%d] BaseAddress not found\n", Index));
-      return EFI_NOT_FOUND;
-    }
-    (*UpdateArray)[Index].BaseAddress = (EFI_PHYSICAL_ADDRESS) Num64;
+		sprintf(Entry, "%s:%s",SectionName,"BaseAddress");
+		Num64 = iniparser_getint(ini, Entry, -1);
+		printf("%s:			 [%d]\n",Entry, Num);
+		if (Num64 == -1) {
+			DEBUG((DEBUG_ERROR, "[%d] BaseAddress not found\n", Index));
+			return EFI_NOT_FOUND;
+		}
+		(*UpdateArray)[Index].BaseAddress = (EFI_PHYSICAL_ADDRESS) Num64;
 
-    //
-    // FileBuid
-    //
-    // Status = GetGuidFromDataFile(
-    //            Context,
-    //            SectionName,
-    //            "FileGuid",
-    //            &FileGuid
-    //            );
-    // if (EFI_ERROR(Status)) {
-    //   DEBUG((DEBUG_ERROR, "[%d] FileGuid not found\n", Index));
-    //   return EFI_NOT_FOUND;
-    // }
+		//
+		// FileBuid
+		//
+		// Status = GetGuidFromDataFile(
+		//						Context,
+		//						SectionName,
+		//						"FileGuid",
+		//						&FileGuid
+		//						);
+		// if (EFI_ERROR(Status)) {
+		//	 DEBUG((DEBUG_ERROR, "[%d] FileGuid not found\n", Index));
+		//	 return EFI_NOT_FOUND;
+		// }
 
-    // CopyGuid(&((*UpdateArray)[Index].FileGuid), &FileGuid);
+		// CopyGuid(&((*UpdateArray)[Index].FileGuid), &FileGuid);
 
-    sprintf(Entry, "%s:%s",SectionName,"Length");
-    Num = iniparser_getint(ini, Entry, -1);
-    printf("%s:      [%d]\n",Entry, Num);
-    if (Num == -1) {
-      DEBUG((DEBUG_ERROR, "[%d] Length not found\n", Index));
-      return EFI_NOT_FOUND;
-    }
+		sprintf(Entry, "%s:%s",SectionName,"Length");
+		Num = iniparser_getint(ini, Entry, -1);
+		printf("%s:			 [%d]\n",Entry, Num);
+		if (Num == -1) {
+			DEBUG((DEBUG_ERROR, "[%d] Length not found\n", Index));
+			return EFI_NOT_FOUND;
+		}
 
-    (*UpdateArray)[Index].Length = (UINTN) Num;
+		(*UpdateArray)[Index].Length = (UINTN) Num;
 
-    //
-    // ImageOffset
-    //
-    sprintf(Entry, "%s:%s",SectionName,"ImageOffset");
-    Num = iniparser_getint(ini, Entry, -1);
-    printf("%s:      [%d]\n",Entry, Num);
-    if (Num == -1) {
-      DEBUG((DEBUG_ERROR, "[%d] ImageOffset not found\n", Index));
-      return EFI_NOT_FOUND;
-    }
+		//
+		// ImageOffset
+		//
+		sprintf(Entry, "%s:%s",SectionName,"ImageOffset");
+		Num = iniparser_getint(ini, Entry, -1);
+		printf("%s:			 [%d]\n",Entry, Num);
+		if (Num == -1) {
+			DEBUG((DEBUG_ERROR, "[%d] ImageOffset not found\n", Index));
+			return EFI_NOT_FOUND;
+		}
 
 
-    (*UpdateArray)[Index].ImageOffset = (UINTN) Num;
-  }
+		(*UpdateArray)[Index].ImageOffset = (UINTN) Num;
+	}
 
-  //
-  // Now all configuration data got. Free those temporary buffers
-  //
-  // CloseIniFile(Context);
+	//
+	// Now all configuration data got. Free those temporary buffers
+	//
+	// CloseIniFile(Context);
 
-  return EFI_SUCCESS;
+	return EFI_SUCCESS;
 }
 
 /**
-  Update System Firmware image component.
+	Update System Firmware image component.
 
-  @param[in]  SystemFirmwareImage     Points to the System Firmware image.
-  @param[in]  SystemFirmwareImageSize The length of the System Firmware image in bytes.
-  @param[in]  ConfigData              Points to the component configuration structure.
-  @param[out] LastAttemptVersion      The last attempt version, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
-  @param[out] LastAttemptStatus       The last attempt status, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
+	@param[in]	SystemFirmwareImage			Points to the System Firmware image.
+	@param[in]	SystemFirmwareImageSize The length of the System Firmware image in bytes.
+	@param[in]	ConfigData							Points to the component configuration structure.
+	@param[out] LastAttemptVersion			The last attempt version, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
+	@param[out] LastAttemptStatus				The last attempt status, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
 
-  @retval EFI_SUCCESS             The System Firmware image is updated.
-  @retval EFI_WRITE_PROTECTED     The flash device is read only.
+	@retval EFI_SUCCESS							The System Firmware image is updated.
+	@retval EFI_WRITE_PROTECTED			The flash device is read only.
 **/
 EFI_STATUS
 PerformUpdate (
-  IN VOID                         *SystemFirmwareImage,
-  IN UINTN                        SystemFirmwareImageSize,
-  IN UPDATE_CONFIG_DATA           *ConfigData,
-  OUT UINT32                      *LastAttemptVersion,
-  OUT UINT32                      *LastAttemptStatus
-  )
+	IN VOID													*SystemFirmwareImage,
+	IN UINTN												SystemFirmwareImageSize,
+	IN UPDATE_CONFIG_DATA						*ConfigData,
+	OUT UINT32											*LastAttemptVersion,
+	OUT UINT32											*LastAttemptStatus
+	)
 {
-  EFI_STATUS                   Status;
+	EFI_STATUS									 Status;
 
-  DEBUG((DEBUG_INFO, "PlatformUpdate:"));
-  DEBUG((DEBUG_INFO, "  BaseAddress - 0x%lx,", ConfigData->BaseAddress));
-  DEBUG((DEBUG_INFO, "  ImageOffset - 0x%x,", ConfigData->ImageOffset));
-  DEBUG((DEBUG_INFO, "  Legnth - 0x%x\n", ConfigData->Length));
-  Status = PerformFlashWrite (
-             ConfigData->FirmwareType,
-             ConfigData->BaseAddress,
-             ConfigData->AddressType,
-             (VOID *)((UINTN)SystemFirmwareImage + (UINTN)ConfigData->ImageOffset),
-             ConfigData->Length
-             );
-  if (!EFI_ERROR(Status)) {
-    *LastAttemptStatus = LAST_ATTEMPT_STATUS_SUCCESS;
-    if (ConfigData->FirmwareType == PlatformFirmwareTypeNvRam) {
-      mNvRamUpdated = TRUE;
-    }
-  } else {
-    *LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL;
-  }
-  return Status;
+	DEBUG((DEBUG_INFO, "PlatformUpdate:"));
+	DEBUG((DEBUG_INFO, "	BaseAddress - 0x%lx,", ConfigData->BaseAddress));
+	DEBUG((DEBUG_INFO, "	ImageOffset - 0x%x,", ConfigData->ImageOffset));
+	DEBUG((DEBUG_INFO, "	Legnth - 0x%x\n", ConfigData->Length));
+	Status = PerformFlashWrite (
+						 ConfigData->FirmwareType,
+						 ConfigData->BaseAddress,
+						 ConfigData->AddressType,
+						 (VOID *)((UINTN)SystemFirmwareImage + (UINTN)ConfigData->ImageOffset),
+						 ConfigData->Length
+						 );
+	if (!EFI_ERROR(Status)) {
+		*LastAttemptStatus = LAST_ATTEMPT_STATUS_SUCCESS;
+		if (ConfigData->FirmwareType == PlatformFirmwareTypeNvRam) {
+			mNvRamUpdated = TRUE;
+		}
+	} else {
+		*LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL;
+	}
+	return Status;
 }
 /**
-  Update System Firmware image.
+	Update System Firmware image.
 
-  @param[in]  SystemFirmwareImage     Points to the System Firmware image.
-  @param[in]  SystemFirmwareImageSize The length of the System Firmware image in bytes.
-  @param[in]  ConfigImage             Points to the config file image.
-  @param[in]  ConfigImageSize         The length of the config file image in bytes.
-  @param[out] LastAttemptVersion      The last attempt version, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
-  @param[out] LastAttemptStatus       The last attempt status, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
+	@param[in]	SystemFirmwareImage			Points to the System Firmware image.
+	@param[in]	SystemFirmwareImageSize The length of the System Firmware image in bytes.
+	@param[in]	ConfigImage							Points to the config file image.
+	@param[in]	ConfigImageSize					The length of the config file image in bytes.
+	@param[out] LastAttemptVersion			The last attempt version, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
+	@param[out] LastAttemptStatus				The last attempt status, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
 
-  @retval EFI_SUCCESS             The System Firmware image is updated.
-  @retval EFI_WRITE_PROTECTED     The flash device is read only.
+	@retval EFI_SUCCESS							The System Firmware image is updated.
+	@retval EFI_WRITE_PROTECTED			The flash device is read only.
 **/
 EFI_STATUS
 UpdateImage (
-  IN VOID                         *SystemFirmwareImage,
-  IN UINTN                        SystemFirmwareImageSize,
-  IN VOID                         *ConfigImage,
-  IN UINTN                        ConfigImageSize,
-  OUT UINT32                      *LastAttemptVersion,
-  OUT UINT32                      *LastAttemptStatus
-  )
+	IN VOID													*SystemFirmwareImage,
+	IN UINTN												SystemFirmwareImageSize,
+	IN VOID													*ConfigImage,
+	IN UINTN												ConfigImageSize,
+	OUT UINT32											*LastAttemptVersion,
+	OUT UINT32											*LastAttemptStatus
+	)
 {
-  EFI_STATUS                            Status;
-  UPDATE_CONFIG_DATA                    *ConfigData;
-  UPDATE_CONFIG_DATA                    *UpdateConfigData;
-  CONFIG_HEADER                         ConfigHeader;
-  UINTN                                 Index;
+	EFI_STATUS														Status;
+	UPDATE_CONFIG_DATA										*ConfigData;
+	UPDATE_CONFIG_DATA										*UpdateConfigData;
+	CONFIG_HEADER													ConfigHeader;
+	UINTN																	Index;
 
-  if ((ConfigImage == NULL) && ((access(INI_FILE_PATH,F_OK))==-1)) {
-    DEBUG((DEBUG_INFO, "PlatformUpdate (NoConfig):"));
-    DEBUG((DEBUG_INFO, "  BaseAddress - 0x%x,", 0));
-    DEBUG((DEBUG_INFO, "  Length - 0x%x\n", SystemFirmwareImageSize));
-    // ASSUME the whole System Firmware include NVRAM region.
-    Status = PerformFlashWrite (
-               PlatformFirmwareTypeNvRam,
-               0,
-               FlashAddressTypeRelativeAddress,
-               SystemFirmwareImage,
-               SystemFirmwareImageSize
-               );
-    if (!EFI_ERROR(Status)) {
-      *LastAttemptStatus = LAST_ATTEMPT_STATUS_SUCCESS;
-      mNvRamUpdated = TRUE;
-    } else {
-      *LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL;
-    }
-    return Status;
-  }
-  else if((ConfigImage == NULL) && ((access(INI_FILE_PATH,F_OK))!=-1)){
-    ConfigImage = INI_FILE_PATH,F_OK;
-  }
+	if ((ConfigImage == NULL) && ((access(INI_FILE_PATH,F_OK))==-1)) {
+		DEBUG((DEBUG_INFO, "PlatformUpdate (NoConfig):"));
+		DEBUG((DEBUG_INFO, "	BaseAddress - 0x%x,", 0));
+		DEBUG((DEBUG_INFO, "	Length - 0x%x\n", SystemFirmwareImageSize));
+		// ASSUME the whole System Firmware include NVRAM region.
+		Status = PerformFlashWrite (
+							 PlatformFirmwareTypeNvRam,
+							 0,
+							 FlashAddressTypeRelativeAddress,
+							 SystemFirmwareImage,
+							 SystemFirmwareImageSize
+							 );
+		if (!EFI_ERROR(Status)) {
+			*LastAttemptStatus = LAST_ATTEMPT_STATUS_SUCCESS;
+			mNvRamUpdated = TRUE;
+		} else {
+			*LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL;
+		}
+		return Status;
+	}
+	else if((ConfigImage == NULL) && ((access(INI_FILE_PATH,F_OK))!=-1)){
+		ConfigImage = INI_FILE_PATH,F_OK;
+	}
 
-  DEBUG((DEBUG_INFO, "PlatformUpdate (With Config):%s\n",ConfigImage));
-  ConfigData        = NULL;
-  memset (&ConfigHeader, 0,sizeof(ConfigHeader));
-  // ZeroMem (&ConfigHeader, sizeof(ConfigHeader));
-  Status            = ParseUpdateDataFile (
-                        ConfigImage,
-                        ConfigImageSize,
-                        &ConfigHeader,
-                        &ConfigData
-                        );
-  DEBUG((DEBUG_INFO, "ParseUpdateDataFile - %r\n", Status));
-  if (EFI_ERROR(Status)) {
-    *LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL;
-    return EFI_INVALID_PARAMETER;
-  }
-  DEBUG((DEBUG_INFO, "ConfigHeader.NumOfUpdates - 0x%x\n", ConfigHeader.NumOfUpdates));
-  // DEBUG((DEBUG_INFO, "PcdEdkiiSystemFirmwareFileGuid - %g\n", PcdGetPtr(PcdEdkiiSystemFirmwareFileGuid)));
+	DEBUG((DEBUG_INFO, "PlatformUpdate (With Config):%s\n",ConfigImage));
+	ConfigData				= NULL;
+	memset (&ConfigHeader, 0,sizeof(ConfigHeader));
+	// ZeroMem (&ConfigHeader, sizeof(ConfigHeader));
+	Status						= ParseUpdateDataFile (
+												ConfigImage,
+												ConfigImageSize,
+												&ConfigHeader,
+												&ConfigData
+												);
+	DEBUG((DEBUG_INFO, "ParseUpdateDataFile - %r\n", Status));
+	if (EFI_ERROR(Status)) {
+		*LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL;
+		return EFI_INVALID_PARAMETER;
+	}
+	DEBUG((DEBUG_INFO, "ConfigHeader.NumOfUpdates - 0x%x\n", ConfigHeader.NumOfUpdates));
+	// DEBUG((DEBUG_INFO, "PcdEdkiiSystemFirmwareFileGuid - %g\n", PcdGetPtr(PcdEdkiiSystemFirmwareFileGuid)));
 
-  Index = 0;
-  UpdateConfigData = ConfigData;
-  while (Index < ConfigHeader.NumOfUpdates) {
-    // if (CompareGuid(&UpdateConfigData->FileGuid, PcdGetPtr(PcdEdkiiSystemFirmwareFileGuid))) {
-      DEBUG((DEBUG_INFO, "FileGuid - %g (processing)\n", &UpdateConfigData->FileGuid));
-      Status = PerformUpdate (
-                 SystemFirmwareImage,
-                 SystemFirmwareImageSize,
-                 UpdateConfigData,
-                 LastAttemptVersion,
-                 LastAttemptStatus
-                 );
-      //
-      // Shall updates be serialized so that if an update is not successfully completed,
-      // the remaining updates won't be performed.
-      //
-      if (EFI_ERROR (Status)) {
-        break;
-      }
-    // } else {
-    //   DEBUG((DEBUG_INFO, "FileGuid - %g (ignored)\n", &UpdateConfigData->FileGuid));
-    // }
+	Index = 0;
+	UpdateConfigData = ConfigData;
+	while (Index < ConfigHeader.NumOfUpdates) {
+		// if (CompareGuid(&UpdateConfigData->FileGuid, PcdGetPtr(PcdEdkiiSystemFirmwareFileGuid))) {
+			DEBUG((DEBUG_INFO, "FileGuid - %g (processing)\n", &UpdateConfigData->FileGuid));
+			Status = PerformUpdate (
+								 SystemFirmwareImage,
+								 SystemFirmwareImageSize,
+								 UpdateConfigData,
+								 LastAttemptVersion,
+								 LastAttemptStatus
+								 );
+			//
+			// Shall updates be serialized so that if an update is not successfully completed,
+			// the remaining updates won't be performed.
+			//
+			if (EFI_ERROR (Status)) {
+				break;
+			}
+		// } else {
+		//	 DEBUG((DEBUG_INFO, "FileGuid - %g (ignored)\n", &UpdateConfigData->FileGuid));
+		// }
 
-    Index++;
-    UpdateConfigData++;
-  }
+		Index++;
+		UpdateConfigData++;
+	}
 
-  return Status;
+	return Status;
 }
 int system_fw_update(char *file_path,char *ini_path)
 {
@@ -295,8 +295,8 @@ int system_fw_update(char *file_path,char *ini_path)
 	int Ret = 0;
 	void * vaddr = NULL;
 	int memoffset=0;
-	UINT32      LastAttemptVersion;
-	UINT32      LastAttemptStatus;
+	UINT32			LastAttemptVersion;
+	UINT32			LastAttemptStatus;
 
 	if((from_fd=open(file_path,O_RDONLY))==-1)
 	{
@@ -383,6 +383,58 @@ int update_bios_img(char *file_path)
 	p2v_mem_clean(vaddr, memoffset);
 	// close(from_fd);
 
+	return 0;
+}
+int read_bios_img(char *file_path, char *strsize)
+{
+	int from_fd=0;
+	unsigned char  *ptr1 = NULL,*ptr2 = NULL;
+	int Ret = 0;
+	int count = 0;
+	void * vaddr = NULL;
+	int memoffset=0;
+	char * default_file="LS.fd";
+	char * file=NULL;
+
+	if((file_path)==NULL)
+		file=default_file;
+	else
+		file=file_path;
+	if(strsize==NULL)
+		count=FLASH_SIZE;
+	else if(strcmp(strsize,"4M")==0)
+		count=0x400000;
+	else if(strcmp(strsize,"8M")==0)
+		count=FLASH_SIZE;
+	else
+		printf("strsize is no support %s\n",strsize);
+
+	if(count>FLASH_SIZE)
+	{
+		printf("file size > flash size or count = %d\n",count);
+		count=FLASH_SIZE;
+	}
+	printf("Genrate Bios File %s Size is %d\n",file,count);
+	ptr1=app_malloc(count*sizeof(char));
+	memset(ptr1,0x0,count*sizeof(char));
+	ptr2=ptr1;
+
+	vaddr=p2v_mem_mapping(GetLs3ASpiRegBaseAddr(),FLASH_SIZE, &memoffset);
+	if(vaddr==NULL)
+		return 1;
+
+	SpiFlashRead ((U64)0,(void *)ptr2,(U64)count,(U64)vaddr);
+	p2v_mem_clean(vaddr, memoffset);
+
+	from_fd=open(file,O_WRONLY|O_CREAT);
+	Ret=write(from_fd,ptr1,count);
+	if(Ret==-1)
+	{
+		printf("Load write File Error\n");
+		close(from_fd);
+		return 1;
+	}
+	close(from_fd);
 	return 0;
 }
 int update_bios_debug(parse_t * pars_p,char *result_p)

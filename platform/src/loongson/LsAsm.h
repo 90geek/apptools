@@ -54,7 +54,7 @@
 // CalcConstFreq (
 //   VOID
 //   );
-
+#ifdef PLATFORM_LA64
 #define ReadCpucfg(val, reg)                    \
 do {                                            \
         UINT64 __res;                           \
@@ -175,4 +175,9 @@ do {                                                \
             : "Jr" (Value), "r" (Sel)               \
             : "memory");                            \
 } while (0)
+#else
+
+#endif
+
+#define ReadCpucfg(val, reg)
 #endif

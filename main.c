@@ -53,6 +53,7 @@ static void ShowUsage(void)
 		"Usage:\n"
 		"apptool [parameter] ... :explain \n"
 		"  help :display help infomation\n"
+		"  rebios <flashsize> <imgfile>:read uefi bios img from flash,flash size is 4M or 8M\n"
 		"  upbiosall <imgfile>:updte uefi bios img to flash\n"
 		"  upbios <imgfile>:updte uefi bios img to flash but reserve configuration parameters\n"
 		"  fwupdate <imgfile> <inifile>:Parses the ./SystemFirmwareUpdateConfig.ini to update the firmware \n"
@@ -222,6 +223,21 @@ int main (int argc,char *argv[])
 	}
 
 #ifdef UPFLASH_SUPPORT
+	if (!strcmp(argv[argv_p], "rebios"))
+	{
+		printf("strsize is no support %d\n",argv_c);
+		argv_c--;
+		argv_p++;
+		if (argv_c > 2)
+			goto _show_usage;
+    if(argv_c==0)
+		  read_bios_img(NULL, NULL);
+    else if(argv_c==1)
+		  read_bios_img(NULL, argv[argv_p]);
+    else if(argv_c==2)
+		  read_bios_img(argv[argv_p+1], argv[argv_p]);
+		goto cleanup;
+	}
 	if (!strcmp(argv[argv_p], "upbiosall"))
 	{
 		argv_c--;
