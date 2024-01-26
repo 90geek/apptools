@@ -296,6 +296,12 @@ int main (int argc,char *argv[])
     read_7a_tcm_id();
 		goto cleanup;
 	}
+  if (!strcmp(argv[argv_p], "clear7a"))
+	{
+    clear_7a_advanced_config();
+		goto cleanup;
+	}
+
 	if (!strcmp(argv[argv_p], "infoui"))
 	{
 		argv_c--;

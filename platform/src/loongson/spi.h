@@ -170,4 +170,18 @@ SpiTcmRead (
   UINTN      BaseRegAddr,
   UINT8      Cs
   );
+
+UINT8
+EFIAPI
+TisRegRead8(
+  IN  UINTN Addr
+  );
+
+UINT8
+EFIAPI
+TisRegWrite8 (
+  IN UINTN Addr,
+  IN UINT8  Data
+  );
+
 #endif

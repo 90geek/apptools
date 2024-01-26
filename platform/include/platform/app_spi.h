@@ -8,6 +8,7 @@ void read_7a_tcm(unsigned int offset, unsigned char * datas, int read_cnt, int c
 void read_7a_spi(unsigned int offset, unsigned char * datas, int read_cnt);
 void read_7a_flash_mac(unsigned int eth);
 void write_7a_spi(unsigned int offset, unsigned char * datas, int write_cnt);
+void clear_7a_advanced_config(void);
 void write_7a_flash_mac(unsigned int eth, unsigned char * datas);
 void read_cpu_spi_flash(unsigned int offset, unsigned char * datas, int read_cnt) ;
 void write_cpu_spi_flash(unsigned int offset, unsigned char * datas, int write_cnt);

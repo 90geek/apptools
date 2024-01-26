@@ -114,6 +114,16 @@ void write_7a_spi(unsigned int offset, unsigned char * datas, int write_cnt)
 	p2v_mem_clean(vaddr, memoffset);
 }
 
+void clear_7a_advanced_config(void) 
+{
+  unsigned char datas[0x7f]={0xff};
+  int i=0;
+  for (i = 0; i < 0x7f; i++)
+  {
+	  datas[i] = 0xff;
+  }
+  write_7a_spi(0x80, datas, 0x7f);
+}
 void write_7a_flash_mac(unsigned int eth, unsigned char * datas)
 {
 	void * vaddr = NULL;
@@ -156,7 +166,6 @@ void read_7a_flash_mac(unsigned int eth)
 	app_print_data(datas,6);
 	p2v_mem_clean(vaddr, memoffset);
 }
-
 
 void read_cpu_spi_flash(unsigned int offset, unsigned char * datas, int read_cnt) 
 {
