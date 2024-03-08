@@ -67,6 +67,7 @@ static void ShowUsage(void)
 		"  beepon :beep on\n"
 		"  beepoff :beep off\n"
 		"  tpmid :read 7a spi tpm id \n"
+		"  clear7acfg :clear 7a flash advanced config\n"
 		"  cmd :into apptool cmdline \n");
 }
 static void read_mac_addr(int argc, char *argv[])
@@ -296,7 +297,7 @@ int main (int argc,char *argv[])
     read_7a_tcm_id();
 		goto cleanup;
 	}
-  if (!strcmp(argv[argv_p], "clear7a"))
+  if (!strcmp(argv[argv_p], "clear7acfg"))
 	{
     clear_7a_advanced_config();
 		goto cleanup;

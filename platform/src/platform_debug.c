@@ -585,6 +585,28 @@ int read_tistpm_debug(parse_t * pars_p,char *result_p)
 	app_print_data(buf,1);
 	return 0;
 }
+int write_tistpm_debug(parse_t * pars_p,char *result_p)
+{
+	int offset,cs,data;
+	unsigned char buf[100]={0};
+	int i=0, error;
+
+	error=cget_integer(pars_p,0,&offset);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->offset!");
+		return 1;
+	}
+	error=cget_integer(pars_p,0,&data);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->data!");
+		return 1;
+	}
+	printf("offset 0x%x,data 0x%x :\n",offset,data);
+  TisRegWrite8(offset,data);
+	return 0;
+}
 int spi_read_tcm_debug(parse_t * pars_p,char *result_p)
 {
 	int len,offset,cs;
@@ -1066,7 +1088,8 @@ void platform_debug_register(void)
 	register_command ("MM_W_DW"			, mm_write_dword_debug , "<base_addr_hi>,<base_addr_lo>,<data_hi>,<data_lo>");
 	register_command ("MM_R_BURST"			, mm_read_burst_debug , "<base_addr_hi>,<base_addr_lo>,<len>");
 	register_command ("READ_TCM"			, spi_read_tcm_debug , "<offset>,<cs>,<len>");
-	register_command ("READ_TIS"			, read_tistpm_debug , "<offset>");
+	register_command ("READ8_TIS"			, read_tistpm_debug , "<offset>");
+	register_command ("WRITE8_TIS"			, write_tistpm_debug , "<offset> <data>");
 	register_command ("TEST_CMD"			, cmd_test_debug , "<cmd>:eg cmd lscpu");
 	register_command ("LS_LPC_IO_READ"			, lpc_io_read_debug , "<prot> <count>");
 	register_command ("LS_SIO_DEV_REG"			, sio_dev_reg_debug , "<dev> <reg> <0(write)/1(read)> <data>");

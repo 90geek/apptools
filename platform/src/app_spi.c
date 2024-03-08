@@ -14,7 +14,6 @@ U64 get_7a_spi_base_addr(void)
 		spi_base_addr=app_get_pcie_region("00:16.0");
 		return spi_base_addr;
 	}
-
 }
 void set_7a_spi_base_addr(U64 base_addr)
 {
@@ -25,7 +24,7 @@ void read_7a_tcm_id(void)
 	void * vaddr = NULL;
 	int memoffset=0;
 	// unsigned char datas[100]={0};
-  unsigned int datas=0;
+	unsigned int datas=0;
 
 
 	if(GetLs7ASpiRegBaseAddr()==0)
@@ -36,32 +35,32 @@ void read_7a_tcm_id(void)
 	vaddr=p2v_mem_mapping(GetLs7ASpiRegBaseAddr(),0xff0, &memoffset);
 	if(vaddr==NULL)
 		return ;
-  printf("\n7A spi Cs0:\n");
+	printf("\n7A spi Cs0:\n");
 	SpiTcmRead ((U64)0x80d40000,(void *)&datas,(U64)1,(U64)vaddr,0);
-  if(datas==0xff)
-  {
-    printf("CS0 No Link!!!\n");
-    goto CS1;
-  }
-  printf("tpm Base Valeu: 0x%x\n",datas);
+	if(datas==0xff)
+	{
+		printf("CS0 No Link!!!\n");
+		goto CS1;
+	}
+	printf("tpm Base Valeu: 0x%x\n",datas);
 	SpiTcmRead ((U64)0x83d40f00,(void *)&datas,(U64)4,(U64)vaddr,0);
-  printf("tpm Vendor Id: 0x%x\n",(datas&0xffff0000)>>16);
+	printf("tpm Vendor Id: 0x%x\n",(datas&0xffff0000)>>16);
 	SpiTcmRead ((U64)0x83d40f04,(void *)&datas,(U64)1,(U64)vaddr,0);
-  printf("tpm rev Id: 0x%x\n\n",(datas&0xff));
+	printf("tpm rev Id: 0x%x\n\n",(datas&0xff));
 CS1:
-  printf("\n7A spi Cs1:\n");
+	printf("\n7A spi Cs1:\n");
 	SpiTcmRead ((U64)0x80d40000,(void *)&datas,(U64)1,(U64)vaddr,1);
-  if(datas==0xff)
-  {
-    printf("CS1 No Link!!!\n");
-    goto END;
-  }
-  printf("tpm Base Valeu: 0x%x\n",datas);
+	if(datas==0xff)
+	{
+		printf("CS1 No Link!!!\n");
+		goto END;
+	}
+	printf("tpm Base Valeu: 0x%x\n",datas);
 	SpiTcmRead ((U64)0x83d40f00,(void *)&datas,(U64)4,(U64)vaddr,1);
-  printf("tpm VendorId: 0x%x\n",(datas&0xffff));
-  printf("tpm DeviceId: 0x%x\n",(datas&0xffff0000)>>16);
+	printf("tpm VendorId: 0x%x\n",(datas&0xffff));
+	printf("tpm DeviceId: 0x%x\n",(datas&0xffff0000)>>16);
 	SpiTcmRead ((U64)0x83d40f04,(void *)&datas,(U64)1,(U64)vaddr,1);
-  printf("tpm rev Id: 0x%x\n\n",(datas&0xff));
+	printf("tpm rev Id: 0x%x\n\n",(datas&0xff));
 END:
 	p2v_mem_clean(vaddr, memoffset);
 }
@@ -116,13 +115,16 @@ void write_7a_spi(unsigned int offset, unsigned char * datas, int write_cnt)
 
 void clear_7a_advanced_config(void) 
 {
-  unsigned char datas[0x7f]={0xff};
-  int i=0;
-  for (i = 0; i < 0x7f; i++)
-  {
-	  datas[i] = 0xff;
-  }
-  write_7a_spi(0x80, datas, 0x7f);
+	unsigned char datas[0x7f]={0xff};
+	printf("7A Flash Advanced Cfg Data:");
+	read_7a_spi(0x80, datas, 0x7f);
+	app_print_data(datas,0x7f);
+	printf("7A Flash Advanced Cfg Start Clear:");
+	memset(datas,0xff,0x7f);
+	write_7a_spi(0x80, datas, 0x7f);
+	printf("7A Flash Advanced Cfg Clear end Data:");
+	read_7a_spi(0x80, datas, 0x7f);
+	app_print_data(datas,0x7f);
 }
 void write_7a_flash_mac(unsigned int eth, unsigned char * datas)
 {

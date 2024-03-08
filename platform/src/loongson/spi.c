@@ -789,16 +789,16 @@ SpiTpmSpiReadBuffer (
   SpiSetCs1 (0);
   // write reg addr
   while (Index < 4) {
-    DEBUG((EFI_D_ERROR, "[TCM]: Wx Buf[%x] = 0x%x\n", Index,Buf[Index]));
+    // DEBUG((EFI_D_ERROR, "[TCM]: Wx Buf[%x] = 0x%x\n", Index,Buf[Index]));
     Buf[Index] = SpiFlashWriteByteCmd (Buf[Index]);
-    DEBUG((EFI_D_ERROR, "[TCM]: Rx Buf[%x] = 0x%x\n", Index,Buf[Index]));
+    // DEBUG((EFI_D_ERROR, "[TCM]: Rx Buf[%x] = 0x%x\n", Index,Buf[Index]));
     Index++;
   }
   // start read
   for (Index = 0; Index < Num; Index++)
   {
     Buf[Index] = SpiFlashReadByteCmd ();
-    DEBUG((EFI_D_ERROR, "[TCM]: In SpiTpm.c, line %d.Read Buf[%x] = 0x%x\n", __LINE__,Index,Buf[Index]));
+    // DEBUG((EFI_D_ERROR, "[TCM]: In SpiTpm.c, line %d.Read Buf[%x] = 0x%x\n", __LINE__,Index,Buf[Index]));
   }
   SpiSetCs1 (1);
 
@@ -907,11 +907,9 @@ TisRegRead8(
   Buffer[3] = Addr & 0x000000ff;
 
   //send command
-  SpiTpmRead (Buffer, 4, (UINTN)vaddr);
+  SpiTpmRead (Buffer, 1, (UINTN)vaddr);
 
-  DEBUG((EFI_D_ERROR, ": In SpiTpmLib.c, line %d.Buffer1=%x,Buffer2=%x, Buffer3=%x,Buffer4=%x\n", __LINE__,Buffer[4],Buffer[5],Buffer[6],Buffer[7]));
   Data = Buffer[0];
-  //Data = add4 << 24 | add3 << 16 | add2 << 8 | add1;
   DEBUG((EFI_D_ERROR, ": In SpiTpmLib.c, line %d.Data=%x \n", __LINE__,Data));
   p2v_mem_clean(vaddr, memoffset);
   return Data;
@@ -924,8 +922,6 @@ TisRegWrite8 (
   IN UINT8  Data
   )
 {
-  //UINT32               vare=1,i=0;
-  //UINT8                add2,add3,add4;
   UINT8                Buffer[8] = {0x03, 0x0}; //command 0x03
   void * vaddr = NULL;
   int memoffset=0;
