@@ -74,7 +74,10 @@ SpiSetCs1 (
 }
 VOID ResetSfcParamReg()
 {
-  if(CheckCpu(LS3C5000_VERSION,0))
+  if(CheckCpu(LS3C5000_VERSION_LO,LS3C5000_VERSION_HI) ||
+     CheckCpu(LS3C5000_LL_VERSION_LO,LS3C5000_LL_VERSION_HI) ||
+     CheckCpu(LS3D5000_VERSION_LO,LS3D5000_VERSION_HI)
+      )
     REGSET(REG_PARAM,0x27);
   else
     REGSET(REG_PARAM,0x47);
@@ -123,7 +126,10 @@ SpiFlashInit (
     ValueRegParam = REGGET(REG_PARAM);
   }
 
-  if(CheckCpu(LS3C5000_VERSION,0))
+  if(CheckCpu(LS3C5000_VERSION_LO,LS3C5000_VERSION_HI) ||
+     CheckCpu(LS3C5000_LL_VERSION_LO,LS3C5000_LL_VERSION_HI) ||
+     CheckCpu(LS3D5000_VERSION_LO,LS3D5000_VERSION_HI)
+      )
   {
     //[spre:spr] [01:00] means clk_div=8
     REGSET(REG_SPCR, 0x52);//[1:0] [0:0]spr
