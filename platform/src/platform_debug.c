@@ -426,7 +426,7 @@ int dump_acpi_reg_debug(parse_t * pars_p,char *result_p)
 	if(num==0)
 	{
 		printf(" start read apci reg:\n");
-		AcpiReadOps();
+		AcpiDump();
 	}
 	else if(num==1)
 	{
@@ -435,6 +435,28 @@ int dump_acpi_reg_debug(parse_t * pars_p,char *result_p)
 	}
 	else
 		printf("Num is invalid");
+	return 0;
+}
+int write_acpi_reg_debug(parse_t * pars_p,char *result_p)
+{
+	int reg;
+	unsigned int data;
+	int error;
+
+	error=cget_integer(pars_p,0,&reg);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->reg!");
+		return 1;
+	}
+	error=cget_integer(pars_p,0,&data);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->data!");
+		return 1;
+	}
+	printf(" start write apci reg: 0x%x data 0x%x\n",reg,data);
+	AcpiRegWrite(reg,data);
 	return 0;
 }
 int dump_gpio_reg_debug(parse_t * pars_p,char *result_p)
@@ -578,7 +600,7 @@ int read_tistpm_debug(parse_t * pars_p,char *result_p)
 		tag_current_line(pars_p,"-->offset!");
 		return 1;
 	}
-  buf[0]=TisRegRead8(offset);
+	buf[0]=TisRegRead8(offset);
 
 
 	printf("value :\n");
@@ -604,7 +626,7 @@ int write_tistpm_debug(parse_t * pars_p,char *result_p)
 		return 1;
 	}
 	printf("offset 0x%x,data 0x%x :\n",offset,data);
-  TisRegWrite8(offset,data);
+	TisRegWrite8(offset,data);
 	return 0;
 }
 int spi_read_tcm_debug(parse_t * pars_p,char *result_p)
@@ -1070,7 +1092,8 @@ void platform_debug_register(void)
 	register_command ("LS_CPU_TEMP"			, read_cpu_temp_debug , "<NONE>");
 	register_command ("LS_7A_TEMP"			, read_7a_temp_debug , "<NONE>");
 	register_command ("LS_CPU_FREQ"			, read_cpu_freq_debug , "<NONE>");
-	register_command ("LS_DUMP_ACPI"			, dump_acpi_reg_debug , "<num>:0dump acpi reg,1apci reboot");
+	register_command ("LS_DUMP_ACPI"			, dump_acpi_reg_debug , "<num>:0 dump acpi reg,1 apci reboot");
+	register_command ("LS_WRITE_ACPI"			, write_acpi_reg_debug , "<reg>:acpi reg, <data>write velue");
 	register_command ("LS_DUMP_GPIO"			, dump_gpio_reg_debug , "<NONE>");
 	register_command ("LS_DUMP_RTC"			, dump_rtc_reg_debug , "<NONE>");
 	register_command ("LS_DUMP_PCI"			, dump_pci_debug , "<bdf>:eg.spi 00:16.0 bdf for b000");

@@ -66,7 +66,28 @@ void RtcReadOps(void)
 #endif
 		p2v_mem_clean(p, memoffset);
 }
-void AcpiReadOps(void)
+void AcpiRegWrite(unsigned char reg, unsigned int data)
+{
+	void * p = NULL;
+	int status ;
+	int memoffset;
+	unsigned int tmp_tmp = 0;
+	if(reg%4!=0)
+	{
+		printf("invalued reg 0x%x\n",reg);
+		return ;
+	}
+	p = p2v_mem_mapping(LS7A_ACPI_BASE_ADDR,4096, &memoffset);
+	printf("mmap addr start : %p \n",p);
+	tmp_tmp = (*(volatile unsigned int *)(p + reg));
+	printf("old RegNum:%x		 RegVal:%x \n",reg,tmp_tmp);
+	tmp_tmp |= data;
+	(*(volatile unsigned int *)(p + reg)) |= tmp_tmp;
+	tmp_tmp = (*(volatile unsigned int *)(p + reg));
+	printf("new RegNum:%x		 RegVal:%x \n",reg,tmp_tmp);
+	p2v_mem_clean(p, memoffset);
+}
+void AcpiDump(void)
 {
 	void * p = NULL;
 	int status ;
@@ -77,20 +98,13 @@ void AcpiReadOps(void)
 	/*Debug ACPI*/
 	int i = 0;
 	unsigned int tmp_tmp = 0;
-	for(i = 0; i< 0x50 ; i=i+4){
+	for(i = 0; i<= 0x54; i=i+4){
+		if(i==0x1c)
+			i=0x28;
+		else if(i==0x3c)
+			i=0x50;
 		tmp_tmp = (*(volatile unsigned int *)(p + i));
 		printf("RegNum:%x		 RegVal:%x \n",i,tmp_tmp);
-	}
-
-	/*Debug ACPI*/
-	for(i=0;i<5;i++){
-		tmp_tmp = (*(volatile unsigned int *)(p + 0xc));
-		printf("AcpiStatus..	RegNum:0xc		RegVal:%x \n",tmp_tmp);
-		(*(volatile unsigned int *)(p + 0xc)) |= tmp_tmp;
-		tmp_tmp = (*(volatile unsigned int *)(p + 0x28));
-		printf("AcpiStatus..	RegNum:0x28		 RegVal:%x \n",tmp_tmp);
-		(*(volatile unsigned int *)(p + 0x28)) |= tmp_tmp;
-		printf("AcpiStatus.. Clear Event Status \n");
 	}
 		p2v_mem_clean(p, memoffset);
 		printf("--------------Release mem Map----------------\n");
@@ -101,7 +115,7 @@ void AcpiReboot(void)
 	int status ;
 	int memoffset;
 
-	p = p2v_mem_mapping(LS7A_RTC_REG_BASE,8, &memoffset);
+	p = p2v_mem_mapping(LS7A_ACPI_BASE_ADDR,8, &memoffset);
 	Writeb (p + 0x30, 0x1);
 	p2v_mem_clean(p, memoffset);
 }
