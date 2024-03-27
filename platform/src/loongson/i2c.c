@@ -264,9 +264,10 @@ void LsCpuI2cRead(
 {
   void * vaddr = NULL;
   int memoffset=0;
-  BaseAddr = BaseAddr | (NodeId << 44);
-  // printf("Nodeid %d i2cbase 0x%llx,devaddr 0x%x, reg 0x%x, size %d\n",NodeId,BaseAddr,DevAddr,Reg,Size);
-  vaddr=p2v_mem_mapping(BaseAddr,0x100, &memoffset);
+  UINT64 Addr;
+  Addr = BaseAddr | ((UINT64)NodeId << NODE_OFFSET);
+  printf("Nodeid %d i2cbase 0x%llx,devaddr 0x%x, reg 0x%x, size %d\n",NodeId,Addr,DevAddr,Reg,Size);
+  vaddr=p2v_mem_mapping(Addr,0x100, &memoffset);
   I2cInitSetFreq ((UINTN)vaddr, I2C_CTL_CLK, I2C_BUS_RATE, ALGORITHM_3A);
   I2cCtlRead ((UINTN)vaddr, DevAddr, Reg, Size, Buffer);
   p2v_mem_clean(vaddr, memoffset);

@@ -42,7 +42,7 @@ int read_cpu_i2c_debug(parse_t * pars_p,char *result_p)
 		return 1;
 	}
 	if(size>100)
-		size=100;
+		size=99;
 	printf("usage:\napptool>READ_CPU_I2C 0 1fe00130 4b 8b 2\n");
 	LsCpuI2cRead(nodeid,base,dev,reg,size,(void *)buf);
 	printf("read cpu %d i2cbase 0x%x,devaddr 0x%x, reg 0x%x, size %d\n",nodeid,base,dev,reg,size);

@@ -22,7 +22,8 @@ void I2cReadOps(int node,unsigned int i2cbus, int mps_addr)
 	int memoffset=0;
 
 	pi2c=node;
-	pi2c=i2cbus|(pi2c<<44);
+	pi2c=i2cbus|((UINT64)pi2c<<NODE_OFFSET);
+  printf("pi2c=0x%llx\n",pi2c);
 	p=p2v_mem_mapping(pi2c ,4096, &memoffset);
 
 	I2cRegBaseAddr = (UINT64)p;
