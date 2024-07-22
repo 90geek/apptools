@@ -361,7 +361,7 @@ int fan_set_freq_debug(parse_t * pars_p,char *result_p)
 	// max 5000  is		10kHz
 	// max 2500  is		20kHz
 	// max 2000  is		25kHz
-	printf("set min %d max %d %\n", Parameter.MinRpm, Parameter.MaxRpm);
+	printf("set min %d max %d \n", Parameter.MinRpm, Parameter.MaxRpm);
 
 	return 0;
 }

@@ -68,6 +68,7 @@ static void ShowUsage(void)
 		"  beepoff :beep off\n"
 		"  tpmid :read 7a spi tpm id \n"
 		"  clear7acfg :clear 7a flash advanced config\n"
+		"  recovery : Force Recovery Mode"
 		"  cmd :into apptool cmdline \n");
 }
 static void read_mac_addr(int argc, char *argv[])
@@ -216,7 +217,7 @@ int main (int argc,char *argv[])
 	hardinfo_init();
 #endif
 #ifdef UPFLASH_SUPPORT
-  update_flash_init() ;
+	update_flash_init() ;
 #endif
 	if (!strcmp(argv[argv_p], "help"))
 	{
@@ -231,12 +232,12 @@ int main (int argc,char *argv[])
 		argv_p++;
 		if (argv_c > 2)
 			goto _show_usage;
-    if(argv_c==0)
-		  read_bios_img(NULL, NULL);
-    else if(argv_c==1)
-		  read_bios_img(NULL, argv[argv_p]);
-    else if(argv_c==2)
-		  read_bios_img(argv[argv_p+1], argv[argv_p]);
+		if(argv_c==0)
+			read_bios_img(NULL, NULL);
+		else if(argv_c==1)
+			read_bios_img(NULL, argv[argv_p]);
+		else if(argv_c==2)
+			read_bios_img(argv[argv_p+1], argv[argv_p]);
 		goto cleanup;
 	}
 	if (!strcmp(argv[argv_p], "upbiosall"))
@@ -263,11 +264,11 @@ int main (int argc,char *argv[])
 		argv_p++;
 		if (argv_c < 1)
 			goto _show_usage;
-    printf("%d--%s--%s\n",argv_c,argv[argv_p],argv[argv_p+1]);
+		printf("%d--%s--%s\n",argv_c,argv[argv_p],argv[argv_p+1]);
 		if (argv_c == 2)
-		  system_fw_update(argv[argv_p],argv[argv_p+1]);
-    else
-		  system_fw_update(argv[argv_p],NULL);
+			system_fw_update(argv[argv_p],argv[argv_p+1]);
+		else
+			system_fw_update(argv[argv_p],NULL);
 		goto cleanup;
 	}
 #endif
@@ -292,14 +293,20 @@ int main (int argc,char *argv[])
 		goto cleanup;
 	}
 
-  if (!strcmp(argv[argv_p], "tpmid"))
+	if (!strcmp(argv[argv_p], "tpmid"))
 	{
-    read_7a_tcm_id();
+		read_7a_tcm_id();
 		goto cleanup;
 	}
-  if (!strcmp(argv[argv_p], "clear7acfg"))
+	if (!strcmp(argv[argv_p], "clear7acfg"))
 	{
-    clear_7a_advanced_config();
+		clear_7a_advanced_config();
+		goto cleanup;
+	}
+	if (!strcmp(argv[argv_p], "recovery"))
+	{
+		ForceRecoveryMode();
+		printf("\nNeed reboot test Recovery Mode!!!\n");
 		goto cleanup;
 	}
 

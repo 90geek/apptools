@@ -81,8 +81,8 @@ void AcpiRegWrite(unsigned char reg, unsigned int data)
 	printf("mmap addr start : %p \n",p);
 	tmp_tmp = (*(volatile unsigned int *)(p + reg));
 	printf("old RegNum:%x		 RegVal:%x \n",reg,tmp_tmp);
-	tmp_tmp |= data;
-	(*(volatile unsigned int *)(p + reg)) |= tmp_tmp;
+	tmp_tmp = data;
+	(*(volatile unsigned int *)(p + reg)) = tmp_tmp;
 	tmp_tmp = (*(volatile unsigned int *)(p + reg));
 	printf("new RegNum:%x		 RegVal:%x \n",reg,tmp_tmp);
 	p2v_mem_clean(p, memoffset);
@@ -119,7 +119,37 @@ void AcpiReboot(void)
 	Writeb (p + 0x30, 0x1);
 	p2v_mem_clean(p, memoffset);
 }
+void ForceRecoveryMode(void)
+{
+	void * p = NULL;
+	int status ;
+	int memoffset;
+	unsigned int tmp_tmp = 0,regval=0;
+	unsigned int reg = 0;
+  
+	p = p2v_mem_mapping(LS7A_ACPI_BASE_ADDR,4096, &memoffset);
+	printf("mmap addr start : %p \n",p);
 
+  reg=0x8;
+	regval = (*(volatile unsigned int *)(p + reg));
+	printf("old RegNum:%x		 RegVal:%x \n",reg,regval);
+	(*(volatile unsigned int *)(p + reg)) = (regval&(~(3<<9)));
+	tmp_tmp = (*(volatile unsigned int *)(p + reg));
+	printf("new RegNum:%x		 RegVal:%x \n",reg,tmp_tmp);
+
+  reg=0x54;
+	tmp_tmp = (*(volatile unsigned int *)(p + reg));
+	printf("old RegNum:%x		 RegVal:%x \n",reg,tmp_tmp);
+	tmp_tmp |= (1<<9);
+	(*(volatile unsigned int *)(p + reg)) = tmp_tmp;
+	tmp_tmp = (*(volatile unsigned int *)(p + reg));
+	printf("new RegNum:%x		 RegVal:%x \n",reg,tmp_tmp);
+  reg=0x8;
+	(*(volatile unsigned int *)(p + 8)) = regval;
+	tmp_tmp = (*(volatile unsigned int *)(p + reg));
+	printf("old RegNum:%x		 RegVal:%x \n",reg,tmp_tmp);
+	p2v_mem_clean(p, memoffset);
+}
 void PciReadOps(UINT32 a)
 {
   void * p = NULL;

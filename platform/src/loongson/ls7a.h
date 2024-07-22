@@ -8,5 +8,6 @@ void AcpiRegWrite(unsigned char reg, unsigned int data);
 void AcpiDump(void);
 void AcpiReboot(void);
 void PciReadOps(UINT32 a);
+void ForceRecoveryMode(void);
 
 #endif

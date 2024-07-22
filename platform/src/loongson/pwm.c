@@ -176,7 +176,7 @@ UINT32 Ls7aPwm0Get()
 
 	//spd = 50 * 1000000 / P1full * 30;
 	cpufanspd = 50 * 1000000 / P1full * 30;
-	printf("cpu_fan speed=%d\r\n",cpufanspd);
+	printf("P1low %d P1full %d cpu_fan speed=%d\r\n",P1low, P1full, cpufanspd);
 	return cpufanspd;
 }
 
@@ -205,7 +205,7 @@ UINT32 Ls7aPwm1Get()
 
 	//spd = 50 * 1000000 / P1full * 30;
 	cpufanspd = 50 * 1000000 / P1full * 30;
-	printf("cpu_fan speed=%d\r\n",cpufanspd);
+	printf("P1low %d P1full %d cpu_fan speed=%d\r\n",P1low, P1full, cpufanspd);
 	return cpufanspd;
 }
 
@@ -234,7 +234,7 @@ UINT32 Ls7aPwm2Get()
 
 	//spd = 50 * 1000000 / P1full * 30;
 	cpufanspd = 50 * 1000000 / P1full * 30;
-	printf("cpu_fan speed=%d\r\n",cpufanspd);
+	printf("P1low %d P1full %d cpu_fan speed=%d\r\n",P1low, P1full, cpufanspd);
 	return cpufanspd;
 }
 UINT32 Ls7aPwm3Get()
@@ -262,7 +262,7 @@ UINT32 Ls7aPwm3Get()
 
 	//spd = 50 * 1000000 / P1full * 30;
 	cpufanspd = 50 * 1000000 / P1full * 30;
-	printf("cpu_fan speed=%d\r\n",cpufanspd);
+	printf("P1low %d P1full %d cpu_fan speed=%d\r\n",P1low, P1full, cpufanspd);
 	return cpufanspd;
 }
 void ls132_speed()
