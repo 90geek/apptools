@@ -307,7 +307,7 @@ int sio_dev_reg_debug(parse_t * pars_p,char *result_p)
 }
 int fan_set_debug(parse_t * pars_p,char *result_p)
 {
-	int num,pwm;
+	int num,pwm,max=0;
 	unsigned char buf[20]={0};
 	int error;
 	LS7A_SMARTFAN_CFG_TABLE Parameter;
@@ -324,25 +324,41 @@ int fan_set_debug(parse_t * pars_p,char *result_p)
 		tag_current_line(pars_p,"-->num!");
 		return 1;
 	}
+	error=cget_integer(pars_p,0,&max);
+	if (error || max<100)
+	{
+    printf("MaxRpm 10000000 is 5Hz\n");
+    printf("MaxRpm 5000000 is 10Hz\n");
+    printf("MaxRpm 10000 is 5kHz\n");
+    printf("MaxRpm 5000 is 10kHz\n");
+    printf("MaxRpm 2500 is 20kHz\n");
+    printf("MaxRpm 2000 is 25kHz\n");
+		printf("MaxRpm is error %d,will used default MaxRpm 2000(25kHz)\n",max);
+    max=2000;
+	}
 	if(num>100)
 	{
 		printf("Percent num is error %d\n",num);
 		return 1;
 	}
-	Parameter.MinRpm = 100 * (100-num);
-	Parameter.MaxRpm = 10000;
+	Parameter.MinRpm = (max/100) * (100-num);
+	Parameter.MaxRpm = max;
 	SmartFanSet (pwm, Parameter);
-
-	printf("set pwm %d fan %d %\n", pwm, num);
-
+	printf("set pwm %d fan %d % MaxRpm %d PwmFreq %dHz\n", pwm, num,max, GET_TO_PWM_FREQ(max));
 	return 0;
 }
 int fan_set_freq_debug(parse_t * pars_p,char *result_p)
 {
-	int max;
+	int max,pwm;
 	int error;
 	LS7A_SMARTFAN_CFG_TABLE Parameter;
 
+  error=cget_integer(pars_p,0,&pwm);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->pwm!");
+		return 1;
+	}
 	error=cget_integer(pars_p,0,&max);
 	if (error)
 	{
@@ -354,14 +370,18 @@ int fan_set_freq_debug(parse_t * pars_p,char *result_p)
 		printf("max is error %d\n",max);
 		return 1;
 	}
+	printf("set pwm %d fan 50 %\n", pwm);
 	Parameter.MinRpm = max/2;// use 50% pwd test
 	Parameter.MaxRpm = max;
-	SmartFanSet (0, Parameter);
+	SmartFanSet (2, Parameter);
+	// max 10000000	is	5Hz
+	// max 5000000	is	10Hz
 	// max 10000	is	5kHz
 	// max 5000  is		10kHz
 	// max 2500  is		20kHz
 	// max 2000  is		25kHz
-	printf("set min %d max %d \n", Parameter.MinRpm, Parameter.MaxRpm);
+  // max*freq=50000000
+	printf("set min %d max %d PwmFreq %d\n", Parameter.MinRpm, Parameter.MaxRpm, GET_TO_PWM_FREQ(max));
 
 	return 0;
 }
@@ -1085,8 +1105,8 @@ int cmd_test_debug(parse_t * pars_p,char *result_p)
 
 void platform_debug_register(void)
 {
-	register_command ("LS_FAN_SET"			, fan_set_debug , "<Pwm>:0-3, <Percent number>:0-100");
-	register_command ("LS_FAN_TEST_FREQ"			, fan_set_freq_debug , "max rpm 100~");
+	register_command ("LS_FAN_SET"			, fan_set_debug , "<Pwm>:0-3, <Percent number>:0-100, <MaxRpm>:NONE/[100:50000000](pwmfreq=50000000/MaxRpm),NONE is default:2000");
+	register_command ("LS_FAN_TEST_FREQ"			, fan_set_freq_debug , "<Pwm>:0-3, <MaxRpm> 100~50000000(pwmfreq=50000000/MaxRpm)");
 	register_command ("LS_FAN_SPEED"		, fan_speed_get_debug , "<Pwm>:0-3");
 	register_command ("LS_FAN_CTRL"		, fan_ctrl_debug , "<NONE>");
 	register_command ("LS_CPU_TEMP"			, read_cpu_temp_debug , "<NONE>");

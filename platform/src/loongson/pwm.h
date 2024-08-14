@@ -34,6 +34,8 @@ typedef struct {
 	UINT32	MaxRpm;
 }LS7A_SMARTFAN_CFG_TABLE;
 
+#define GET_TO_PWM_FREQ(MaxRpm) (50000000/MaxRpm)
+
 int SmartFanSet (UINT8 Pwm, LS7A_SMARTFAN_CFG_TABLE SmartFanParameter);
 UINT32 SmartFanSpeedGet (UINT8 Pwm);
 void FanCtrl(void);
