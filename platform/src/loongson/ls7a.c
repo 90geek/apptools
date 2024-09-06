@@ -124,17 +124,18 @@ void ForceRecoveryMode(void)
 	void * p = NULL;
 	int status ;
 	int memoffset;
-	unsigned int tmp_tmp = 0,regval=0;
+	unsigned int tmp_tmp = 0;
+  unsigned char regval= 0;
 	unsigned int reg = 0;
   
 	p = p2v_mem_mapping(LS7A_ACPI_BASE_ADDR,4096, &memoffset);
 	printf("mmap addr start : %p \n",p);
 
-  reg=0x8;
-	regval = (*(volatile unsigned int *)(p + reg));
+  reg=0x8+1;
+	regval = (*(volatile unsigned char *)(p + reg));
 	printf("old RegNum:%x		 RegVal:%x \n",reg,regval);
-	(*(volatile unsigned int *)(p + reg)) = (regval&(~(3<<9)));
-	tmp_tmp = (*(volatile unsigned int *)(p + reg));
+	(*(volatile unsigned char *)(p + reg)) = (regval&(~(3<<1)));
+	tmp_tmp = (*(volatile unsigned char *)(p + reg));
 	printf("new RegNum:%x		 RegVal:%x \n",reg,tmp_tmp);
 
   reg=0x54;
@@ -144,9 +145,9 @@ void ForceRecoveryMode(void)
 	(*(volatile unsigned int *)(p + reg)) = tmp_tmp;
 	tmp_tmp = (*(volatile unsigned int *)(p + reg));
 	printf("new RegNum:%x		 RegVal:%x \n",reg,tmp_tmp);
-  reg=0x8;
-	(*(volatile unsigned int *)(p + 8)) = regval;
-	tmp_tmp = (*(volatile unsigned int *)(p + reg));
+  reg=0x8+1;
+	(*(volatile unsigned char *)(p + 8)) = regval;
+	tmp_tmp = (*(volatile unsigned char *)(p + reg));
 	printf("old RegNum:%x		 RegVal:%x \n",reg,tmp_tmp);
 	p2v_mem_clean(p, memoffset);
 }
