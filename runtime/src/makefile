@@ -14,6 +14,13 @@ LIBS := libruntime
 DRV_LIB_OUT := ../lib/$(LINK_TYPE)
 
 OBJS := efi_runtime_test.o
+OBJS += utils/utils.o
+OBJS += uefigetnextvarname/uefigetnextvarname.o 
+OBJS += uefiresetsystem/uefiresetsystem.o
+OBJS += uefiresetsystem/uefiresetsystem.o
+OBJS += uefitime/uefitime.o
+OBJS += uefivarset/uefivarset.o
+OBJS += uefivarget/uefivarget.o
 
 
 #===============================================================================

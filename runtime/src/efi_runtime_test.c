@@ -8,7 +8,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
-#include "fwts_efi_runtime.h"
+#include <efi_runtime.h>
+#include <runtime.h>
 
 static char *efi_dev_name = "/dev/efi_test";
 static char *efi_capsule_loader = "/dev/efi_capsule_loader";
@@ -687,7 +688,7 @@ static int parse_para_options(int argc, char *argv[])
 }
 
 // int main(int argc, char **argv)
-int runtime_start(int argc, char **argv)
+int runtime_test(int argc, char **argv)
 {
 	int ret;
 
@@ -700,4 +701,64 @@ int runtime_start(int argc, char **argv)
 	ret = parse_para_options(argc, argv);
 
 	return ret;
+}
+static void RTShowUsage(void)
+{
+	puts(
+		"Usage:\n"
+		"apptool rt [parameter] ... :explain\n"
+		"  test : run runtime test api\n"
+		"  time : run main_uefitime\n"
+		"  getvar : run get variable\n"
+		"  setvar : run set variable\n"
+		"  getnextvarname : run get next variable name and guid\n"
+		"  reset :run uefiresetsystem \n");
+}
+int runtime_start(int argc, char **argv)
+{
+	int argv_c = argc - 1, argv_p = 1;
+	int Ret = 0;
+
+	if (argc == 1)
+	{
+    RTShowUsage();
+		return Ret;
+  }
+
+	if (!strcmp(argv[argv_p], "test"))
+	{
+		runtime_test (argv_c, argv + argv_p);
+		return Ret;
+	}
+  else if (!strcmp(argv[argv_p], "reset"))
+	{
+		main_uefiresetsystem (argv_c, argv + argv_p);
+		return Ret;
+	}
+  else if (!strcmp(argv[argv_p], "time"))
+	{
+		main_uefitime (argv_c, argv + argv_p);
+		return Ret;
+	}
+  else if (!strcmp(argv[argv_p], "getvar"))
+	{
+		main_uefivarget (argv_c, argv + argv_p);
+		return Ret;
+	}
+  else if (!strcmp(argv[argv_p], "setvar"))
+	{
+		main_uefivarset (argv_c, argv + argv_p);
+		return Ret;
+	}
+  else if (!strcmp(argv[argv_p], "getnextvarname"))
+	{
+		main_uefigetnextvarname (argv_c, argv + argv_p);
+		return Ret;
+	}
+  else{
+    printf("unsupport %s\n",argv[argv_p]);
+    RTShowUsage();
+		return Ret;
+  }
+	return Ret;
 }

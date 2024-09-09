@@ -179,5 +179,4 @@ do {                                                \
 
 #endif
 
-#define ReadCpucfg(val, reg)
 #endif

@@ -26,8 +26,6 @@
 #include "mem.h"
 #include "platform/app_platform.h"
 
-UINT64 TempRegBaseAddr;
-
 UINT8 lscpu_tempdetect(UINT32 *temp0,UINT32 *temp1)
 {
 	UINT32 Data = 0;

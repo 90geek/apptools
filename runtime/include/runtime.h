@@ -20,5 +20,10 @@
 #define _RUNTIME_H_
 
 int runtime_start(int argc, char **argv);
+int main_uefigetnextvarname(int argc, char **argv);
+int main_uefiresetsystem(int argc, char **argv);
+int main_uefitime(int argc, char **argv);
+int main_uefivarget(int argc, char **argv);
+int main_uefivarset(int argc, char **argv);
 #endif /**/
 

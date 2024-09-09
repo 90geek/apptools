@@ -177,6 +177,19 @@ LIB +=
 CFLAGS += -fgnu89-inline -DPLATFORM_LA64
 LDFLAGS +=
 #########################################################################
+else ifeq ($(PLATFORM), lagcc14)
+
+INCLUDEFLAGS += -I$(SDK_DIR)/platform/src
+
+MSTAR_LIB +=
+
+LIBPATH +=
+
+LIB +=
+
+CFLAGS += -fgnu89-inline -DPLATFORM_LA64
+LDFLAGS +=
+#########################################################################
 else ifeq ($(PLATFORM), mips64)
 
 INCLUDEFLAGS += -I$(SDK_DIR)/platform/src

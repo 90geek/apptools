@@ -6,6 +6,8 @@ else ifeq ($(PLATFORM), loongarch64)
 # TOOLCHAIN_DIR = /home/zhubo/loongson/toolchain/LARCH_toolchain_root
 # export TOOLCHAIN_PREFIX = ${TOOLCHAIN_DIR}/bin/loongarch64-linux-gnu-
 export TOOLCHAIN_PREFIX = loongarch64-linux-gnu-
+else ifeq ($(PLATFORM), lagcc14)
+export TOOLCHAIN_PREFIX = loongarch64-unknown-linux-gnu-
 else ifeq ($(PLATFORM), mips64)
 export TOOLCHAIN_PREFIX = mips-linux-gnu-
 else 
