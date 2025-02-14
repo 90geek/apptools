@@ -251,6 +251,17 @@ void erase_block_cpu_spi_flash(unsigned int offset, int byte_cnt)
 	SpiFlashErase ((U64)offset, byte_cnt,(U64)vaddr);
 	p2v_mem_clean(vaddr, memoffset);
 }
+void spi_unlock_bios_wp()
+{
+	void * vaddr = NULL;
+	int memoffset=0;
+	printf("%s \n",__func__);
+	vaddr=p2v_mem_mapping(GetLs3ASpiRegBaseAddr(), 4096, &memoffset);
+	if(vaddr==NULL)
+		return;
+	UnlockFlashWriteProtected ((U64)vaddr);
+	p2v_mem_clean(vaddr, memoffset);
+}
 #define NOT_USED printf("%s not used\n", __FUNCTION__)
 void app_spi_init(void)
 {

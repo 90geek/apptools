@@ -627,6 +627,19 @@ SpiFlashWrite (
 }
 
 VOID
+UnlockFlashWriteProtected (
+  UINTN        BaseRegAddr
+  )
+{
+
+  SpiFlashSetRegBase(BaseRegAddr);
+  SpiFlashInit ();
+  SpiFlashDisableWriteProtection ();
+  SpiFlashReset ();
+  ResetSfcParamReg();
+}
+
+VOID
 UpdateBiosInSpiFlash (
   UINTN      Offset,
   VOID       *Buffer,

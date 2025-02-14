@@ -15,6 +15,7 @@ void write_cpu_spi_flash(unsigned int offset, unsigned char * datas, int write_c
 void erase_cpu_spi_flash(unsigned int offset, int byte_cnt);
 void erase_block_cpu_spi_flash(unsigned int offset, int byte_cnt);
 void read_7a_tcm_id(void);
+void spi_unlock_bios_wp();
 
 void app_spi_init(void);
 void app_spi_read(int spi_dev,unsigned int offset, unsigned char * datas, int read_cnt);

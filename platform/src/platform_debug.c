@@ -784,7 +784,12 @@ int spi_write_7a_flash_mac_debug(parse_t * pars_p,char *result_p)
 
 	return 0;
 }
-
+int spi_unlock_bios_wp_debug(parse_t * pars_p,char *result_p)
+{
+	printf("unlock bios write protected !!! \n");
+	spi_unlock_bios_wp();
+	return 0;
+}
 int mm_read_byte_debug(parse_t * pars_p,char *result_p)
 {
 	unsigned int addr_h,addr_l;
@@ -1121,6 +1126,7 @@ void platform_debug_register(void)
 	register_command ("SPI_READ"			, spi_read_debug , "<spi_dev>,<offset>,<len>:spi_dev 0cpuflash/17a");
 	register_command ("SPI_WRITE"			, spi_write_debug , "<spi_dev>,<offset>,<data>:spi_dev 0cpuflash/17a,data 32bit");
 	register_command ("SPI_WRITE_MAC"			, spi_write_7a_flash_mac_debug , "<eth> <macaddr>, eg 0 11:22:33:44:55:66");
+	register_command ("SPI_UNLOCK_BIOS_WP"			, spi_unlock_bios_wp_debug , "none");
 	register_command ("MM_R_B"			, mm_read_byte_debug , "<base_addr_hi>,<base_addr_lo>");
 	register_command ("MM_R_HW"			, mm_read_hword_debug , "<base_addr_hi>,<base_addr_lo>");
 	register_command ("MM_R_W"			, mm_read_word_debug , "<base_addr_hi>,<base_addr_lo>");

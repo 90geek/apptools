@@ -119,6 +119,11 @@ GetLs7ASpiRegBaseAddr(
   );
 
 VOID
+UnlockFlashWriteProtected (
+  UINTN      BaseRegAddr
+  );
+
+VOID
 SpiFlashErase (
   UINTN      Offset,
   UINTN      Num,
