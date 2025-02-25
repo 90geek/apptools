@@ -17,7 +17,7 @@ OBJS := app_os.o app_platform.o platform_debug.o app_spi.o app_mac_addr.o app_mm
 OBJS += loongson/edk_api.o loongson/mem.o loongson/pwm.o  loongson/spi.o 
 OBJS += loongson/temperature.o loongson/cpu.o loongson/ls7a.o loongson/i2c.o
 OBJS += loongson/mps.o loongson/ChipsetLpc.o loongson/Ls7aGpio.o loongson/Beep.o loongson/Gpio.o
-
+OBJS += loongson/AvsLib.o
 #===============================================================================
 # rules
 #===============================================================================

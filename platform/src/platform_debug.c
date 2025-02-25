@@ -327,14 +327,14 @@ int fan_set_debug(parse_t * pars_p,char *result_p)
 	error=cget_integer(pars_p,0,&max);
 	if (error || max<100)
 	{
-    printf("MaxRpm 10000000 is 5Hz\n");
-    printf("MaxRpm 5000000 is 10Hz\n");
-    printf("MaxRpm 10000 is 5kHz\n");
-    printf("MaxRpm 5000 is 10kHz\n");
-    printf("MaxRpm 2500 is 20kHz\n");
-    printf("MaxRpm 2000 is 25kHz\n");
+		printf("MaxRpm 10000000 is 5Hz\n");
+		printf("MaxRpm 5000000 is 10Hz\n");
+		printf("MaxRpm 10000 is 5kHz\n");
+		printf("MaxRpm 5000 is 10kHz\n");
+		printf("MaxRpm 2500 is 20kHz\n");
+		printf("MaxRpm 2000 is 25kHz\n");
 		printf("MaxRpm is error %d,will used default MaxRpm 2000(25kHz)\n",max);
-    max=2000;
+		max=2000;
 	}
 	if(num>100)
 	{
@@ -353,7 +353,7 @@ int fan_set_freq_debug(parse_t * pars_p,char *result_p)
 	int error;
 	LS7A_SMARTFAN_CFG_TABLE Parameter;
 
-  error=cget_integer(pars_p,0,&pwm);
+	error=cget_integer(pars_p,0,&pwm);
 	if (error)
 	{
 		tag_current_line(pars_p,"-->pwm!");
@@ -380,7 +380,7 @@ int fan_set_freq_debug(parse_t * pars_p,char *result_p)
 	// max 5000  is		10kHz
 	// max 2500  is		20kHz
 	// max 2000  is		25kHz
-  // max*freq=50000000
+	// max*freq=50000000
 	printf("set min %d max %d PwmFreq %d\n", Parameter.MinRpm, Parameter.MaxRpm, GET_TO_PWM_FREQ(max));
 
 	return 0;
@@ -578,7 +578,63 @@ int mps_write_vddn_debug(parse_t * pars_p,char *result_p)
 	printf("node 0x%x,i2cbus 0x%x, mps_addr 0x%x, step %d, volmV %d\n",node,i2cbus, mps_addr, step, volmV);
 	I2cWriteOps(node,i2cbus, mps_addr, step, volmV);
 }
+int avs_read_debug(parse_t * pars_p,char *result_p)
+{
+	int node;
+	unsigned int Val;
+	int error;
 
+	error=cget_integer(pars_p,0,&node);
+	if (error)
+	{
+		tag_current_line(pars_p,"--> node!");
+		return 1;
+	}
+
+	printf("usage:\napptool>AVS_READ 0\n");
+	printf("node %d\n",node);
+	Val = AvsGetVol(node, 0, 0, 4);
+	if (!Val) {
+		printf("AVS: Get Vddn error!\r\n");
+	} else {
+		printf("AVS: Get Vddn value is: 0x%x(%d)\n",Val, Val);
+	}
+	Val = AvsGetVol(node, 1, 0, 4);
+	if (!Val) {
+		printf("AVS: Get Vddp error!\r\n");
+	} else {
+		printf("AVS: Get Vddp value is: 0x%x(%d)\n",Val, Val);
+	}
+}
+
+int avs_write_debug(parse_t * pars_p,char *result_p)
+{
+	int node, vddn,vddp;
+	int error;
+
+	error=cget_integer(pars_p,0,&node);
+	if (error)
+	{
+		tag_current_line(pars_p,"--> node!");
+		return 1;
+	}
+	error=cget_integer(pars_p,0,&vddn);
+	if (error)
+	{
+		tag_current_line(pars_p,"--> vddn!");
+		return 1;
+	}
+
+	error=cget_integer(pars_p,0,&vddp);
+	if (error)
+	{
+		tag_current_line(pars_p,"--> vddp!");
+		return 1;
+	}
+	printf("usage:\napptool>AVS_WTIRE 0 +1050 +1200\n");
+	printf("node %d,vddn 0x%x(%d), vddp 0x%x(%d)\n",node, vddn, vddn, vddp, vddp);
+	AvsAdjustVol (node, vddn, vddp);
+}
 int set_7a_spi_base_addr_debug(parse_t * pars_p,char *result_p)
 {
 	unsigned int addr_h,addr_l;
@@ -1152,4 +1208,6 @@ void platform_debug_register(void)
 	register_command ("READ_CPU_I2C"			, read_cpu_i2c_debug , "<nodeid>,<i2cbase>,<i2cdev>,<reg>,<size>");
 	register_command ("MPS_READ"			, mps_read_debug , "<node> <i2cbus> <mps_addr>,node 0/4/8/16,i2cbus 1fe00120/1fe00130, mps_addr 3b/4b");
 	register_command ("MPS_WRITE_VDDN"			, mps_write_vddn_debug , "<node> <i2cbus> <mps_addr> <step> <volmV>,node 0/4/8/16,i2cbus 1fe00120/1fe00130 mps_addr 3b/4b step +5/+10 volmV +950~+1250");
+	register_command ("AVS_READ"			, avs_read_debug , "<node> ,node 0/1/2/3");
+	register_command ("AVS_WRITE"			, avs_write_debug , "<node> <vddn> <vddp> ,node 0/1/2/3");
 }
