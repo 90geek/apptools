@@ -189,4 +189,19 @@ TisRegWrite8 (
   IN UINT8  Data
   );
 
+UINTN
+SpiRead (
+  IN  UINT8  Dev,
+  IN  UINT8  Cs,
+  VOID       *Buffer,
+  UINTN      Num
+  );
+
+VOID
+SpiWrite (
+  UINT8        Dev,
+  UINT8        Cs,
+  VOID         *Buffer,
+  UINTN        Num
+  );
 #endif

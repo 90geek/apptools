@@ -72,6 +72,20 @@ SpiSetCs1 (
 
   SpiFlashDelayUs (3);
 }
+
+VOID
+SpiCs (
+  UINT8 Cs,
+  INTN Bit
+  )
+{
+
+  if (Cs == 0)
+    SpiFlashSetCs (Bit);
+  else
+    SpiSetCs1 (Bit);
+}
+
 VOID ResetSfcParamReg()
 {
   if(CheckCpu(LS3C5000_VERSION_LO,LS3C5000_VERSION_HI) ||
@@ -777,6 +791,7 @@ SpiTcmRead (
 }
 VOID
 SpiTpmSpiWriteBuffer (
+  UINT8    Cs,
   VOID     *Buffer,
   UINTN    Num
   )
@@ -785,19 +800,20 @@ SpiTpmSpiWriteBuffer (
   UINT8  *Buf = (UINT8 *) Buffer;
   UINTN  Index = 0;
 
-  SpiSetCs1 (0);
+  SpiCs (Cs, 0);
   while (Index < Num) {
     DEBUG((EFI_D_ERROR, "[TCM]: Wx Buf[%x] = 0x%x\n", Index,Buf[Index]));
     Buf[Index] = SpiFlashWriteByteCmd (Buf[Index]);
     DEBUG((EFI_D_ERROR, "[TCM]: Rx Buf[%x] = 0x%x\n", Index,Buf[Index]));
     Index++;
   }
-  SpiSetCs1 (1);
+  SpiCs (Cs, 1);
   SpiFlashWait ();
 }
 
 UINTN
 SpiTpmSpiReadBuffer (
+  IN  UINT8 Cs,
   VOID  *Buffer,
   UINTN  Num
   )
@@ -805,7 +821,7 @@ SpiTpmSpiReadBuffer (
   UINT8  *Buf = (UINT8 *) Buffer;
   UINTN   Index;
 
-  SpiSetCs1 (0);
+  SpiCs (Cs, 0);
   // write reg addr
   while (Index < 4) {
     // DEBUG((EFI_D_ERROR, "[TCM]: Wx Buf[%x] = 0x%x\n", Index,Buf[Index]));
@@ -819,7 +835,7 @@ SpiTpmSpiReadBuffer (
     Buf[Index] = SpiFlashReadByteCmd ();
     // DEBUG((EFI_D_ERROR, "[TCM]: In SpiTpm.c, line %d.Read Buf[%x] = 0x%x\n", __LINE__,Index,Buf[Index]));
   }
-  SpiSetCs1 (1);
+  SpiCs (Cs, 1);
 
   return Index;
 }
@@ -833,10 +849,11 @@ SpiTpmSetRegBase (
 }
 
 UINTN
-SpiTpmRead (
+SpiRead (
+  IN  UINT8  Dev,
+  IN  UINT8  Cs,
   VOID       *Buffer,
-  UINTN      Num,
-  UINTN      BaseRegAddr
+  UINTN      Num
   )
 {
   UINTN Ret;
@@ -845,38 +862,86 @@ SpiTpmRead (
     ASSERT(0);
   }
 
-  SpiTpmSetRegBase(BaseRegAddr);
+  // p to v
+  void * vaddr = NULL;
+  int memoffset=0;
+  UINTN DevBase = 0;
+  if (Dev == 0) {
+    DevBase = GetLs3ASpiRegBaseAddr();
+  }else if (Dev == 1) {
+    if(GetLs7ASpiRegBaseAddr()==0)
+    {
+      printf("7a spi base addr is 0\n");
+      return 0;
+    }
+    DevBase = GetLs7ASpiRegBaseAddr();
+  } else {
+    DEBUG((EFI_D_ERROR, "No Support Device %d, defualt 3a!", Dev));
+    DevBase = GetLs3ASpiRegBaseAddr();
+  }
+  vaddr=p2v_mem_mapping(DevBase, 8, &memoffset);
+  if(vaddr==NULL)
+    return 0;
+ 
+  SpiTpmSetRegBase(vaddr);
   SpiFlashInit ();
-  Ret = SpiTpmSpiReadBuffer (Buffer, Num);
+  Ret = SpiTpmSpiReadBuffer (Cs, Buffer, Num);
   SpiFlashReset ();
   ResetSfcParamReg();
+  // p to v
+  p2v_mem_clean(vaddr, memoffset);
 
   return Ret;
 }
 
 VOID
-SpiTpmWrite (
+SpiWrite (
+  UINT8        Dev,
+  UINT8        Cs,
   VOID         *Buffer,
-  UINTN        Num,
-  UINTN        BaseRegAddr
+  UINTN        Num
   )
 {
   if(!Buffer || INVALID_NUM(Num)){
     ASSERT(0);
   }
 
-  SpiTpmSetRegBase(BaseRegAddr);
+  // p to v
+  void * vaddr = NULL;
+  int memoffset=0;
+  UINTN DevBase = 0;
+  if (Dev == 0) {
+    DevBase = GetLs3ASpiRegBaseAddr();
+  }else if (Dev == 1) {
+    if(GetLs7ASpiRegBaseAddr()==0)
+    {
+      printf("7a spi base addr is 0\n");
+      return ;
+    }
+    DevBase = GetLs7ASpiRegBaseAddr();
+  } else {
+    DEBUG((EFI_D_ERROR, "No Support Device %d, defualt 3a!", Dev));
+    DevBase = GetLs3ASpiRegBaseAddr();
+  }
+  vaddr=p2v_mem_mapping(DevBase,8, &memoffset);
+  if(vaddr==NULL)
+    return ;
+
+  SpiTpmSetRegBase(vaddr);
   SpiFlashInit ();
-  SpiTpmSpiWriteBuffer (Buffer, Num);
+  SpiTpmSpiWriteBuffer (Cs, Buffer, Num);
   SpiFlashReset ();
   ResetSfcParamReg();
+
+  // p to v
+  p2v_mem_clean(vaddr, memoffset);
 }
 
 
 UINT16
 EFIAPI
 ReadSpiTpmVid(
-  VOID
+  UINT8 Cs
   )
 {
   UINT16               VID = 0;
@@ -885,7 +950,7 @@ ReadSpiTpmVid(
   //For Loongson 3A5000 Platform SPI TCM
   // *(volatile UINT16 *)(0x80000efdfe000004 | (22 << 11)) = 0x47;
 
-  SpiTpmWrite (Buffer, 8, LS7ASPIFLASHADDR);
+  SpiWrite (1, 1, Buffer, 8);
   DEBUG((EFI_D_ERROR, ": In SpiTpmLib.c, line %d.Buffer1=%x, Buffer2=%x, Buffer3=%x,Buffer4=%x\n", __LINE__,Buffer[4],Buffer[5],Buffer[6],Buffer[7]));
 
   //read ID from DR
@@ -906,19 +971,7 @@ TisRegRead8(
   )
 {
   UINT8                Data;
-  //UINT32               vare = 1, i = 0;
-  //UINT8                add1,add2,add3,add4;
   UINT8                Buffer[8] = {0x80, 0x0}; //command 0x80 is read 1byte
-  void * vaddr = NULL;
-  int memoffset=0;
-  if(GetLs7ASpiRegBaseAddr()==0)
-  {
-    printf("7a spi base addr is 0\n");
-    return 0;
-  }
-  vaddr=p2v_mem_mapping(GetLs7ASpiRegBaseAddr(),8, &memoffset);
-  if(vaddr==NULL)
-    return 0;
 
   DEBUG((EFI_D_ERROR, "0x%x:",Addr));
   Buffer[1] = (Addr & 0x00ff0000) >> 16;
@@ -926,11 +979,10 @@ TisRegRead8(
   Buffer[3] = Addr & 0x000000ff;
 
   //send command
-  SpiTpmRead (Buffer, 1, (UINTN)vaddr);
+  SpiRead (1, 1, Buffer, 1);
 
   Data = Buffer[0];
   DEBUG((EFI_D_ERROR, ": In SpiTpmLib.c, line %d.Data=%x \n", __LINE__,Data));
-  p2v_mem_clean(vaddr, memoffset);
   return Data;
 }
 
@@ -942,16 +994,7 @@ TisRegWrite8 (
   )
 {
   UINT8                Buffer[8] = {0x03, 0x0}; //command 0x03
-  void * vaddr = NULL;
-  int memoffset=0;
-  if(GetLs7ASpiRegBaseAddr()==0)
-  {
-    printf("7a spi base addr is 0\n");
-    return 0;
-  }
-  vaddr=p2v_mem_mapping(GetLs7ASpiRegBaseAddr(),8, &memoffset);
-  if(vaddr==NULL)
-    return 0;
+
   DEBUG((EFI_D_ERROR, "%x:",Addr));
   Buffer[1] = (Addr & 0x00ff0000) >> 16;
   Buffer[2] = (Addr & 0x0000ff00) >> 8;
@@ -960,8 +1003,7 @@ TisRegWrite8 (
   Buffer[4] = Data;
 
   //send command
-  SpiTpmWrite (Buffer, 5, (UINTN)vaddr);
-  p2v_mem_clean(vaddr, memoffset);
+  SpiWrite (1, 1, Buffer, 5);
 
   return Data;
 }

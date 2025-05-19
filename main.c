@@ -66,7 +66,7 @@ static void ShowUsage(void)
 		"  devmem :devmem cmd,eg devmem addr\n"
 		"  beepon :beep on\n"
 		"  beepoff :beep off\n"
-		"  tpmid :read 7a spi tpm id \n"
+		"  tpmid :read 3A/7a spi tpm id \n"
 		"  clear7acfg :clear 7a flash advanced config\n"
 		"  recovery : Force Recovery Mode"
 		"  cmd :into apptool cmdline \n");
@@ -295,7 +295,7 @@ int main (int argc,char *argv[])
 
 	if (!strcmp(argv[argv_p], "tpmid"))
 	{
-		read_7a_tcm_id();
+		read_tpm_id();
 		goto cleanup;
 	}
 	if (!strcmp(argv[argv_p], "clear7acfg"))

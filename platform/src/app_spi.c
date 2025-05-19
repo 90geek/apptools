@@ -19,14 +19,13 @@ void set_7a_spi_base_addr(U64 base_addr)
 {
 	spi_base_addr=base_addr;
 }
-void read_7a_tcm_id(void)
+void read_tpm_id(void)
 {
 	void * vaddr = NULL;
 	int memoffset=0;
-	// unsigned char datas[100]={0};
 	unsigned int datas=0;
 
-
+// 7A Spi Tpm
 	if(GetLs7ASpiRegBaseAddr()==0)
 	{
 		printf("7a spi base addr is 0\n");
@@ -39,21 +38,21 @@ void read_7a_tcm_id(void)
 	SpiTcmRead ((U64)0x80d40000,(void *)&datas,(U64)1,(U64)vaddr,0);
 	if(datas==0xff)
 	{
-		printf("CS0 No Link!!!\n");
-		goto CS1;
+		printf("7A CS0 No Link!!!\n");
+		goto CS1_7A;
 	}
 	printf("tpm Base Valeu: 0x%x\n",datas);
 	SpiTcmRead ((U64)0x83d40f00,(void *)&datas,(U64)4,(U64)vaddr,0);
 	printf("tpm Vendor Id: 0x%x\n",(datas&0xffff0000)>>16);
 	SpiTcmRead ((U64)0x83d40f04,(void *)&datas,(U64)1,(U64)vaddr,0);
 	printf("tpm rev Id: 0x%x\n\n",(datas&0xff));
-CS1:
+CS1_7A:
 	printf("\n7A spi Cs1:\n");
 	SpiTcmRead ((U64)0x80d40000,(void *)&datas,(U64)1,(U64)vaddr,1);
 	if(datas==0xff)
 	{
-		printf("CS1 No Link!!!\n");
-		goto END;
+		printf("7A CS1 No Link!!!\n");
+		goto END7A;
 	}
 	printf("tpm Base Valeu: 0x%x\n",datas);
 	SpiTcmRead ((U64)0x83d40f00,(void *)&datas,(U64)4,(U64)vaddr,1);
@@ -61,8 +60,43 @@ CS1:
 	printf("tpm DeviceId: 0x%x\n",(datas&0xffff0000)>>16);
 	SpiTcmRead ((U64)0x83d40f04,(void *)&datas,(U64)1,(U64)vaddr,1);
 	printf("tpm rev Id: 0x%x\n\n",(datas&0xff));
-END:
+END7A:
 	p2v_mem_clean(vaddr, memoffset);
+	
+// 3A Spi Tpm
+	vaddr=p2v_mem_mapping(GetLs3ASpiRegBaseAddr(),0xff0, &memoffset);
+	if(vaddr==NULL)
+		return ;
+	printf("\n3A spi Cs0:\n");
+	SpiTcmRead ((U64)0x80d40000,(void *)&datas,(U64)1,(U64)vaddr,0);
+	if(datas==0xff)
+	{
+		printf("3A CS0 No Link!!!\n");
+		goto CS1_3A;
+	}
+	printf("tpm Base Valeu: 0x%x\n",datas);
+	SpiTcmRead ((U64)0x83d40f00,(void *)&datas,(U64)4,(U64)vaddr,0);
+	printf("tpm Vendor Id: 0x%x\n",(datas&0xffff0000)>>16);
+	SpiTcmRead ((U64)0x83d40f04,(void *)&datas,(U64)1,(U64)vaddr,0);
+	printf("tpm rev Id: 0x%x\n\n",(datas&0xff));
+CS1_3A:
+	printf("\n3A spi Cs1:\n");
+	SpiTcmRead ((U64)0x80d40000,(void *)&datas,(U64)1,(U64)vaddr,1);
+	if(datas==0xff)
+	{
+		printf("3A CS1 No Link!!!\n");
+		goto END3A;
+	}
+	printf("tpm Base Valeu: 0x%x\n",datas);
+	SpiTcmRead ((U64)0x83d40f00,(void *)&datas,(U64)4,(U64)vaddr,1);
+	printf("tpm VendorId: 0x%x\n",(datas&0xffff));
+	printf("tpm DeviceId: 0x%x\n",(datas&0xffff0000)>>16);
+	SpiTcmRead ((U64)0x83d40f04,(void *)&datas,(U64)1,(U64)vaddr,1);
+	printf("tpm rev Id: 0x%x\n\n",(datas&0xff));
+
+END3A:
+	p2v_mem_clean(vaddr, memoffset);
+
 }
 void read_7a_tcm(unsigned int offset, unsigned char * datas, int read_cnt, int cs) 
 {
