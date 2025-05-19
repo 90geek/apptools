@@ -21,6 +21,13 @@ AvsGetVol (
   INTN ClkDiv
   );
 
+RETURN_STATUS
+AvsGet (
+  UINT64 TotNode,
+  INTN RailSel,
+  INTN CmdType
+  );
+
 VOID
 AvsAdjustVol (
   UINT64 TotNode,

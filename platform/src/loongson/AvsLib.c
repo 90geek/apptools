@@ -90,6 +90,44 @@ AvsGetVol (
   return 0;
 }
 
+/*RailSel p: 1    n: 0*/
+/*CmdType 
+ * vol:0 Equation: TARGET RAIL VOLTAGE = (Direct value)
+ * cur: 2  Equation: RAIL CURRENT= (Direct value) / 100
+ * temp 3 Equation: TEMPERATURE = (Direct value) / 10
+ * power 5
+*/
+RETURN_STATUS
+AvsGet (
+  UINT64 TotNode,
+  INTN RailSel,
+  INTN CmdType
+  )
+{
+    UINT64 Base;
+    INTN RxDelay=0;
+    INTN ClkDiv=4;
+
+    void * vaddr = NULL;
+    int memoffset=0;
+    vaddr=p2v_mem_mapping(AVS_BASE | (TotNode << NODE_OFFSET),64, &memoffset);
+    if(vaddr==NULL)
+      return EFI_LOAD_ERROR;
+    Base = (UINT64)vaddr;
+    Writel(Base | AVS_CSR, 0x10000 | (ClkDiv << 17) | (0x7 << 25) | (RxDelay << 20));
+    Writel(Base | AVS_MREG, 0xe0000000 | (RailSel << 20) | (CmdType << 24));
+
+    while (Readl(Base | AVS_SREG) & 0x80000000);
+
+    if ((Readl(Base | AVS_SREG) & 0x60000000))
+      return 0;
+    else
+      return (Readl(Base | AVS_SREG) & 0xffff);
+    p2v_mem_clean(vaddr, memoffset);
+
+  return 0;
+}
+
 /* p: 1    n: 0*/
 VOID
 AvsVolPrint (

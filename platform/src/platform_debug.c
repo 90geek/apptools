@@ -580,6 +580,46 @@ int mps_write_vddn_debug(parse_t * pars_p,char *result_p)
 }
 int avs_read_debug(parse_t * pars_p,char *result_p)
 {
+	int node, rail_sel, cmd_type;
+	unsigned int Val;
+	int error;
+
+	error=cget_integer(pars_p,0,&node);
+	if (error)
+	{
+		tag_current_line(pars_p,"--> node!");
+		return 1;
+	}
+
+	error=cget_integer(pars_p,0,&rail_sel);
+	if (error)
+	{
+		tag_current_line(pars_p,"--> rail_sel!");
+		return 1;
+	}
+
+	error=cget_integer(pars_p,0,&cmd_type);
+	if (error)
+	{
+		tag_current_line(pars_p,"--> cmd_type!");
+		return 1;
+	}
+
+	printf("usage:\napptool>AVS_READ 0\n");
+	printf("node %d rail_sel 0x%x cmd_type 0x%x\n",node, rail_sel, cmd_type);
+	Val = AvsGet(node, rail_sel, cmd_type);
+	if (!Val) {
+		printf("AVS: Get Vddn error!\r\n");
+	} else {
+		printf("AVS: Get value is: 0x%x(%d)\n",Val, Val);
+		if(cmd_type == 2)
+			printf("AVS: Get value is: 0x%x(%d)mA\n",Val/100, Val/100);// Equation: RAIL CURRENT= (Direct value) / 100
+	}
+	Val = AvsGet(node, 0, 2);
+			printf("AVS: Get value is: 0x%x(%d)mA\n",Val/100, Val/100);// Equation: RAIL CURRENT= (Direct value) / 100
+}
+int avs_read_vol_debug(parse_t * pars_p,char *result_p)
+{
 	int node;
 	unsigned int Val;
 	int error;
@@ -607,7 +647,7 @@ int avs_read_debug(parse_t * pars_p,char *result_p)
 	}
 }
 
-int avs_write_debug(parse_t * pars_p,char *result_p)
+int avs_write_vol_debug(parse_t * pars_p,char *result_p)
 {
 	int node, vddn,vddp;
 	int error;
@@ -1208,6 +1248,7 @@ void platform_debug_register(void)
 	register_command ("READ_CPU_I2C"			, read_cpu_i2c_debug , "<nodeid>,<i2cbase>,<i2cdev>,<reg>,<size>");
 	register_command ("MPS_READ"			, mps_read_debug , "<node> <i2cbus> <mps_addr>,node 0/4/8/16,i2cbus 1fe00120/1fe00130, mps_addr 3b/4b");
 	register_command ("MPS_WRITE_VDDN"			, mps_write_vddn_debug , "<node> <i2cbus> <mps_addr> <step> <volmV>,node 0/4/8/16,i2cbus 1fe00120/1fe00130 mps_addr 3b/4b step +5/+10 volmV +950~+1250");
-	register_command ("AVS_READ"			, avs_read_debug , "<node> ,node 0/1/2/3");
-	register_command ("AVS_WRITE"			, avs_write_debug , "<node> <vddn> <vddp> ,node 0/1/2/3");
+	register_command ("AVS_READ"			, avs_read_debug , "<node> <rail_sel> <cmd_type>,node 0/1/2/3, rail_sel 0/1 cmd_type 0/2/3/5");
+	register_command ("AVS_READ_VOL"			, avs_read_vol_debug , "<node> ,node 0/1/2/3");
+	register_command ("AVS_WRITE_VOL"			, avs_write_vol_debug , "<node> <vddn> <vddp> ,node 0/1/2/3");
 }
