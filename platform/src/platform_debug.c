@@ -591,13 +591,19 @@ int avs_read_debug(parse_t * pars_p,char *result_p)
 		return 1;
 	}
 
+	/*RailSel p: 1		n: 0*/
 	error=cget_integer(pars_p,0,&rail_sel);
 	if (error)
 	{
 		tag_current_line(pars_p,"--> rail_sel!");
 		return 1;
 	}
-
+	/*CmdType 
+	 * vol:0 Equation: TARGET RAIL VOLTAGE = (Direct value)
+	 * cur: 2  Equation: RAIL CURRENT= (Direct value) / 100
+	 * temp 3 Equation: TEMPERATURE = (Direct value) / 10
+	 * power 5
+	*/
 	error=cget_integer(pars_p,0,&cmd_type);
 	if (error)
 	{
@@ -612,11 +618,16 @@ int avs_read_debug(parse_t * pars_p,char *result_p)
 		printf("AVS: Get Vddn error!\r\n");
 	} else {
 		printf("AVS: Get value is: 0x%x(%d)\n",Val, Val);
-		if(cmd_type == 2)
-			printf("AVS: Get value is: 0x%x(%d)mA\n",Val/100, Val/100);// Equation: RAIL CURRENT= (Direct value) / 100
+		if(cmd_type == 2)// cur
+		{
+			printf("AVS: Get value is: 0x%x(%d)10mA\n",Val, Val);// Equation: RAIL CURRENT= (Direct value) / 100
+			printf("AVS: Get value is: 0x%x(%d)A\n",Val/100, Val/100);// Equation: RAIL CURRENT= (Direct value) / 100
+		}else if(cmd_type == 0 && rail_sel == 0) {// vddn
+			printf("AVS: Get vddn value is: 0x%x(%d)mV\n",Val, Val);// Equation: RAIL CURRENT= (Direct value) / 100
+		}else if(cmd_type == 0 && rail_sel == 1) {// vddp
+			printf("AVS: Get vddp value is: 0x%x(%d)mV\n",Val, Val);// Equation: RAIL CURRENT= (Direct value) / 100
+		}
 	}
-	Val = AvsGet(node, 0, 2);
-			printf("AVS: Get value is: 0x%x(%d)mA\n",Val/100, Val/100);// Equation: RAIL CURRENT= (Direct value) / 100
 }
 int avs_read_vol_debug(parse_t * pars_p,char *result_p)
 {
