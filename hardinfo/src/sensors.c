@@ -9,7 +9,7 @@
 
 int get_sensors(ls_sensors_t *sen)
 {
-	lscpu_tempdetect(&sen->cputemp0,&sen->cputemp1);
+	lscpu_tempdetect(0, &sen->cputemp0,&sen->cputemp1, NULL);
 	// printf("cpu temp0 %d ,temp1 %d\n", sen->cputemp0,sen->cputemp1);
   return 0;
 }

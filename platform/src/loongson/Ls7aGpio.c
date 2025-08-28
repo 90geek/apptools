@@ -27,20 +27,19 @@
 #include "LsRegDef.h"
 #include "loongson3_def.h"
 #include "mem.h"
+#include <stdint.h>
 
 #define WritelBit(addr, BitValue, Area, StartBit) \
-  (*(volatile UINT32*)(addr)) &= (~(Area<<StartBit)); \
-(*(volatile UINT32*)(addr)) |= ((BitValue)<<StartBit)
+  Writel((addr), ((Readl(addr) & (~(Area<<StartBit))) | ((BitValue)<<StartBit)));
 
 #define WritelMatchBit(addr, Value, Area, StartBit) \
-  (*(volatile UINT32*)(addr)) &= (~(Area<<StartBit)); \
-(*(volatile UINT32*)(addr)) |= (Value & (Area<<StartBit))
+  Writel((addr), ((Readl(addr) & (~(Area<<StartBit))) | (Value & (Area<<StartBit))));
 
 #define ReadlBit(addr,Area, StartBit) \
-  (((*(volatile UINT32*)(addr)) & (Area<<StartBit))>>StartBit)
+  Readl(addr) & (Area<<StartBit))>>StartBit
 
 #define ReadlMatchBit(addr,Area, StartBit) \
-  ((*(volatile UINT32*)(addr)) & (Area<<StartBit))
+  Readl(addr) & (Area<<StartBit)
 
 
 //
@@ -68,9 +67,9 @@
 #define LS7A_PWM_REG_OFFSET_LOW          (0x04)
 #define LS7A_PWM_REG_OFFSET_FULL         (0x08)
 #define LS7A_PWM_REG_OFFSET_CTRL         (0x0C)
-#define LS7A_PWMn_REG_ADDR_CTRL(PWM)     (LS7A_PWM0_REG_BASE + (PWM<<0x08) + LS7A_PWM_REG_OFFSET_CTRL)
-#define LS7A_PWMn_REG_ADDR_FULL(PWM)     (LS7A_PWM0_REG_BASE + (PWM<<0x08) + LS7A_PWM_REG_OFFSET_FULL)
-#define LS7A_PWMn_REG_ADDR_LOW(PWM)      (LS7A_PWM0_REG_BASE + (PWM<<0x08) + LS7A_PWM_REG_OFFSET_LOW)
+#define LS7A_PWMn_REG_ADDR_CTRL(PWM)     (uintptr_t)(LS7A_PWM0_REG_BASE + (PWM<<0x08) + LS7A_PWM_REG_OFFSET_CTRL)
+#define LS7A_PWMn_REG_ADDR_FULL(PWM)     (uintptr_t)(LS7A_PWM0_REG_BASE + (PWM<<0x08) + LS7A_PWM_REG_OFFSET_FULL)
+#define LS7A_PWMn_REG_ADDR_LOW(PWM)      (uintptr_t)(LS7A_PWM0_REG_BASE + (PWM<<0x08) + LS7A_PWM_REG_OFFSET_LOW)
 
 /*************************************
  * Function: Enable PwmCh device.

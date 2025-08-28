@@ -93,6 +93,7 @@ void LsCpuI2cRead(
    UINTN                                DevAddr,
    UINTN                                Reg,
    UINT8                                Size,
-   VOID                                 *Buffer
+   VOID                                 *Buffer,
+   UINTN                                BusRate
     );
 #endif

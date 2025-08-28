@@ -34,7 +34,7 @@
 #define ALGORITHM_3A 0x3a
 #define ALGORITHM_7A 0x7a
 #define I2C_CTL_CLK        100000         //BASE_CLK (Unit Khz)  
-#define I2C_BUS_RATE       42
+#define I2C_BUS_RATE       42 //Unit Kbps
 /**
   Initialize and set the I2c Control Information.
 
@@ -259,16 +259,23 @@ void LsCpuI2cRead(
    UINTN                                DevAddr,
    UINTN                                Reg,
    UINT8                                Size,
-   VOID                                 *Buffer
+   VOID                                 *Buffer,
+   UINTN                                BusRate
     )
 {
   void * vaddr = NULL;
   int memoffset=0;
   UINT64 Addr;
   Addr = BaseAddr | ((UINT64)NodeId << NODE_OFFSET);
-  printf("Nodeid %d i2cbase 0x%llx,devaddr 0x%x, reg 0x%x, size %d\n",NodeId,Addr,DevAddr,Reg,Size);
+  printf("Nodeid %d i2cbase 0x%llx,devaddr 0x%x, reg 0x%x, size %d, bus_rate %d\n",NodeId,Addr,DevAddr,Reg,Size, BusRate);
   vaddr=p2v_mem_mapping(Addr,0x100, &memoffset);
-  I2cInitSetFreq ((UINTN)vaddr, I2C_CTL_CLK, I2C_BUS_RATE, ALGORITHM_3A);
+  if(BusRate>400 || BusRate<=0)
+  {
+    printf("Warning:bus_rate %d is no support,use default %d\n",BusRate, I2C_BUS_RATE);
+    I2cInitSetFreq ((UINTN)vaddr, I2C_CTL_CLK, I2C_BUS_RATE, ALGORITHM_3A);
+  }
+  else
+    I2cInitSetFreq ((UINTN)vaddr, I2C_CTL_CLK, BusRate, ALGORITHM_3A);
   I2cCtlRead ((UINTN)vaddr, DevAddr, Reg, Size, Buffer);
   p2v_mem_clean(vaddr, memoffset);
 }

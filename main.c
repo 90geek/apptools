@@ -68,7 +68,8 @@ static void ShowUsage(void)
 		"  beepoff :beep off\n"
 		"  tpmid :read 3A/7a spi tpm id \n"
 		"  clear7acfg :clear 7a flash advanced config\n"
-		"  recovery : Force Recovery Mode"
+		"  recovery : Force Recovery Mode\n"
+		"  info :get cpu info\n"
 		"  cmd :into apptool cmdline \n");
 }
 static void read_mac_addr(int argc, char *argv[])
@@ -184,6 +185,11 @@ int main (int argc,char *argv[])
 		return Ret;
 	}
 
+	if (!strcmp(argv[argv_p], "info"))
+	{
+		GetCpuInfo();
+		return Ret;
+	}
 	if (!strcmp(argv[argv_p], "dmi"))
 	{
 #ifdef DMIDECODE_SUPPORT

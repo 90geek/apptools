@@ -883,7 +883,7 @@ SpiRead (
   if(vaddr==NULL)
     return 0;
  
-  SpiTpmSetRegBase(vaddr);
+  SpiTpmSetRegBase((UINTN)vaddr);
   SpiFlashInit ();
   Ret = SpiTpmSpiReadBuffer (Cs, Buffer, Num);
   SpiFlashReset ();
@@ -927,7 +927,7 @@ SpiWrite (
   if(vaddr==NULL)
     return ;
 
-  SpiTpmSetRegBase(vaddr);
+  SpiTpmSetRegBase((UINTN)vaddr);
   SpiFlashInit ();
   SpiTpmSpiWriteBuffer (Cs, Buffer, Num);
   SpiFlashReset ();

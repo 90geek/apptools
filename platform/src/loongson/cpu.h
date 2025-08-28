@@ -25,6 +25,7 @@
 #define  _CPU_FREQ_H_
 
 #include "edk_api.h"
+#include "loongson3_def.h"
 
 EFI_STATUS
 EFIAPI
@@ -36,5 +37,19 @@ CpuGetFrequency (
 UINT8 CheckCpu(
 	UINT64 cpuid_l,
 	UINT64 cpuid_h
+);
+
+UINT8 CheckCpuName(
+	CHAR8 *CpuName
+);
+
+EFI_STATUS
+EFIAPI
+GetCpuId (
+	CpuId *CpuId
+);
+
+UINT8 GetCpuInfo(
+  VOID
 );
 #endif

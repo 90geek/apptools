@@ -263,6 +263,8 @@ int app_msg_send_no_wait(int msg_id,msg_buf_t  *msg_buf, int len);
  flag = 0 , no wait*/
 int  app_msg_receive(int msg_id,msg_buf_t  *msg_buf,int len,int flag);
 
+void app_ascii_to_str(const char* codes, int len, char* output);
+void app_str_to_ascii(const char* str, char* output);
 void app_print_data(unsigned char *buf,int size);
 
 void app_ProgressInit(void);

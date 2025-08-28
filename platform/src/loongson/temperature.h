@@ -26,7 +26,7 @@
 
 #include "edk_api.h"
 
-UINT8 lscpu_tempdetect(UINT32 *temp0,UINT32 *temp1);
+UINT8 lscpu_tempdetect(UINT8 node, UINT32 *temp0,UINT32 *temp1, UINT32 *temp428);
 UINT8 ls7a_tempdetect(UINT32 *temp0);
 
 #endif

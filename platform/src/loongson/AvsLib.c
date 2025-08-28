@@ -19,8 +19,11 @@
 
 **/
 
-#include "loongson/LsRegDef.h"
+#include "LsRegDef.h"
 #include "edk_api.h"
+#include <stdio.h>
+#include <string.h>
+#include "mem.h"
 
 #define AVS_BASE PHYS_TO_UNCACHED(0x1fe00160)
 #define AVS_CSR  0
@@ -42,7 +45,7 @@ AvsSetVol (
     int memoffset=0;
     vaddr=p2v_mem_mapping(AVS_BASE | (TotNode << NODE_OFFSET),64, &memoffset);
     if(vaddr==NULL)
-      return EFI_LOAD_ERROR;
+      return ;
     Base = (UINT64)vaddr;
     if ((Vol < 600) || (Vol > 1300)) {
       printf("\r\nAVS: Set Vol range error!!!\r\n");

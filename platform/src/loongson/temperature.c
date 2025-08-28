@@ -26,15 +26,27 @@
 #include "mem.h"
 #include "platform/app_platform.h"
 
-UINT8 lscpu_tempdetect(UINT32 *temp0,UINT32 *temp1)
+UINT8 lscpu_tempdetect(UINT8 node, UINT32 *temp0,UINT32 *temp1, UINT32 *temp428)
 {
 	UINT32 Data = 0;
 	UINT16 TempSensorDigital0,TempSensorDigital1; //UINT16
 	INT8	 TempSensorAnalog0,TempSensorAnalog1;		//INT8 (-40 - 125)
 	void * vaddr = NULL;
 	int memoffset;
+	UINT64 Base;
+	Base= CPU_TEMP_428_SAMPLE_BASE | ((UINT64)node<<NODE_OFFSET);
 
-  vaddr=p2v_mem_mapping(CPU_TEMP_SAMPLE_BASE +TEMP_SENSOR_VALUE_OFFSET,4,&memoffset);
+  vaddr=p2v_mem_mapping(Base,4,&memoffset);
+	if(vaddr==NULL)
+		return EFI_LOAD_ERROR;
+	Data = Read32((U64)vaddr);
+	p2v_mem_clean(vaddr,memoffset);
+	// printf("Cpu Temp reg428 %d\n",Data);
+	if(temp428 != NULL)
+		*temp428=Data;
+
+	Base= CPU_TEMP_SAMPLE_BASE | ((UINT64)node<<NODE_OFFSET);
+  vaddr=p2v_mem_mapping(Base +TEMP_SENSOR_VALUE_OFFSET,4,&memoffset);
 	if(vaddr==NULL)
 		return EFI_LOAD_ERROR;
 	Data = Read32((U64)vaddr);
@@ -42,16 +54,32 @@ UINT8 lscpu_tempdetect(UINT32 *temp0,UINT32 *temp1)
 
 	TempSensorDigital0 = Data & 0xffff;
 	TempSensorDigital1 = (Data & (0xffff << 16)) >> 16; //48-32 16
-	//Calculate Temp
-	TempSensorAnalog0 = TempSensorDigital0 * 731 / 0x4000 - 273 ;
-	TempSensorAnalog1 = TempSensorDigital1 * 731 / 0x4000 - 273 ;
-	// *(INT8 *)Temperature = (TempSensorAnalog0 + TempSensorAnalog1) / 2;
-	*temp0=TempSensorAnalog0;
-	if(CheckCpu(LS2K2000_VERSION,0))
-		*temp1=TempSensorAnalog0;
+	if(CheckCpuName("3C6000/S") ||
+		CheckCpuName("3C6000/D") ||
+		CheckCpuName("3C6000/Q") ||
+		CheckCpuName("3A6000") ||
+		CheckCpuName("3B6000")
+			)
+	{
+		TempSensorAnalog0 = TempSensorDigital0 * 820 / 0x4000 - 311 ;
+		TempSensorAnalog1 = TempSensorDigital1 * 820 / 0x4000 - 311 ;
+	}
 	else
-		*temp1=TempSensorAnalog1;
-
+	{
+		//Calculate Temp
+		TempSensorAnalog0 = TempSensorDigital0 * 731 / 0x4000 - 273 ;
+		TempSensorAnalog1 = TempSensorDigital1 * 731 / 0x4000 - 273 ;
+	}
+	// *(INT8 *)Temperature = (TempSensorAnalog0 + TempSensorAnalog1) / 2;
+	if(temp0 != NULL)
+		*temp0=TempSensorAnalog0;
+	if(temp1 != NULL)
+	{
+		if(CheckCpu(LS2K2000_VERSION,0))
+			*temp1=TempSensorAnalog0;
+		else
+			*temp1=TempSensorAnalog1;
+	}
 	return EFI_SUCCESS;
 }
 

@@ -26,7 +26,6 @@
 #ifndef __LS3A_DEF_H__
 #define __LS3A_DEF_H__
 
-#include "loongson/LsRegDef.h"
 #include "edk_api.h"
 
 #define LS3A4000_VERSION                        0x0000303030344133 /* 3A4000 */

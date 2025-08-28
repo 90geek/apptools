@@ -440,7 +440,7 @@ UINT8 TempToPercent(
 	UINT32 temp0,temp1, temp;
 	UINT8 Percent;
 
-	Status = lscpu_tempdetect(&temp0,&temp1);
+	Status = lscpu_tempdetect(0,&temp0,&temp1,NULL);
 	if(Status!=EFI_SUCCESS)
 		return 0;
 
@@ -489,7 +489,7 @@ UINT8 TempToPercent_LangChao(
 	UINT32 temp0,temp1, temp;
 	UINT8 Percent;
 
-	Status = lscpu_tempdetect(&temp0,&temp1);
+	Status = lscpu_tempdetect(0, &temp0,&temp1, NULL);
 	if(Status!=EFI_SUCCESS)
 		return 50;
 

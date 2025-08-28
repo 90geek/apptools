@@ -460,7 +460,20 @@ int  app_msg_receive(int msg_id,msg_buf_t  *msg_buf,int len,int flag)
 
 	return status;		
 }
+// ASCII码数组转字符串
+void app_ascii_to_str(const char* codes, int len, char* output) {
+    for (int i = 0; i < len; i++) {
+        output[i] = (char)(codes[i] & 0x7F); // 只保留7位ASCII
+    }
+    output[len] = '\0';
+}
 
+// 字符串转ASCII码数组
+void app_str_to_ascii(const char* str, char* output) {
+    for (int i = 0; str[i] != '\0'; i++) {
+        output[i] = (char)str[i];
+    }
+}
 void app_print_data(unsigned char *buf,int size)
 {
 	int tmp=0;

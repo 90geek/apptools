@@ -4,6 +4,7 @@
 #include "i2c.h"
 #include "platform/app_types.h"
 #include "platform/app_os.h"
+#include "LsRegDef.h"
 
 //#define SPI_CONFUSE_SPACE (0x0efdfe000000 + 0x8000/*Need 4K align*/ ) //b000 is Spi,so add 0x3000
 //#define MPS_ADDR 0x3b //single

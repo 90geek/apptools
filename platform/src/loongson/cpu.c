@@ -30,6 +30,26 @@
 #define LS3A_CPU_FREQ_CONFIG_BASE  PHYS_TO_UNCACHED(0x1fe001b0)  //Frequency configuration register
 #define LS2K_CPU_FREQ_CONFIG_BASE  PHYS_TO_UNCACHED(0x100104a0)  //Frequency configuration register
 
+void CpuIdToCpuName(CpuId Value, UINT8* Output) {
+	UINT8 i;
+	UINT8 CpuIdArray[16]={0};
+	for (i = 0; i < 8; i++) {
+			CpuIdArray[i] = (Value.l >> (8 * i)) & 0xFF;
+	}
+	for (; i < 16; i++) {
+			CpuIdArray[i] = (Value.h >> (8 * i)) & 0xFF;
+	}
+	app_ascii_to_str((char *)CpuIdArray,sizeof(CpuIdArray) , Output);
+}
+
+void CpuNameToCpuId(UINT8* CpuName, CpuId *Output) {
+	UINT8 i;
+	UINT8 CpuIdArray[16]={0};
+	app_str_to_ascii(CpuName, CpuIdArray);
+	Output->l=*(UINT64 *)CpuIdArray;
+	Output->h=*(UINT64 *)(CpuIdArray + 8);
+}
+
 /**
 	This module is Get the operating frequency of the processor.
 
@@ -109,7 +129,48 @@ GetCpuId (
 	 p2v_mem_clean(vaddr, memoffset);
 	 return EFI_SUCCESS;
 }
+UINT8 GetCpuInfo(
+	VOID
+)
+{
+	CpuId CpuId,ToCpuId;
+	EFI_STATUS Status;
+	CHAR8 CpuName[20]={0};
+	
+	Status = GetCpuId(&CpuId);
+	if(Status!=EFI_SUCCESS)
+		return 0;
+	printf("CpuId.l 0x%llx\n",CpuId.l);
+	printf("CpuId.h 0x%llx\n",CpuId.h);
+	CpuIdToCpuName(CpuId, CpuName);
+	printf("CPU Name:%s\n", CpuName);
+	CpuNameToCpuId(CpuName, &ToCpuId);
+	printf("CpuName to CpuId.l 0x%llx\n",ToCpuId.l);
+	printf("CpuName to CpuId.h 0x%llx\n",ToCpuId.h);
+	return 0;
+}
+//
+// check cpu id
+//
+UINT8 CheckCpuName(
+	CHAR8 *CpuName
+)
+{
+	CpuId CpuId,ToCpuId;
+	EFI_STATUS Status;
+	
+	CpuNameToCpuId(CpuName, &ToCpuId);
+	Status = GetCpuId(&CpuId);
+	if(Status!=EFI_SUCCESS)
+		return 0;
 
+	if(CpuId.l==ToCpuId.l&&	\
+		CpuId.h==ToCpuId.h)
+	{
+		return 1;
+	}
+	return 0;
+}
 //
 // check cpu id
 //

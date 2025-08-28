@@ -7,7 +7,7 @@
 int read_cpu_i2c_debug(parse_t * pars_p,char *result_p)
 {
 	int error;
-	int nodeid=0,base,dev,size;
+	int nodeid=0,base,dev,size,bus_rate;
 	int reg;
 	unsigned char buf[100]={0};
 
@@ -41,11 +41,17 @@ int read_cpu_i2c_debug(parse_t * pars_p,char *result_p)
 		tag_current_line(pars_p,"-->size!");
 		return 1;
 	}
+	error=cget_integer(pars_p,0,&bus_rate);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->bus_rate!");
+		return 1;
+	}
 	if(size>100)
 		size=99;
-	printf("usage:\napptool>READ_CPU_I2C 0 1fe00130 4b 8b 2\n");
-	LsCpuI2cRead(nodeid,base,dev,reg,size,(void *)buf);
-	printf("read cpu %d i2cbase 0x%x,devaddr 0x%x, reg 0x%x, size %d\n",nodeid,base,dev,reg,size);
+	printf("usage:\napptool>READ_CPU_I2C 0 1fe00130 4b 8b 2 42\n");
+	LsCpuI2cRead(nodeid,base,dev,reg,size,(void *)buf, bus_rate);
+	printf("read cpu %d i2cbase 0x%x,devaddr 0x%x, reg 0x%x, size %d, Bus_rate\n",nodeid,base,dev,reg,size, bus_rate);
 	app_print_data(buf,size);
 	return 0;
 }
@@ -409,10 +415,20 @@ int fan_ctrl_debug(parse_t * pars_p,char *result_p)
 }
 int read_cpu_temp_debug(parse_t * pars_p,char *result_p)
 {
-	U32 temp0,temp1;
+	U32 temp0,temp1,temp428;
+	int node;
+	int error;
 
-	lscpu_tempdetect(&temp0,&temp1);
-	printf("cpu temp0 %d ,temp1 %d\n", temp0,temp1);
+	error=cget_integer(pars_p,0,&node);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->node!");
+		return 1;
+	}
+
+	printf("node %d\n", node);
+	lscpu_tempdetect(node,&temp0,&temp1,&temp428);
+	printf("cpu temp0 %d ,temp1 %d, temp428 %d\n", temp0,temp1,temp428);
 	return 0;
 }
 int read_7a_temp_debug(parse_t * pars_p,char *result_p)
@@ -1256,7 +1272,7 @@ void platform_debug_register(void)
 	register_command ("LSCPU_GPIO_SET"			, cpu_gpio_set_debug , "<mode>0:low,1:hi,2:get,<gpionum>0~31 ");
 	register_command ("LSCPU_GPIO_PWMBEEP"			, lscpu_gpio_pwmbeep_on_debug , "<keepms>1~,<pwmfreq>1~ ");
 	register_command ("READ_CPUCFG"			, read_cpucfg_debug , "<reg>");
-	register_command ("READ_CPU_I2C"			, read_cpu_i2c_debug , "<nodeid>,<i2cbase>,<i2cdev>,<reg>,<size>");
+	register_command ("READ_CPU_I2C"			, read_cpu_i2c_debug , "<nodeid>,<i2cbase>,<i2cdev>,<reg>,<size> <bus_rate>");
 	register_command ("MPS_READ"			, mps_read_debug , "<node> <i2cbus> <mps_addr>,node 0/4/8/16,i2cbus 1fe00120/1fe00130, mps_addr 3b/4b");
 	register_command ("MPS_WRITE_VDDN"			, mps_write_vddn_debug , "<node> <i2cbus> <mps_addr> <step> <volmV>,node 0/4/8/16,i2cbus 1fe00120/1fe00130 mps_addr 3b/4b step +5/+10 volmV +950~+1250");
 	register_command ("AVS_READ"			, avs_read_debug , "<node> <rail_sel> <cmd_type>,node 0/1/2/3, rail_sel 0/1 cmd_type 0/2/3/5");

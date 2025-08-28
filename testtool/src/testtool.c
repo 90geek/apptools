@@ -33,6 +33,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <stdint.h>
 
 
 #include "testtool/testtool.h"
@@ -1044,9 +1045,9 @@ int find_string(parse_t *pars_p,char *result_p)
        address=base;
        while(address<(base+length))
         {
-         if (*((char *)address)==string[0])
+         if (*((char *)(uintptr_t)address)==string[0])
           {
-           if (memcmp((char *)address,string,strlen(string))==0)
+           if (memcmp((char *)(uintptr_t)address,string,strlen(string))==0)
             {
              print("Match found at #%lx\n",address);
              match   = address;
