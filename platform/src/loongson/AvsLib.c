@@ -109,7 +109,7 @@ AvsGet (
 {
     UINT64 Base;
     INTN RxDelay=0;
-    INTN ClkDiv=4;
+    INTN ClkDiv=3;
 
     void * vaddr = NULL;
     int memoffset=0;
@@ -138,14 +138,14 @@ AvsVolPrint (
   )
 {
   UINT32 Val;
-  Val = AvsGetVol(TotNode, 0, 0, 4);
+  Val = AvsGetVol(TotNode, 0, 0, 3);
   if (!Val) {
     printf("AVS: Get Vddn error!\r\n");
   } else {
     printf("AVS: Get Vddn value is: 0x%x",Val);
     printf("\r\n");
   }
-  Val = AvsGetVol(TotNode, 1, 0, 4);
+  Val = AvsGetVol(TotNode, 1, 0, 3);
   if (!Val) {
     printf("AVS: Get Vddp error!\r\n");
   } else {
@@ -162,8 +162,8 @@ AvsAdjustVol (
   )
 {
   /* set vddn */
-  AvsSetVol(TotNode, 0, Vddn, 0, 4);
+  AvsSetVol(TotNode, 0, Vddn, 0, 3);
   /* set vddp */
-  AvsSetVol(TotNode, 1, Vddp, 0, 4);
+  AvsSetVol(TotNode, 1, Vddp, 0, 3);
   AvsVolPrint(TotNode);
 }

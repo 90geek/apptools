@@ -631,7 +631,7 @@ int avs_read_debug(parse_t * pars_p,char *result_p)
 	printf("node %d rail_sel 0x%x cmd_type 0x%x\n",node, rail_sel, cmd_type);
 	Val = AvsGet(node, rail_sel, cmd_type);
 	if (!Val) {
-		printf("AVS: Get Vddn error!\r\n");
+		printf("AVS: Get error!\r\n");
 	} else {
 		printf("AVS: Get value is: 0x%x(%d)\n",Val, Val);
 		if(cmd_type == 2)// cur
@@ -660,13 +660,13 @@ int avs_read_vol_debug(parse_t * pars_p,char *result_p)
 
 	printf("usage:\napptool>AVS_READ 0\n");
 	printf("node %d\n",node);
-	Val = AvsGetVol(node, 0, 0, 4);
+	Val = AvsGetVol(node, 0, 0, 3);
 	if (!Val) {
 		printf("AVS: Get Vddn error!\r\n");
 	} else {
 		printf("AVS: Get Vddn value is: 0x%x(%d)\n",Val, Val);
 	}
-	Val = AvsGetVol(node, 1, 0, 4);
+	Val = AvsGetVol(node, 1, 0, 3);
 	if (!Val) {
 		printf("AVS: Get Vddp error!\r\n");
 	} else {
