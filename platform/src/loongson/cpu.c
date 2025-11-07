@@ -29,6 +29,7 @@
 
 #define LS3A_CPU_FREQ_CONFIG_BASE  PHYS_TO_UNCACHED(0x1fe001b0)  //Frequency configuration register
 #define LS2K_CPU_FREQ_CONFIG_BASE  PHYS_TO_UNCACHED(0x100104a0)  //Frequency configuration register
+#define LS2K3000_CPU_FREQ_CONFIG_BASE  PHYS_TO_UNCACHED(0x10010480)
 
 void CpuIdToCpuName(CpuId Value, UINT8* Output) {
 	UINT8 i;
@@ -63,8 +64,9 @@ void CpuNameToCpuId(UINT8* CpuName, CpuId *Output) {
 EFI_STATUS
 EFIAPI
 CpuGetFrequency (
-	IN UINT32	clk_ref,
-	OUT VOID				*Frequency //&UINT32 Mhz
+	IN UINT32 clk_ref,
+	OUT VOID *Frequency, //&UINT32 Mhz
+	IN	UINTN NodeNum
 	)
 {
 	UINT32 Data = 0;
@@ -75,9 +77,11 @@ CpuGetFrequency (
 	void * vaddr = NULL;
 	int memoffset=0;
 
-	if(CheckCpu(LS2K2000_VERSION,0))
+	if(CheckCpuName("2K2000AA") ||
+			CheckCpuName("2K2000BA")
+		)
 	{
-		 vaddr=p2v_mem_mapping(LS2K_CPU_FREQ_CONFIG_BASE,4, &memoffset);
+		 vaddr=p2v_mem_mapping(LS2K_CPU_FREQ_CONFIG_BASE  | (NodeNum << NODE_OFFSET),4, &memoffset);
 		 if(vaddr==NULL)
 			return EFI_LOAD_ERROR;
 
@@ -89,9 +93,27 @@ CpuGetFrequency (
 		 DivRefc = (Data & 0x7f); //L1 PLL PARAM: DIV_REFC
 		 p2v_mem_clean(vaddr, memoffset);
 	}
+	else if(CheckCpuName("2K3000") ||
+			CheckCpuName("2K3000L") ||
+			CheckCpuName("2K3000-H") ||
+			CheckCpuName("2K3000-K") ||
+			CheckCpuName("3B6000M") ||
+			CheckCpuName("3B6000M/4")
+			)
+	{
+		 vaddr=p2v_mem_mapping(LS2K3000_CPU_FREQ_CONFIG_BASE  | (NodeNum << NODE_OFFSET),4, &memoffset);
+		 if(vaddr==NULL)
+			return EFI_LOAD_ERROR;
+		 Data = Read32((U64)vaddr);
+		 CoreDiv = (Data & 0x7f);//L1 PLL PARAM: DIV_OUT
+		 CoreLoopc = (Data & 0x3fe00000) >> 21;//L1 PLL PARAM: DIV_LOOPC
+		 Data = Read32((U64)vaddr + 0x4);
+		 DivRefc = (Data & 0x7f); //L1 PLL PARAM: DIV_REFC
+		 p2v_mem_clean(vaddr, memoffset);
+	}
 	else
 	{
-		 vaddr=p2v_mem_mapping(LS3A_CPU_FREQ_CONFIG_BASE,4, &memoffset);
+		 vaddr=p2v_mem_mapping(LS3A_CPU_FREQ_CONFIG_BASE  | (NodeNum << NODE_OFFSET),4, &memoffset);
 		 if(vaddr==NULL)
 			return EFI_LOAD_ERROR;
 

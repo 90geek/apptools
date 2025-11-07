@@ -31,7 +31,8 @@ EFI_STATUS
 EFIAPI
 CpuGetFrequency (
 	IN UINT32	clk_ref,
-	OUT VOID				*Frequency //&UINT32 Mhz
+	OUT VOID				*Frequency, //&UINT32 Mhz
+	IN	UINTN NodeNum
 	);
 
 UINT8 CheckCpu(

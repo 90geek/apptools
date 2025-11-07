@@ -443,9 +443,18 @@ int read_7a_temp_debug(parse_t * pars_p,char *result_p)
 int read_cpu_freq_debug(parse_t * pars_p,char *result_p)
 {
 	U32 freq;
+	int node;
+	int error;
 
-	CpuGetFrequency (100000,&freq);
-	printf("cpu freq %d\n", freq);
+	error=cget_integer(pars_p,0,&node);
+	if (error)
+	{
+		tag_current_line(pars_p,"-->node!");
+		return 1;
+	}
+
+	CpuGetFrequency (100000,&freq, node);
+	printf("cpu %d freq %d\n", node freq);
 	return 0;
 }
 int dump_acpi_reg_debug(parse_t * pars_p,char *result_p)
@@ -1239,7 +1248,7 @@ void platform_debug_register(void)
 	register_command ("LS_FAN_CTRL"		, fan_ctrl_debug , "<NONE>");
 	register_command ("LS_CPU_TEMP"			, read_cpu_temp_debug , "<NONE>");
 	register_command ("LS_7A_TEMP"			, read_7a_temp_debug , "<NONE>");
-	register_command ("LS_CPU_FREQ"			, read_cpu_freq_debug , "<NONE>");
+	register_command ("LS_CPU_FREQ"			, read_cpu_freq_debug , "<node_num>");
 	register_command ("LS_DUMP_ACPI"			, dump_acpi_reg_debug , "<num>:0 dump acpi reg,1 apci reboot");
 	register_command ("LS_WRITE_ACPI"			, write_acpi_reg_debug , "<reg>:acpi reg, <data>write velue");
 	register_command ("LS_DUMP_GPIO"			, dump_gpio_reg_debug , "<NONE>");

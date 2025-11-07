@@ -70,6 +70,8 @@ static void ShowUsage(void)
 		"  clear7acfg :clear 7a flash advanced config\n"
 		"  recovery : Force Recovery Mode\n"
 		"  info :get cpu info\n"
+		"  cputemp <node>:get cpu tempdetect,eg cputemp 0\n"
+		"  7atemp :get bridge tempdetect\n"
 		"  cmd :into apptool cmdline \n");
 }
 static void read_mac_addr(int argc, char *argv[])
@@ -343,6 +345,28 @@ int main (int argc,char *argv[])
 	if (!strcmp(argv[argv_p], "beepoff"))
 	{
 		BeepOff ();
+		goto cleanup;
+	}
+
+	if (!strcmp(argv[argv_p], "cputemp"))
+	{
+		argv_c--;
+		argv_p++;
+		if (argv_c < 1)
+			goto _show_usage;
+		U32 temp0,temp1,temp428;
+		int node =atoi(argv[argv_p]) ;
+		printf("node %d\n", node);
+		lscpu_tempdetect(node, &temp0, &temp1, &temp428);
+		printf("cpu temp0 %d ,temp1 %d, temp428 %d\n", temp0,temp1,temp428);
+		goto cleanup;
+	}
+
+	if (!strcmp(argv[argv_p], "7atemp"))
+	{
+		U32 temp0;
+		ls7a_tempdetect(&temp0);
+		printf("7a temp0 %d n", temp0);
 		goto cleanup;
 	}
 
